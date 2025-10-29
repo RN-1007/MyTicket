@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Selamat Datang - Travel App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+
+    <div th:replace="~{fragment/user-navbar :: navbar}"></div>
+
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-6">Pesan Perjalanan Anda</h1>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Hotels</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div th:each="hotel : ${hotels}" class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-xl font-bold" th:text="${hotel.name}">Nama Hotel</h3>
+                    <p class="text-gray-600" th:text="${hotel.location}">Lokasi</p>
+                    <p class="text-yellow-500" th:text="${hotel.stars} + ' Bintang'">5 Bintang</p>
+                    
+                    <div th:each="room : ${hotel.rooms}" class="mt-4 border-t pt-2">
+                        <form th:action="@{/order/create}" method="post">
+                            <p class="font-semibold" th:text="${room.roomType}">Tipe Kamar</p>
+                            <p th:text="'Kapasitas: ' + ${room.capacity} + ' orang'">Kapasitas</p>
+                            <p class="text-blue-600" th:text="'Rp ' + ${#numbers.formatDecimal(room.price, 0, 'POINT', 0, 'COMMA')}">Harga</p>
+                            
+                            <input type="hidden" name="itemType" value="Hotel" />
+                            <input type="hidden" name="itemId" th:value="${room.roomId}" />
+                            
+                            <label>Jumlah:</label>
+                            <input type="number" name="quantity" value="1" min="1" class="w-20 border rounded p-1">
+                            <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded text-sm">Pesan</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4">Attractions</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div th:each="attraction : ${attractions}" class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-xl font-bold" th:text="${attraction.name}">Nama Atraksi</h3>
+                    <p class="text-gray-600" th:text="${attraction.location}">Lokasi</p>
+                    
+                    <div th:each="ticket : ${attraction.tickets}" class="mt-4 border-t pt-2">
+                         <form th:action="@{/order/create}" method="post">
+                            <p class="font-semibold" th:text="'Tiket ' + ${#dates.format(ticket.validDate, 'dd-MMM-yyyy')}">Detail Tiket</p>
+                            <p class="text-green-600" th:text="'Rp ' + ${#numbers.formatDecimal(ticket.price, 0, 'POINT', 0, 'COMMA')}">Harga</p>
+
+                            <input type="hidden" name="itemType" value="Attraction" />
+                            <input type="hidden" name="itemId" th:value="${ticket.attractionTicketId}" />
+                            <label>Jumlah:</label>
+                            <input type="number" name="quantity" value="1" min="1" class="w-20 border rounded p-1">
+                            <button type="submit" class="bg-green-500 text-white px-3 py-1 rounded text-sm">Pesan</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-semibold mb-4">Transports</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div th:each="transport : ${transports}" class="bg-white p-4 rounded-lg shadow">
+                    <h3 class="text-xl font-bold" th:text="${transport.name}">Nama Transport</h3>
+                    <p class="text-gray-600" th:text="${transport.provider.name} + ' (' + ${transport.provider.type} + ')'">Penyedia</p>
+                    
+                    <div th:each="ticket : ${transport.tickets}" class="mt-4 border-t pt-2">
+                         <form th:action="@{/order/create}" method="post">
+                            <p class="font-semibold" th:text="'Berangkat: ' + ${#dates.format(ticket.departureDate, 'dd-MMM-yyyy')}">Detail Tiket</p>
+                            <p class="text-purple-600" th:text="'Rp ' + ${#numbers.formatDecimal(ticket.price, 0, 'POINT', 0, 'COMMA')}">Harga</p>
+
+                            <input type="hidden" name="itemType" value="Transport" />
+                            <input type="hidden" name="itemId" th:value="${ticket.ticketId}" />
+                            <label>Jumlah:</label>
+                            <input type="number" name="quantity" value="1" min="1" class="w-20 border rounded p-1">
+                            <button type="submit" class="bg-purple-500 text-white px-3 py-1 rounded text-sm">Pesan</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
