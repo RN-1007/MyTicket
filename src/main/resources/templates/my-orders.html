@@ -4,78 +4,111 @@
     <meta charset="UTF-8">
     <title>Pesanan Saya</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Gaya tambahan untuk efek hover pada baris dan kontainer */
+        .order-table-container {
+            border: 1px solid #e5e7eb; /* Border halus */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Shadow lebih elegan */
+        }
+    </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-gray-50 min-h-screen font-sans">
 
     <div th:replace="~{fragment/user-navbar :: navbar}"></div>
 
-    <div class="container mx-auto p-6">
-        <h1 class="text-3xl font-bold mb-6">Pesanan Saya</h1>
+    <div class="container mx-auto p-4 sm:p-8 lg:p-12">
+        <header class="mb-8">
+            <h1 class="text-4xl font-semibold text-gray-900 border-l-4 border-blue-600 pl-4">Riwayat Pesanan Saya</h1>
+        </header>
 
-        <div th:if="${successMessage}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+        <div th:if="${successMessage}" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg mb-4" role="alert">
             <span th:text="${successMessage}"></span>
         </div>
-        <div th:if="${errorMessage}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-             <span th:text="${errorMessage}"></span>
+        <div th:if="${errorMessage}" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-4" role="alert">
+            <span th:text="${errorMessage}"></span>
         </div>
 
-        <div class="bg-white shadow-md rounded-lg overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Detail Item</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Harga</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    
-                    <tr th:each="order : ${orders}">
-                        <td class="px-6 py-4" th:text="${order.orderId}">1</td>
-                        <td class="px-6 py-4" th:text="${#dates.format(order.orderDate, 'dd-MMM-yyyy HH:mm')}">Tanggal</td>
-                        <td class="px-6 py-4">
-                             <span th:text="${order.status}"
-                                   th:classappend="${order.status.name() == 'PAID'} ? 'text-green-600' : (${order.status.name() == 'PENDING'} ? 'text-yellow-600' : 'text-red-600')"
-                                   class="font-semibold">
-                                 Status
-                             </span>
-                        </td>
+        <div class="bg-white rounded-xl overflow-hidden order-table-container">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-blue-600">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">Order ID</th>
+                            <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">Tanggal</th>
+                            <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">Detail Item</th>
+                            <th class="px-6 py-4 text-left text-sm font-bold text-white uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-4 text-right text-sm font-bold text-white uppercase tracking-wider">Total Harga</th>
+                            <th class="px-6 py-4 text-center text-sm font-bold text-white uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-100">
+                        
+                        <tr th:each="order : ${orders}" class="hover:bg-blue-50 transition duration-150 ease-in-out">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900" th:text="${order.orderId}">1</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" th:text="${#dates.format(order.orderDate, 'dd-MMM-yyyy HH:mm')}">Tanggal</td>
+                            
+                            <td class="px-6 py-4 text-sm text-gray-700 max-w-xs">
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li th:each="detail : ${order.orderDetails}" class="text-gray-600">
+                                        <span th:if="${detail.hotelRoom != null}" 
+                                              th:text="${detail.quantity} + 'x ' + ${detail.hotelRoom.roomType} + ' (' + ${detail.hotelRoom.hotel.name} + ')'">
+                                            Detail Hotel
+                                        </span>
+                                        <span th:if="${detail.attractionTicket != null}" 
+                                              th:text="${detail.quantity} + 'x Tiket ' + ${detail.attractionTicket.attraction.name}">
+                                            Detail Atraksi
+                                        </span>
+                                        <span th:if="${detail.transportTicket != null}" 
+                                              th:text="${detail.quantity} + 'x Tiket ' + ${detail.transportTicket.transport.name}">
+                                            Detail Transport
+                                        </span>
+                                    </li>
+                                </ul>
+                            </td>
+                            
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span th:text="${order.status}"
+                                      th:classappend="${order.status.name() == 'PAID'} ? 'bg-green-100 text-green-800' : 
+                                                      ((${order.status.name() == 'PENDING'} or ${order.status.name() == 'WAITING_PAYMENT'}) ? 'bg-yellow-100 text-yellow-800' : 
+                                                      'bg-red-100 text-red-800')"
+                                      class="px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full uppercase shadow-sm">
+                                    Status
+                                </span>
+                            </td>
+                            
+                            <td class="px-6 py-4 whitespace-nowrap text-lg font-extrabold text-right text-blue-800">
+                                <span th:text="'Rp ' + ${#numbers.formatDecimal(#aggregates.sum(order.orderDetails.![totalPrice]), 0, 'POINT', 0, 'COMMA')}">
+                                    Rp 0.000.000
+                                </span>
+                            </td>
 
-                        <td class="px-6 py-4">
-                            <ul class="list-disc list-inside">
-                                <li th:each="detail : ${order.orderDetails}">
-                                    
-                                    <span th:if="${detail.hotelRoom != null}" 
-                                          th:text="${detail.quantity} + 'x ' + ${detail.hotelRoom.roomType} + ' (' + ${detail.hotelRoom.hotel.name} + ')'">
-                                        Detail Hotel
-                                    </span>
-                                    
-                                    <span th:if="${detail.attractionTicket != null}" 
-                                          th:text="${detail.quantity} + 'x Tiket ' + ${detail.attractionTicket.attraction.name}">
-                                        Detail Atraksi
-                                    </span>
-                                    
-                                    <span th:if="${detail.transportTicket != null}" 
-                                          th:text="${detail.quantity} + 'x Tiket ' + ${detail.transportTicket.transport.name}">
-                                        Detail Transport
-                                    </span>
-                                </li>
-                            </ul>
-                        </td>
-                        <td class="px-6 py-4 font-semibold">
-                            <span th:text="'Rp ' + ${#numbers.formatDecimal(#aggregates.sum(order.orderDetails.![totalPrice]), 0, 'POINT', 0, 'COMMA')}">
-                                Total Harga
-                            </span>
-                        </td>
-                    </tr>
-                    
-                    <tr th:if="${#lists.isEmpty(orders)}">
-                        <td colspan="5" class="px-6 py-4 text-center text-gray-500">Anda belum memiliki pesanan.</td>
-                    </tr>
-                </tbody>
-            </table>
+                            <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                                <div th:if="${order.status.name() == 'PENDING' or order.status.name() == 'WAITING_PAYMENT'}">
+                                    <form th:action="@{/pesanan/batalkan/{id}(id=${order.orderId})}" method="post" 
+                                          onsubmit="return confirm('Apakah Anda yakin ingin membatalkan Pesanan ID ' + [[${order.orderId}]] + '?')">
+                                        
+                                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}" />
+                                        
+                                        <button type="submit" 
+                                                class="bg-red-600 text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-red-700 transition duration-300 transform hover:scale-105">
+                                            Batalkan Pesanan
+                                        </button>
+                                    </form>
+                                </div>
+                                <div th:unless="${order.status.name() == 'PENDING' or order.status.name() == 'WAITING_PAYMENT'}">
+                                    <span class="text-gray-400 text-sm italic">Aksi Selesai</span>
+                                </div>
+                            </td>
+                        </tr>
+                        
+                        <tr th:if="${#lists.isEmpty(orders)}">
+                            <td colspan="6" class="px-6 py-10 text-center text-xl font-medium text-gray-500 bg-gray-100">
+                                Belum ada riwayat pesanan.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </body>
