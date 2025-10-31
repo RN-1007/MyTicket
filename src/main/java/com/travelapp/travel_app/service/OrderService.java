@@ -55,6 +55,7 @@ public class OrderService {
         newOrder.setStatus(OrderStatus.Pending);
         Order savedOrder = orderRepository.save(newOrder);
 
+
         // 3. Ambil harga (Tidak berubah, kita tetap perlu memanggil helper getPrice)
         BigDecimal pricePerItem = getPrice(itemType, itemId);
         if (pricePerItem == null) {
