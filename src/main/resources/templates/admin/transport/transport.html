@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Manage Transports</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+    <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
+
+        <div th:fragment="content">
+            <div class="flex justify-between items-center mb-6">
+                <h1 class="text-3xl font-bold">Manage Transports</h1>
+                <a th:href="@{/admin/transports/add}" 
+                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                    + Tambah Transport Baru
+                </a>
+            </div>
+
+            <div class="bg-white shadow-md rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Transport</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kapasitas</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Provider</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr th:each="transport : ${transports}">
+                            <td class="px-6 py-4" th:text="${transport.transportId}">1</td>
+                            <td class="px-6 py-4" th:text="${transport.name}">Nama Transport</td>
+                            <td class="px-6 py-4" th:text="${transport.capacity}">100</td>
+                            <td class="px-6 py-4" th:text="${transport.provider?.name}">Nama Provider</td>
+                            <td class="px-6 py-4 space-x-2">
+                                <a th:href="@{/admin/transports/edit/{id}(id=${transport.transportId})}" 
+                                   class="text-blue-500 hover:text-blue-700">Edit</a>
+                                <a th:href="@{/admin/transports/delete/{id}(id=${transport.transportId})}" 
+                                   class="text-red-500 hover:text-red-700"
+                                   onclick="return confirm('Apakah Anda yakin ingin menghapus transport ini?');">Delete</a>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(transports)}">
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data transport.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

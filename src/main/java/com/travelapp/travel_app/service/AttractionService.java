@@ -1,11 +1,13 @@
 package com.travelapp.travel_app.service;
 
-import com.travelapp.travel_app.model.Attraction;
-import com.travelapp.travel_app.repository.AttractionRepository;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.travelapp.travel_app.model.Attraction;
+import com.travelapp.travel_app.repository.attraction.AttractionRepository; 
 
 @Service
 public class AttractionService {
@@ -19,5 +21,20 @@ public class AttractionService {
 
     public long getAttractionCount() {
         return attractionRepository.count();
+    }
+
+    // --- METHOD BARU ---
+    public Optional<Attraction> getAttractionById(Integer id) {
+        return attractionRepository.findById(id);
+    }
+
+    // --- METHOD BARU ---
+    public Attraction saveAttraction(Attraction attraction) {
+        return attractionRepository.save(attraction);
+    }
+
+    // --- METHOD BARU ---
+    public void deleteAttraction(Integer id) {
+        attractionRepository.deleteById(id);
     }
 }

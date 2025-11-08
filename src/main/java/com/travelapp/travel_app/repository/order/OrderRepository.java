@@ -1,4 +1,4 @@
-package com.travelapp.travel_app.repository;
+package com.travelapp.travel_app.repository.order;
 
 import java.util.List;
 

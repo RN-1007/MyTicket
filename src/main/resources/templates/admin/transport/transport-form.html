@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle}">Form Transport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+
+    <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
+
+        <div th:fragment="content">
+            <h1 class="text-3xl font-bold mb-6" th:text="${pageTitle}">Judul Halaman</h1>
+
+            <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl">
+                <form th:action="@{/admin/transports/save}" th:object="${transport}" method="POST">
+                
+                    <input type="hidden" th:field="*{transportId}" />
+
+                    <div class="mb-4">
+                        <label for="name" class="block text-gray-700 font-semibold mb-2">Nama Transport</label>
+                        <input type="text" id="name" th:field="*{name}" class="w-full px-3 py-2 border rounded-lg" required />
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="capacity" class="block text-gray-700 font-semibold mb-2">Kapasitas</label>
+                        <input type="number" id="capacity" th:field="*{capacity}" class="w-full px-3 py-2 border rounded-lg" required />
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="provider" class="block text-gray-700 font-semibold mb-2">Provider</label>
+                        <select id="provider" th:field="*{provider}" class="w-full px-3 py-2 border rounded-lg" required>
+                            <option value="">-- Pilih Provider --</option>
+                            <option th:each="p : ${allProviders}" 
+                                    th:value="${p.providerId}" 
+                                    th:text="${p.name}">
+                                Nama Provider
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end space-x-4">
+                        <a th:href="@{/admin/transports}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                            Batal
+                        </a>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                            Simpan
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
