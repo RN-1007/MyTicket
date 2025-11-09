@@ -1,4 +1,4 @@
-package com.travelapp.travel_app.service;
+package com.travelapp.travel_app.service.user; // <-- PERBAIKAN DI SINI
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -16,18 +16,16 @@ import com.travelapp.travel_app.model.OrderDetail;
 import com.travelapp.travel_app.model.OrderStatus;
 import com.travelapp.travel_app.model.TransportTicket;
 import com.travelapp.travel_app.model.User;
-import com.travelapp.travel_app.repository.AttractionTicketRepository;
-import com.travelapp.travel_app.repository.HotelRoomRepository;
-import com.travelapp.travel_app.repository.OrderDetailRepository;
-import com.travelapp.travel_app.repository.OrderRepository;
-import com.travelapp.travel_app.repository.TransportTicketRepository;
 import com.travelapp.travel_app.repository.UserRepository;
+import com.travelapp.travel_app.repository.attraction.AttractionTicketRepository;
+import com.travelapp.travel_app.repository.hotel.HotelRoomRepository;
+import com.travelapp.travel_app.repository.order.OrderDetailRepository;
+import com.travelapp.travel_app.repository.order.OrderRepository;
+import com.travelapp.travel_app.repository.transport.TransportTicketRepository;
 
 @Service
 public class OrderService {
 
-    // Service ini meng-inject semua repository yang berhubungan dengan pemesanan
-    // (Ini tidak berubah)
     @Autowired private OrderRepository orderRepository;
     @Autowired private OrderDetailRepository orderDetailRepository;
     @Autowired private UserRepository userRepository;
@@ -36,10 +34,7 @@ public class OrderService {
     @Autowired private AttractionTicketRepository attractionTicketRepository;
 
     /**
-     * Logika bisnis utama untuk membuat pesanan baru.
-     * @Transactional memastikan semua operasi database berhasil,
-     * atau semua akan dibatalkan (rollback) jika terjadi error.
-     * * --- INI ADALAH METHOD YANG DIMODIFIKASI ---
+     * (Sisa kode Anda sudah benar, tidak perlu diubah)
      */
     @Transactional
     public Order createNewOrder(ItemType itemType, Integer itemId, int quantity, String userEmail) {

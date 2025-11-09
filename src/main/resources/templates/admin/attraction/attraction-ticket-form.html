@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${pageTitle}">Form Tiket Atraksi</title>
+<script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        .sidebar {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Sembunyikan menu dropdown (transisi) */
+        .dropdown-menu {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
+        }
+        
+        /* Tampilkan menu saat parent-nya punya class .open */
+        .dropdown-parent.open .dropdown-menu {
+            max-height: 200px; /* Cukup tinggi untuk 2 item */
+            opacity: 1;
+            visibility: visible;
+            transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
+        }
+        
+        /* Transisi untuk panah */
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+        /* Class .rotate-180 akan ditambahkan oleh JS */
+    </style></head>
+<body>
+    <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
+        <div th:fragment="content">
+            <h1 class="text-3xl font-bold mb-6" th:text="${pageTitle}">Judul Halaman</h1>
+
+            <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl">
+                <form th:action="@{/admin/attraction-tickets/save}" th:object="${attractionTicket}" method="POST">
+                    <input type="hidden" th:field="*{attractionTicketId}" />
+
+                    <div class="mb-6">
+                        <label for="attraction" class="block text-gray-700 font-semibold mb-2">Atraksi Induk</label>
+                        <select id="attraction" th:field="*{attraction}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="">-- Pilih Atraksi --</option>
+                            <option th:each="a : ${allAttractions}" 
+                                    th:value="${a.attractionId}" 
+                                    th:text="${a.name}">
+                                Nama Atraksi
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="validDate" class="block text-gray-700 font-semibold mb-2">Tanggal Valid</label>
+                        <input type="date" id="validDate" th:field="*{validDate}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required 
+                               th:value="${#dates.format(attractionTicket.validDate, 'yyyy-MM-dd')}"/>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="price" class="block text-gray-700 font-semibold mb-2">Harga</label>
+                        <input type="number" id="price" th:field="*{price}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+                    </div>
+
+                    <div class="flex justify-end space-x-4">
+                        <a th:href="@{/admin/attraction-tickets}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                            Batal
+                        </a>
+                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                            Simpan
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        if (!window.adminScriptLoaded) {
+            document.addEventListener("DOMContentLoaded", function() {
+                const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+                dropdownToggles.forEach(function(toggle) {
+                    toggle.addEventListener('click', function(e) {
+                        const parentDiv = e.currentTarget.closest('.dropdown-parent');
+                        const icon = e.currentTarget.querySelector('.arrow-icon');
+                        parentDiv.classList.toggle('open');
+                        if(icon) { icon.classList.toggle('rotate-180'); }
+                    });
+                });
+            });
+            window.adminScriptLoaded = true;
+        }
+    </script>
+</body>
+</html>

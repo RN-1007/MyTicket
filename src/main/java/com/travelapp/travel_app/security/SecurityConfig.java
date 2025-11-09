@@ -1,13 +1,10 @@
 package com.travelapp.travel_app.security; 
 
-import com.travelapp.travel_app.service.CustomUserDetailsService;
+import com.travelapp.travel_app.service.user.CustomUserDetailsService; // <-- Path ini sudah benar
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-// HAPUS IMPORT BCRYPT DAN PASSWORDENCODER JIKA HANYA MEREKA YANG DIPAKAI DI SINI
-// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder; 
-// import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -21,27 +18,21 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    /**
-     * HAPUS BEAN PASSWORD ENCODER DARI SINI
-     *
-     * @Bean
-     * public PasswordEncoder passwordEncoder() {
-     * return new BCryptPasswordEncoder();
-     * }
-     */
     
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        // (Sisa dari kode ini tidak perlu diubah, biarkan apa adanya)
+        
         http
             .authorizeHttpRequests(authz -> authz
                 
                 .requestMatchers("/css/**", "/js/**", "/vendor/**", "/img/**").permitAll() 
                 .requestMatchers("/login", "/register").permitAll() 
                 
-                .requestMatchers("/admin/**").hasRole("ADMIN")
-                .requestMatchers("/", "/my-orders", "/order/create").hasRole("USER")
-                
+                // --- PERBAIKAN DI SINI ---
+                .requestMatchers("/admin/**").hasRole("ADMIN") // Hapus "ROLE_"
+                .requestMatchers("/", "/my-orders", "/order/create").hasRole("USER") // Hapus "ROLE_"
+                // --- AKHIR PERBAIKAN ---
+
                 .anyRequest().authenticated()
             )
             
@@ -49,6 +40,7 @@ public class SecurityConfig {
                 .loginPage("/login") 
                 .loginProcessingUrl("/login") 
                 .successHandler((request, response, authentication) -> {
+                    // Cek di sini tetap menggunakan .getAuthority() yang berisi nama lengkap
                     if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                         response.sendRedirect("/admin/dashboard");
                     } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
