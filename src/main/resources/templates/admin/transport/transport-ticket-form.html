@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${pageTitle}">Form Atraksi</title>
-<script src="https://cdn.tailwindcss.com"></script>
+    <title th:text="${pageTitle}">Form Tiket Transport</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
     
@@ -37,40 +37,42 @@
             transition: transform 0.3s ease;
         }
         /* Class .rotate-180 akan ditambahkan oleh JS */
-    </style></head>
+    </style>
+</head>
 <body>
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
         <div th:fragment="content">
             <h1 class="text-3xl font-bold mb-6" th:text="${pageTitle}">Judul Halaman</h1>
 
             <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl">
-                <form th:action="@{/admin/attractions/save}" th:object="${attraction}" method="POST">
-                    <input type="hidden" th:field="*{attractionId}" />
-
-                    <div class="mb-4">
-                        <label for="name" class="block text-gray-700 font-semibold mb-2">Nama Atraksi</label>
-                        <input type="text" id="name" th:field="*{name}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="location" class="block text-gray-700 font-semibold mb-2">Lokasi</label>
-                        <input type="text" id="location" th:field="*{location}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
-                    </div>
+                <form th:action="@{/admin/transport-tickets/save}" th:object="${transportTicket}" method="POST">
+                    <input type="hidden" th:field="*{ticketId}" />
 
                     <div class="mb-6">
-                        <label for="category" class="block text-gray-700 font-semibold mb-2">Kategori</label>
-                        <select id="category" th:field="*{category}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            <option th:each="cat : ${allCategories}" 
-                                    th:value="${cat}" 
-                                    th:text="${cat}">
-                                Kategori
+                        <label for="transport" class="block text-gray-700 font-semibold mb-2">Transport Induk</label>
+                        <select id="transport" th:field="*{transport}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="">-- Pilih Transport --</option>
+                            <option th:each="t : ${allTransports}" 
+                                    th:value="${t.transportId}" 
+                                    th:text="${t.name}">
+                                Nama Transport
                             </option>
                         </select>
                     </div>
 
+                    <div class="mb-4">
+                        <label for="departureDate" class="block text-gray-700 font-semibold mb-2">Tanggal Berangkat</label>
+                        <input type="date" id="departureDate" th:field="*{departureDate}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required 
+                               th:value="${#dates.format(transportTicket.departureDate, 'yyyy-MM-dd')}"/>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="price" class="block text-gray-700 font-semibold mb-2">Harga</label>
+                        <input type="number" id="price" th:field="*{price}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+                    </div>
+
                     <div class="flex justify-end space-x-4">
-                        <a th:href="@{/admin/attractions}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                        <a th:href="@{/admin/transport-tickets}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
                             Batal
                         </a>
                         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">

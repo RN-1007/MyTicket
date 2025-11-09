@@ -2,12 +2,46 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+   <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        .sidebar {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Sembunyikan menu dropdown (transisi) */
+        .dropdown-menu {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
+        }
+        
+        /* Tampilkan menu saat parent-nya punya class .open */
+        .dropdown-parent.open .dropdown-menu {
+            max-height: 200px; /* Cukup tinggi untuk 2 item */
+            opacity: 1;
+            visibility: visible;
+            transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
+        }
+        
+        /* Transisi untuk panah */
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+        /* Class .rotate-180 akan ditambahkan oleh JS */
+    </style>
 </head>
 <body>
 
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
-
         <div th:fragment="content">
             <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
             
@@ -28,8 +62,23 @@
                 </div>
             </div>
         </div>
-
     </div>
 
+    <script>
+        if (!window.adminScriptLoaded) {
+            document.addEventListener("DOMContentLoaded", function() {
+                const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+                dropdownToggles.forEach(function(toggle) {
+                    toggle.addEventListener('click', function(e) {
+                        const parentDiv = e.currentTarget.closest('.dropdown-parent');
+                        const icon = e.currentTarget.querySelector('.arrow-icon');
+                        parentDiv.classList.toggle('open');
+                        if(icon) { icon.classList.toggle('rotate-180'); }
+                    });
+                });
+            });
+            window.adminScriptLoaded = true;
+        }
+    </script>
 </body>
 </html>

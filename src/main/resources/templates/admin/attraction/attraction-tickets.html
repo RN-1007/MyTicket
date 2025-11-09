@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Manage Attractions</title>
+    <title>Manage Attraction Tickets</title>
 <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
@@ -42,10 +42,10 @@
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
         <div th:fragment="content">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-bold">Manage Attractions</h1>
-                <a th:href="@{/admin/attractions/add}" 
+                <h1 class="text-3xl font-bold">Manage Attraction Tickets</h1>
+                <a th:href="@{/admin/attraction-tickets/add}" 
                    class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
-                    + Tambah Atraksi Baru
+                    + Tambah Tiket Atraksi Baru
                 </a>
             </div>
 
@@ -54,28 +54,28 @@
                     <thead class="bg-gray-100">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Atraksi</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lokasi</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kategori</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Atraksi Induk</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tgl. Valid</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Harga</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr th:each="attraction : ${attractions}">
-                            <td class="px-6 py-4" th:text="${attraction.attractionId}">1</td>
-                            <td class="px-6 py-4" th:text="${attraction.name}">Nama Atraksi</td>
-                            <td class="px-6 py-4" th:text="${attraction.location}">Lokasi</td>
-                            <td class="px-6 py-4" th:text="${attraction.category}">Kategori</td>
+                        <tr th:each="ticket : ${attractionTickets}">
+                            <td class="px-6 py-4" th:text="${ticket.attractionTicketId}">1</td>
+                            <td class="px-6 py-4" th:text="${ticket.attraction?.name}">Nama Atraksi</td>
+                            <td class="px-6 py-4" th:text="${#dates.format(ticket.validDate, 'dd-MMM-yyyy')}">Tanggal</td>
+                            <td class="px-6 py-4" th:text="${#numbers.formatDecimal(ticket.price, 0, 'POINT', 0, 'COMMA')}">Harga</td>
                             <td class="px-6 py-4 space-x-4">
-                                <a th:href="@{/admin/attractions/edit/{id}(id=${attraction.attractionId})}" 
+                                <a th:href="@{/admin/attraction-tickets/edit/{id}(id=${ticket.attractionTicketId})}" 
                                    class="text-yellow-500 hover:text-yellow-600 text-xl"><i class="ri-pencil-fill"></i></a>
-                                <a th:href="@{/admin/attractions/delete/{id}(id=${attraction.attractionId})}" 
+                                <a th:href="@{/admin/attraction-tickets/delete/{id}(id=${ticket.attractionTicketId})}" 
                                    class="text-red-500 hover:text-red-600 text-xl"
-                                   onclick="return confirm('Apakah Anda yakin ingin menghapus atraksi ini?');"><i class="ri-delete-bin-line"></i></a>
+                                   onclick="return confirm('Apakah Anda yakin ingin menghapus tiket ini?');"><i class="ri-delete-bin-line"></i></a>
                             </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(attractions)}">
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data atraksi.</td>
+                        <tr th:if="${#lists.isEmpty(attractionTickets)}">
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data tiket atraksi.</td>
                         </tr>
                     </tbody>
                 </table>

@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.travelapp.travel_app.model.User;
-import com.travelapp.travel_app.service.AttractionService;
-import com.travelapp.travel_app.service.CustomUserDetailsService;
-import com.travelapp.travel_app.service.HotelService;
-import com.travelapp.travel_app.service.OrderService; 
-import com.travelapp.travel_app.service.TransportService; 
+import com.travelapp.travel_app.service.attraction.AttractionService;
+import com.travelapp.travel_app.service.hotel.HotelService;
+import com.travelapp.travel_app.service.transport.TransportService;
+import com.travelapp.travel_app.service.user.CustomUserDetailsService;
+import com.travelapp.travel_app.service.user.OrderService; 
 
 @Controller
 public class PageController {
@@ -61,6 +61,6 @@ public class PageController {
     public String myOrdersPage(Model model, Authentication authentication) {
         String email = authentication.getName();
         model.addAttribute("orders", orderService.findOrdersByUser(email));
-        return "my-orders"; // <-- PENYESUAIAN PATH (dari "my-order" ke "my-orders")
+        return "my-orders";
     }
 }

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title th:text="${pageTitle}">Form Atraksi</title>
+    <title th:text="${pageTitle}">Form Kamar Hotel</title>
 <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
@@ -44,33 +44,38 @@
             <h1 class="text-3xl font-bold mb-6" th:text="${pageTitle}">Judul Halaman</h1>
 
             <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl">
-                <form th:action="@{/admin/attractions/save}" th:object="${attraction}" method="POST">
-                    <input type="hidden" th:field="*{attractionId}" />
-
-                    <div class="mb-4">
-                        <label for="name" class="block text-gray-700 font-semibold mb-2">Nama Atraksi</label>
-                        <input type="text" id="name" th:field="*{name}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="location" class="block text-gray-700 font-semibold mb-2">Lokasi</label>
-                        <input type="text" id="location" th:field="*{location}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
-                    </div>
+                <form th:action="@{/admin/hotel-rooms/save}" th:object="${hotelRoom}" method="POST">
+                    <input type="hidden" th:field="*{roomId}" />
 
                     <div class="mb-6">
-                        <label for="category" class="block text-gray-700 font-semibold mb-2">Kategori</label>
-                        <select id="category" th:field="*{category}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
-                            <option value="">-- Pilih Kategori --</option>
-                            <option th:each="cat : ${allCategories}" 
-                                    th:value="${cat}" 
-                                    th:text="${cat}">
-                                Kategori
+                        <label for="hotel" class="block text-gray-700 font-semibold mb-2">Hotel Induk</label>
+                        <select id="hotel" th:field="*{hotel}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            <option value="">-- Pilih Hotel --</option>
+                            <option th:each="h : ${allHotels}" 
+                                    th:value="${h.hotelId}" 
+                                    th:text="${h.name}">
+                                Nama Hotel
                             </option>
                         </select>
                     </div>
 
+                    <div class="mb-4">
+                        <label for="roomType" class="block text-gray-700 font-semibold mb-2">Tipe Kamar</label>
+                        <input type="text" id="roomType" th:field="*{roomType}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="price" class="block text-gray-700 font-semibold mb-2">Harga</label>
+                        <input type="number" id="price" th:field="*{price}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="capacity" class="block text-gray-700 font-semibold mb-2">Kapasitas</label>
+                        <input type="number" id="capacity" th:field="*{capacity}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+                    </div>
+
                     <div class="flex justify-end space-x-4">
-                        <a th:href="@{/admin/attractions}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                        <a th:href="@{/admin/hotel-rooms}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
                             Batal
                         </a>
                         <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">

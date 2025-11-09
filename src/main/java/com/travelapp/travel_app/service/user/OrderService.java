@@ -1,4 +1,4 @@
-package com.travelapp.travel_app.service;
+package com.travelapp.travel_app.service.user; // <-- PERBAIKAN DI SINI
 
 import java.math.BigDecimal;
 import java.util.Date;

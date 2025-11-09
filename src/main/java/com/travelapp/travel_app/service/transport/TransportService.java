@@ -1,4 +1,4 @@
-package com.travelapp.travel_app.service;
+package com.travelapp.travel_app.service.transport;
 
 import java.util.List;
 import java.util.Optional;
