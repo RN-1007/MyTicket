@@ -41,15 +41,15 @@
 <body>
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
         <div th:fragment="content">
-            <h1 class="text-3xl font-bold mb-6" th:text="${pageTitle}">Judul Halaman</h1>
+            <h1 class="text-2xl font-semibold text-white mb-6" th:text="${pageTitle}">Judul Halaman</h1>
 
-            <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl">
+            <div class="bg-gray-800 p-8 rounded-lg shadow-lg max-w-2xl">
                 <form th:action="@{/admin/attraction-tickets/save}" th:object="${attractionTicket}" method="POST">
                     <input type="hidden" th:field="*{attractionTicketId}" />
 
-                    <div class="mb-6">
-                        <label for="attraction" class="block text-gray-700 font-semibold mb-2">Atraksi Induk</label>
-                        <select id="attraction" th:field="*{attraction}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                    <div class="mb-5">
+                        <label for="attraction" class="block text-gray-300 font-semibold mb-2">Atraksi Induk</label>
+                        <select id="attraction" th:field="*{attraction}" class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                             <option value="">-- Pilih Atraksi --</option>
                             <option th:each="a : ${allAttractions}" 
                                     th:value="${a.attractionId}" 
@@ -59,22 +59,22 @@
                         </select>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="validDate" class="block text-gray-700 font-semibold mb-2">Tanggal Valid</label>
-                        <input type="date" id="validDate" th:field="*{validDate}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required 
+                    <div class="mb-5">
+                        <label for="validDate" class="block text-gray-300 font-semibold mb-2">Tanggal Valid</label>
+                        <input type="date" id="validDate" th:field="*{validDate}" class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required 
                                th:value="${#dates.format(attractionTicket.validDate, 'yyyy-MM-dd')}"/>
                     </div>
                     
-                    <div class="mb-4">
-                        <label for="price" class="block text-gray-700 font-semibold mb-2">Harga</label>
-                        <input type="number" id="price" th:field="*{price}" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required />
+                    <div class="mb-8">
+                        <label for="price" class="block text-gray-300 font-semibold mb-2">Harga</label>
+                        <input type="number" id="price" th:field="*{price}" class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                     </div>
 
                     <div class="flex justify-end space-x-4">
-                        <a th:href="@{/admin/attraction-tickets}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-lg">
+                        <a th:href="@{/admin/attraction-tickets}" class="bg-gray-600 hover:bg-gray-500 text-gray-200 px-5 py-2.5 rounded-lg font-medium">
                             Batal
                         </a>
-                        <button type="submit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium">
                             Simpan
                         </button>
                     </div>

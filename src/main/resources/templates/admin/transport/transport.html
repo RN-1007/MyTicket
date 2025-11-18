@@ -40,38 +40,38 @@
     </style>
 </head>
 <body>
-    <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
+   <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
         <div th:fragment="content">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-bold">Manage Transports</h1>
+                <h1 class="text-2xl font-semibold text-white">Manage Transports</h1>
                 <a th:href="@{/admin/transports/add}" 
-                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg">
+                   class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium">
                     + Tambah Transport Baru
                 </a>
             </div>
 
-            <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-100">
+            <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-700">
+                    <thead class="bg-gray-700">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Transport</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kapasitas</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Provider</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Aksi</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Nama Transport</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Kapasitas</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Provider</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        <tr th:each="transport : ${transports}">
-                            <td class="px-6 py-4" th:text="${transport.transportId}">1</td>
-                            <td class="px-6 py-4" th:text="${transport.name}">Nama Transport</td>
-                            <td class="px-6 py-4" th:text="${transport.capacity}">100</td>
-                            <td class="px-6 py-4" th:text="${transport.provider?.name}">Nama Provider</td>
+                    <tbody class="divide-y divide-gray-700">
+                        <tr th:each="transport : ${transports}" class="hover:bg-gray-700/50">
+                            <td class="px-6 py-4 text-sm text-gray-200" th:text="${transport.transportId}">1</td>
+                            <td class="px-6 py-4 text-sm text-white font-medium" th:text="${transport.name}">Nama Transport</td>
+                            <td class="px-6 py-4 text-sm text-gray-300" th:text="${transport.capacity}">100</td>
+                            <td class="px-6 py-4 text-sm text-gray-300" th:text="${transport.provider?.name}">Nama Provider</td>
                             <td class="px-6 py-4 space-x-4">
                                 <a th:href="@{/admin/transports/edit/{id}(id=${transport.transportId})}" 
-                                   class="text-yellow-500 hover:text-yellow-600 text-xl"><i class="ri-pencil-fill"></i></a>
+                                   class="text-yellow-400 hover:text-yellow-300 text-xl"><i class="ri-pencil-fill"></i></a>
                                 <a th:href="@{/admin/transports/delete/{id}(id=${transport.transportId})}" 
-                                   class="text-red-500 hover:text-red-600 text-xl"
+                                   class="text-red-500 hover:text-red-400 text-xl"
                                    onclick="return confirm('Apakah Anda yakin ingin menghapus transport ini?');"><i class="ri-delete-bin-line"></i></a>
                             </td>
                         </tr>
@@ -83,7 +83,6 @@
             </div>
         </div>
     </div>
-
     <script>
         if (!window.adminScriptLoaded) {
             document.addEventListener("DOMContentLoaded", function() {
