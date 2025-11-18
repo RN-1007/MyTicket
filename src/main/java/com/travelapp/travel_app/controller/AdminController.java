@@ -1,5 +1,8 @@
 package com.travelapp.travel_app.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller; 
 import org.springframework.ui.Model;
@@ -14,6 +17,8 @@ import com.travelapp.travel_app.model.AttractionTicket;
 import com.travelapp.travel_app.model.Category;
 import com.travelapp.travel_app.model.Hotel;
 import com.travelapp.travel_app.model.HotelRoom; 
+import com.travelapp.travel_app.model.Order;
+import com.travelapp.travel_app.model.OrderDetail;
 import com.travelapp.travel_app.model.Role;
 import com.travelapp.travel_app.model.Transport;
 import com.travelapp.travel_app.model.TransportTicket; 
@@ -35,7 +40,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequestMapping("/admin")
 public class AdminController {
 
-    // (Dependency injection Anda sudah benar)
     @Autowired private HotelService hotelService;
     @Autowired private TransportService transportService;
     @Autowired private AttractionService attractionService;
@@ -43,7 +47,6 @@ public class AdminController {
     @Autowired private UserRepository userRepository; 
     @Autowired private OrderRepository orderRepository;
 
-    // --- SERVICE BARU UNTUK SUB-ITEM ---
     @Autowired private HotelRoomService hotelRoomService;
     @Autowired private TransportTicketService transportTicketService;
     @Autowired private AttractionTicketService attractionTicketService;
@@ -64,7 +67,7 @@ public class AdminController {
         return "admin/dashboard"; 
     }
 
-    // == CRUD UNTUK HOTEL == (Tidak berubah)
+    // == CRUD HOTEL ==
     @GetMapping("/hotels")
     public String showHotelList(Model model) {
         model.addAttribute("hotels", hotelService.getAllHotels());
@@ -95,51 +98,45 @@ public class AdminController {
         return "redirect:/admin/hotels"; 
     }
     
-    // == CRUD UNTUK HOTEL ROOMS == (BARU)
+    // == CRUD HOTEL ROOMS ==
     @GetMapping("/hotel-rooms")
     public String showHotelRoomList(Model model) {
         model.addAttribute("hotelRooms", hotelRoomService.findAll());
         return "admin/hotel/hotel-rooms";
     }
-
     @GetMapping("/hotel-rooms/add")
     public String showAddHotelRoomForm(Model model) {
         model.addAttribute("hotelRoom", new HotelRoom());
-        model.addAttribute("allHotels", hotelService.getAllHotels()); // Untuk dropdown
+        model.addAttribute("allHotels", hotelService.getAllHotels());
         model.addAttribute("pageTitle", "Add New Hotel Room");
         return "admin/hotel/hotel-room-form";
     }
-
     @PostMapping("/hotel-rooms/save")
     public String saveHotelRoom(@ModelAttribute("hotelRoom") HotelRoom hotelRoom) {
         hotelRoomService.save(hotelRoom); 
         return "redirect:/admin/hotel-rooms";
     }
-
     @GetMapping("/hotel-rooms/edit/{id}")
     public String showEditHotelRoomForm(@PathVariable("id") Integer id, Model model) {
         HotelRoom hotelRoom = hotelRoomService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid hotel room Id:" + id));
         model.addAttribute("hotelRoom", hotelRoom);
-        model.addAttribute("allHotels", hotelService.getAllHotels()); // Untuk dropdown
+        model.addAttribute("allHotels", hotelService.getAllHotels());
         model.addAttribute("pageTitle", "Edit Hotel Room");
         return "admin/hotel/hotel-room-form";
     }
-
     @GetMapping("/hotel-rooms/delete/{id}")
     public String deleteHotelRoom(@PathVariable("id") Integer id) {
         hotelRoomService.deleteById(id); 
         return "redirect:/admin/hotel-rooms";
     }
 
-
-    // == CRUD UNTUK TRANSPORT == (Tidak berubah)
+    // == CRUD TRANSPORT ==
     @GetMapping("/transports")
     public String showTransportList(Model model) {
         model.addAttribute("transports", transportService.getAllTransports());
         return "admin/transport/transport"; 
     }
-    // ... (method add, save, edit, delete untuk transport lainnya) ...
     @GetMapping("/transports/add")
     public String showAddTransportForm(Model model) {
         model.addAttribute("transport", new Transport());
@@ -167,52 +164,45 @@ public class AdminController {
         return "redirect:/admin/transports"; 
     }
 
-
-    // == CRUD UNTUK TRANSPORT TICKETS == (BARU)
+    // == CRUD TRANSPORT TICKETS ==
     @GetMapping("/transport-tickets")
     public String showTransportTicketList(Model model) {
         model.addAttribute("transportTickets", transportTicketService.findAll());
         return "admin/transport/transport-tickets";
     }
-
     @GetMapping("/transport-tickets/add")
     public String showAddTransportTicketForm(Model model) {
         model.addAttribute("transportTicket", new TransportTicket());
-        model.addAttribute("allTransports", transportService.getAllTransports()); // Untuk dropdown
+        model.addAttribute("allTransports", transportService.getAllTransports());
         model.addAttribute("pageTitle", "Add New Transport Ticket");
         return "admin/transport/transport-ticket-form";
     }
-
     @PostMapping("/transport-tickets/save")
     public String saveTransportTicket(@ModelAttribute("transportTicket") TransportTicket ticket) {
         transportTicketService.save(ticket);
         return "redirect:/admin/transport-tickets";
     }
-
     @GetMapping("/transport-tickets/edit/{id}")
     public String showEditTransportTicketForm(@PathVariable("id") Integer id, Model model) {
         TransportTicket ticket = transportTicketService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid transport ticket Id:" + id));
         model.addAttribute("transportTicket", ticket);
-        model.addAttribute("allTransports", transportService.getAllTransports()); // Untuk dropdown
+        model.addAttribute("allTransports", transportService.getAllTransports());
         model.addAttribute("pageTitle", "Edit Transport Ticket");
         return "admin/transport/transport-ticket-form";
     }
-
     @GetMapping("/transport-tickets/delete/{id}")
     public String deleteTransportTicket(@PathVariable("id") Integer id) {
         transportTicketService.deleteById(id);
         return "redirect:/admin/transport-tickets";
     }
 
-
-    // == CRUD UNTUK ATTRACTION == (Tidak berubah)
+    // == CRUD ATTRACTION ==
     @GetMapping("/attractions")
     public String showAttractionList(Model model) {
         model.addAttribute("attractions", attractionService.getAllAttractions());
         return "admin/attraction/attraction"; 
     }
-    // ... (method add, save, edit, delete untuk attraction lainnya) ...
     @GetMapping("/attractions/add")
     public String showAddAttractionForm(Model model) {
         model.addAttribute("attraction", new Attraction());
@@ -240,90 +230,124 @@ public class AdminController {
         return "redirect:/admin/attractions"; 
     }
 
-    // == CRUD UNTUK ATTRACTION TICKETS == (BARU)
+    // == CRUD ATTRACTION TICKETS ==
     @GetMapping("/attraction-tickets")
     public String showAttractionTicketList(Model model) {
         model.addAttribute("attractionTickets", attractionTicketService.findAll());
         return "admin/attraction/attraction-tickets";
     }
-
     @GetMapping("/attraction-tickets/add")
     public String showAddAttractionTicketForm(Model model) {
         model.addAttribute("attractionTicket", new AttractionTicket());
-        model.addAttribute("allAttractions", attractionService.getAllAttractions()); // Untuk dropdown
+        model.addAttribute("allAttractions", attractionService.getAllAttractions());
         model.addAttribute("pageTitle", "Add New Attraction Ticket");
         return "admin/attraction/attraction-ticket-form";
     }
-
     @PostMapping("/attraction-tickets/save")
     public String saveAttractionTicket(@ModelAttribute("attractionTicket") AttractionTicket ticket) {
         attractionTicketService.save(ticket);
         return "redirect:/admin/attraction-tickets";
     }
-
     @GetMapping("/attraction-tickets/edit/{id}")
     public String showEditAttractionTicketForm(@PathVariable("id") Integer id, Model model) {
         AttractionTicket ticket = attractionTicketService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid attraction ticket Id:" + id));
         model.addAttribute("attractionTicket", ticket);
-        model.addAttribute("allAttractions", attractionService.getAllAttractions()); // Untuk dropdown
+        model.addAttribute("allAttractions", attractionService.getAllAttractions());
         model.addAttribute("pageTitle", "Edit Attraction Ticket");
         return "admin/attraction/attraction-ticket-form";
     }
-
     @GetMapping("/attraction-tickets/delete/{id}")
     public String deleteAttractionTicket(@PathVariable("id") Integer id) {
         attractionTicketService.deleteById(id);
         return "redirect:/admin/attraction-tickets";
     }
 
-   @GetMapping("/users")
+    // == USER MANAGEMENT ==
+    @GetMapping("/users")
     public String showUserList(Model model) {
-        // MODIFIKASI: Gunakan UserService
         model.addAttribute("allUsers", userService.findAll());
         return "admin/user/users-list"; 
     }
-
-    @GetMapping("/orders")
-    public String showAllOrders(Model model) {
-        model.addAttribute("allOrders", orderRepository.findAll());
-        return "admin/order/order-list";
-    }
-
-    // --- TAMBAHKAN METHOD-METHOD BARU DI BAWAH INI ---
-
     @GetMapping("/users/add")
     public String showAddUserForm(Model model) {
         model.addAttribute("user", new User());
-        model.addAttribute("allRoles", Role.values()); // Mengirim enum Role ke form
+        model.addAttribute("allRoles", Role.values());
         model.addAttribute("pageTitle", "Add New User");
-        return "admin/user/user-form"; // Mengarah ke form baru
+        return "admin/user/user-form";
     }
-
     @GetMapping("/users/edit/{id}")
     public String showEditUserForm(@PathVariable("id") Integer id, Model model) {
         User user = userService.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-        
-        // PENTING: Kosongkan password agar tidak terkirim ke HTML
         user.setPassword(""); 
-        
         model.addAttribute("user", user);
-        model.addAttribute("allRoles", Role.values()); // Mengirim enum Role ke form
+        model.addAttribute("allRoles", Role.values());
         model.addAttribute("pageTitle", "Edit User");
-        return "admin/user/user-form"; // Mengarah ke form baru
+        return "admin/user/user-form";
     }
-
     @PostMapping("/users/save")
     public String saveUser(@ModelAttribute("user") User user) {
-        // Logika kompleks (enkripsi, update, create) sudah dihandle oleh service
         userService.saveUser(user);
         return "redirect:/admin/users";
     }
-
     @GetMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable("id") Integer id) {
         userService.deleteById(id);
         return "redirect:/admin/users";
+    }
+    @GetMapping("/users/status/{id}")
+    public String toggleUserStatus(@PathVariable("id") Integer id) {
+        userService.toggleUserStatus(id);
+        return "redirect:/admin/users";
+    }
+
+
+    // == ORDER MANAGEMENT (VIEW BY USER) ==
+    
+    /**
+     * Halaman 1: Menampilkan Daftar User yang Memiliki Order
+     */
+    @GetMapping("/orders")
+    public String showUsersForOrders(Model model) {
+        model.addAttribute("users", userService.findAll());
+        return "admin/order/order-users"; 
+    }
+
+    /**
+     * Halaman 2: Detail Pesanan User (Dipisah per Kategori)
+     */
+    @GetMapping("/orders/{userId}")
+    public String showUserOrderDetails(@PathVariable("userId") Integer userId, Model model) {
+        User user = userService.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + userId));
+        
+        // Ambil semua order milik user ini
+        List<Order> userOrders = orderRepository.findByUser(user);
+
+        // Wadah untuk memisahkan item
+        List<OrderDetail> hotelDetails = new ArrayList<>();
+        List<OrderDetail> transportDetails = new ArrayList<>();
+        List<OrderDetail> attractionDetails = new ArrayList<>();
+
+        // Logika Pemisahan
+        for (Order order : userOrders) {
+            for (OrderDetail detail : order.getOrderDetails()) {
+                if (detail.getHotelRoom() != null) {
+                    hotelDetails.add(detail);
+                } else if (detail.getTransportTicket() != null) {
+                    transportDetails.add(detail);
+                } else if (detail.getAttractionTicket() != null) {
+                    attractionDetails.add(detail);
+                }
+            }
+        }
+
+        model.addAttribute("user", user);
+        model.addAttribute("hotelDetails", hotelDetails);
+        model.addAttribute("transportDetails", transportDetails);
+        model.addAttribute("attractionDetails", attractionDetails);
+
+        return "admin/order/user-order-details"; 
     }
 }

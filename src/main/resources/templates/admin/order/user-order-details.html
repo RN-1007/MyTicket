@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Detail Pesanan User</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .sidebar {
+            font-family: 'Poppins', sans-serif;
+        }
+        .dropdown-menu {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
+        }
+        .dropdown-parent.open .dropdown-menu {
+            max-height: 200px;
+            opacity: 1;
+            visibility: visible;
+            transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
+        }
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
+        <div th:fragment="content">
+            
+            <div class="flex items-center justify-between mb-8 bg-gray-800 p-6 rounded-lg shadow-lg">
+                <div>
+                    <h1 class="text-2xl font-bold text-white mb-1">Detail Pesanan</h1>
+                    <p class="text-gray-400 text-sm">
+                        User: <span class="text-yellow-400 font-medium text-base" th:text="${user.name}">Nama User</span> 
+                        <span class="mx-2">|</span>
+                        Email: <span class="text-gray-300" th:text="${user.email}">email@mail.com</span>
+                    </p>
+                </div>
+                <a th:href="@{/admin/orders}" 
+                   class="bg-gray-700 hover:bg-gray-600 text-white px-5 py-2.5 rounded-lg flex items-center font-medium transition-all shadow-md hover:shadow-lg">
+                    <i class="ri-arrow-left-line mr-2 text-xl"></i> Kembali ke Daftar User
+                </a>
+            </div>
+
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-blue-400 mb-4 flex items-center border-b border-gray-700 pb-2">
+                    <i class="ri-hotel-bed-line mr-3 text-2xl"></i> Riwayat Booking Hotel
+                </h2>
+                <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-700">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Order ID</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Tanggal</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Nama Hotel</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Kamar</th>
+                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Qty</th>
+                                <th class="px-6 py-4 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">Total Harga</th>
+                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr th:each="item : ${hotelDetails}" class="hover:bg-gray-700/50 transition">
+                                <td class="px-6 py-4 text-sm text-gray-400 font-mono" th:text="${item.order.orderId}">#123</td>
+                                <td class="px-6 py-4 text-sm text-gray-300" th:text="${#dates.format(item.order.orderDate, 'dd MMM yyyy')}">Date</td>
+                                <td class="px-6 py-4 text-sm text-white font-medium" th:text="${item.hotelRoom.hotel.name}">Hotel Name</td>
+                                <td class="px-6 py-4 text-sm text-gray-300" th:text="${item.hotelRoom.roomType}">Deluxe</td>
+                                <td class="px-6 py-4 text-sm text-gray-300 text-center" th:text="${item.quantity}">1</td>
+                                <td class="px-6 py-4 text-sm text-right text-blue-300 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(item.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span th:text="${item.order.status}" 
+                                          th:classappend="${item.order.status.name() == 'PAID'} ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'"
+                                          class="px-3 py-1 rounded-full text-xs font-bold uppercase">Status</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(hotelDetails)}">
+                                <td colspan="7" class="px-6 py-8 text-center text-gray-500 italic bg-gray-800/50">Tidak ada booking hotel untuk user ini.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-purple-400 mb-4 flex items-center border-b border-gray-700 pb-2">
+                    <i class="ri-plane-line mr-3 text-2xl"></i> Riwayat Tiket Transportasi
+                </h2>
+                <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-700">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Order ID</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Tgl Pesan</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Transport</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Berangkat</th>
+                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Qty</th>
+                                <th class="px-6 py-4 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">Total Harga</th>
+                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr th:each="item : ${transportDetails}" class="hover:bg-gray-700/50 transition">
+                                <td class="px-6 py-4 text-sm text-gray-400 font-mono" th:text="${item.order.orderId}">#123</td>
+                                <td class="px-6 py-4 text-sm text-gray-300" th:text="${#dates.format(item.order.orderDate, 'dd MMM yyyy')}">Date</td>
+                                <td class="px-6 py-4 text-sm text-white font-medium" th:text="${item.transportTicket.transport.name}">Garuda</td>
+                                <td class="px-6 py-4 text-sm text-yellow-300" th:text="${#dates.format(item.transportTicket.departureDate, 'dd MMM HH:mm')}">Tgl Berangkat</td>
+                                <td class="px-6 py-4 text-sm text-gray-300 text-center" th:text="${item.quantity}">1</td>
+                                <td class="px-6 py-4 text-sm text-right text-purple-300 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(item.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span th:text="${item.order.status}" 
+                                          th:classappend="${item.order.status.name() == 'PAID'} ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'"
+                                          class="px-3 py-1 rounded-full text-xs font-bold uppercase">Status</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(transportDetails)}">
+                                <td colspan="7" class="px-6 py-8 text-center text-gray-500 italic bg-gray-800/50">Tidak ada tiket transportasi untuk user ini.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="mb-10">
+                <h2 class="text-xl font-semibold text-green-400 mb-4 flex items-center border-b border-gray-700 pb-2">
+                    <i class="ri-ticket-2-line mr-3 text-2xl"></i> Riwayat Tiket Atraksi
+                </h2>
+                <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
+                    <table class="min-w-full divide-y divide-gray-700">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Order ID</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Tgl Pesan</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Nama Atraksi</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Berlaku</th>
+                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Qty</th>
+                                <th class="px-6 py-4 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">Total Harga</th>
+                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr th:each="item : ${attractionDetails}" class="hover:bg-gray-700/50 transition">
+                                <td class="px-6 py-4 text-sm text-gray-400 font-mono" th:text="${item.order.orderId}">#123</td>
+                                <td class="px-6 py-4 text-sm text-gray-300" th:text="${#dates.format(item.order.orderDate, 'dd MMM yyyy')}">Date</td>
+                                <td class="px-6 py-4 text-sm text-white font-medium" th:text="${item.attractionTicket.attraction.name}">Dufan</td>
+                                <td class="px-6 py-4 text-sm text-yellow-300" th:text="${#dates.format(item.attractionTicket.validDate, 'dd MMM yyyy')}">Valid</td>
+                                <td class="px-6 py-4 text-sm text-gray-300 text-center" th:text="${item.quantity}">1</td>
+                                <td class="px-6 py-4 text-sm text-right text-green-300 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(item.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
+                                <td class="px-6 py-4 text-center">
+                                    <span th:text="${item.order.status}" 
+                                          th:classappend="${item.order.status.name() == 'PAID'} ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'"
+                                          class="px-3 py-1 rounded-full text-xs font-bold uppercase">Status</span>
+                                </td>
+                            </tr>
+                            <tr th:if="${#lists.isEmpty(attractionDetails)}">
+                                <td colspan="7" class="px-6 py-8 text-center text-gray-500 italic bg-gray-800/50">Tidak ada tiket atraksi untuk user ini.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script>
+        if (!window.adminScriptLoaded) {
+            document.addEventListener("DOMContentLoaded", function() {
+                const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+                dropdownToggles.forEach(function(toggle) {
+                    toggle.addEventListener('click', function(e) {
+                        const parentDiv = e.currentTarget.closest('.dropdown-parent');
+                        const icon = e.currentTarget.querySelector('.arrow-icon');
+                        parentDiv.classList.toggle('open');
+                        if(icon) { icon.classList.toggle('rotate-180'); }
+                    });
+                });
+            });
+            window.adminScriptLoaded = true;
+        }
+    </script>
+</body>
+</html>
