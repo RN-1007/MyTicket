@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -15,118 +13,196 @@
         .sidebar {
             font-family: 'Poppins', sans-serif;
         }
-
-        /* Sembunyikan menu dropdown (transisi) */
         .dropdown-menu {
             overflow: hidden;
             max-height: 0;
             opacity: 0;
             visibility: hidden;
             transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
+            background-color: #1F2937; 
         }
-        
-        /* Tampilkan menu saat parent-nya punya class .open */
         .dropdown-parent.open .dropdown-menu {
-            max-height: 200px; /* Cukup tinggi untuk 2 item */
+            max-height: 200px; 
             opacity: 1;
             visibility: visible;
             transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
         }
-        
-        /* Transisi untuk panah */
         .arrow-icon {
             transition: transform 0.3s ease;
         }
-        /* Class .rotate-180 akan ditambahkan oleh JS */
     </style>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-900 text-gray-200">
 
     <div th:fragment="layout(content)">
         <div class="flex h-screen">
             
-            <div class="w-64 bg-gray-900 text-gray-300 flex flex-col sidebar">
-                <div class="p-5 text-2xl font-semibold text-white">Admin Panel</div>
+            <div class="w-64 bg-black text-gray-400 flex flex-col sidebar">
                 
-                <nav class="flex-1 px-4 py-2 space-y-2">
+                <div class="p-5 text-2xl font-semibold text-white border-b border-gray-800">
+                    <a th:href="@{/admin/dashboard}">ADMIN PANEL</a>
+                </div>
+                
+                <nav class="flex-1 px-4 py-4 space-y-2">
 
                     <a th:href="@{/admin/dashboard}" 
-                       class="flex items-center space-x-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200">
+                       class="flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-colors duration-200"
+                       th:classappend="${currentUri == '/admin/dashboard'} 
+                           ? 'bg-gray-800 text-white border-l-4 border-yellow-500'
+                           : 'hover:bg-gray-800 hover:text-white'">
                        <i class="ri-dashboard-line w-5 h-5"></i> 
-                       <span class="font-medium">Dashboard</span>
+                       <span>Dashboard</span>
                     </a>
 
-                    <div class="space-y-1 dropdown-parent">
-                        <button class="w-full flex justify-between items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200 focus:outline-none dropdown-toggle">
+                    <div class="space-y-1 dropdown-parent"
+                         th:classappend="${currentUri.startsWith('/admin/hotels') or currentUri.startsWith('/admin/hotel-rooms')} ? 'open' : ''">
+                        
+                        <button class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle"
+                                th:classappend="${currentUri.startsWith('/admin/hotels') or currentUri.startsWith('/admin/hotel-rooms')} ? 'text-white' : ''">
                             <span class="flex items-center space-x-3">
                                 <i class="ri-hotel-line w-5 h-5"></i> 
-                                <span class="font-medium">Hotel Management</span>
+                                <span>Hotel Management</span>
                             </span>
-                            <i class="ri-arrow-down-s-line arrow-icon"></i>
+                            <i class="ri-arrow-down-s-line arrow-icon"
+                               th:classappend="${currentUri.startsWith('/admin/hotels') or currentUri.startsWith('/admin/hotel-rooms')} ? 'rotate-180' : ''"></i>
                         </button>
+                        
                         <div class="pl-8 space-y-1 dropdown-menu">
-                            <a th:href="@{/admin/hotels}" class="block w-full px-4 py-2 rounded-lg hover:bg-gray-700 hover:text-white text-sm transition-colors duration-200">
+                            <a th:href="@{/admin/hotels}" 
+                               class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
+                               th:classappend="${currentUri.startsWith('/admin/hotels')} ? 'text-yellow-400 font-semibold' : ''">
                                Manage Hotels
                             </a>
-                            <a th:href="@{/admin/hotel-rooms}" class="block w-full px-4 py-2 rounded-lg hover:bg-gray-700 hover:text-white text-sm transition-colors duration-200">
+                            <a th:href="@{/admin/hotel-rooms}" 
+                               class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
+                               th:classappend="${currentUri.startsWith('/admin/hotel-rooms')} ? 'text-yellow-400 font-semibold' : ''">
                                Manage Hotel Rooms
                             </a>
                         </div>
                     </div>
 
-                    <div class="space-y-1 dropdown-parent">
-                        <button class="w-full flex justify-between items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200 focus:outline-none dropdown-toggle">
+                    <div class="space-y-1 dropdown-parent"
+                         th:classappend="${currentUri.startsWith('/admin/transports') or currentUri.startsWith('/admin/transport-tickets')} ? 'open' : ''">
+                        
+                        <button class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle"
+                                th:classappend="${currentUri.startsWith('/admin/transports') or currentUri.startsWith('/admin/transport-tickets')} ? 'text-white' : ''">
                             <span class="flex items-center space-x-3">
                                 <i class="ri-bus-line w-5 h-5"></i> 
-                                <span class="font-medium">Transport Management</span>
+                                <span>Transport Mgt.</span>
                             </span>
-                            <i class="ri-arrow-down-s-line arrow-icon"></i>
+                            <i class="ri-arrow-down-s-line arrow-icon"
+                               th:classappend="${currentUri.startsWith('/admin/transports') or currentUri.startsWith('/admin/transport-tickets')} ? 'rotate-180' : ''"></i>
                         </button>
+                        
                         <div class="pl-8 space-y-1 dropdown-menu">
-                            <a th:href="@{/admin/transports}" class="block w-full px-4 py-2 rounded-lg hover:bg-gray-700 hover:text-white text-sm transition-colors duration-200">
+                            <a th:href="@{/admin/transports}" 
+                               class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
+                               th:classappend="${currentUri.startsWith('/admin/transports') and not currentUri.startsWith('/admin/transport-tickets')} ? 'text-yellow-400 font-semibold' : ''">
                                Manage Transports
                             </a>
-                            <a th:href="@{/admin/transport-tickets}" class="block w-full px-4 py-2 rounded-lg hover:bg-gray-700 hover:text-white text-sm transition-colors duration-200">
+                            <a th:href="@{/admin/transport-tickets}" 
+                               class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
+                               th:classappend="${currentUri.startsWith('/admin/transport-tickets')} ? 'text-yellow-400 font-semibold' : ''">
                                Manage Transport Tickets
                             </a>
                         </div>
                     </div>
-
-                    <div class="space-y-1 dropdown-parent">
-                        <button class="w-full flex justify-between items-center px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200 focus:outline-none dropdown-toggle">
+                    
+                    <div class="space-y-1 dropdown-parent"
+                         th:classappend="${currentUri.startsWith('/admin/attractions') or currentUri.startsWith('/admin/attraction-tickets')} ? 'open' : ''">
+                        
+                        <button class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle"
+                                th:classappend="${currentUri.startsWith('/admin/attractions') or currentUri.startsWith('/admin/attraction-tickets')} ? 'text-white' : ''">
                             <span class="flex items-center space-x-3">
                                 <i class="ri-camera-lens-line w-5 h-5"></i> 
-                                <span class="font-medium">Attraction Management</span>
+                                <span>Attraction Mgt.</span>
                             </span>
-                            <i class="ri-arrow-down-s-line arrow-icon"></i>
+                            <i class="ri-arrow-down-s-line arrow-icon"
+                               th:classappend="${currentUri.startsWith('/admin/attractions') or currentUri.startsWith('/admin/attraction-tickets')} ? 'rotate-180' : ''"></i>
                         </button>
+
                         <div class="pl-8 space-y-1 dropdown-menu">
-                            <a th:href="@{/admin/attractions}" class="block w-full px-4 py-2 rounded-lg hover:bg-gray-700 hover:text-white text-sm transition-colors duration-200">
+                            <a th:href="@{/admin/attractions}" 
+                               class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
+                               th:classappend="${currentUri.startsWith('/admin/attractions') and not currentUri.startsWith('/admin/attraction-tickets')} ? 'text-yellow-400 font-semibold' : ''">
                                Manage Attractions
                             </a>
-                            <a th:href="@{/admin/attraction-tickets}" class="block w-full px-4 py-2 rounded-lg hover:bg-gray-700 hover:text-white text-sm transition-colors duration-200">
+                            <a th:href="@{/admin/attraction-tickets}" 
+                               class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
+                               th:classappend="${currentUri.startsWith('/admin/attraction-tickets')} ? 'text-yellow-400 font-semibold' : ''">
                                Manage Attraction Tickets
                             </a>
                         </div>
                     </div>
 
+                    <div class="space-y-1 dropdown-parent"
+                         th:classappend="${currentUri.startsWith('/admin/users') or currentUri.startsWith('/admin/orders')} ? 'open' : ''">
+                        
+                        <button class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle"
+                                th:classappend="${currentUri.startsWith('/admin/users') or currentUri.startsWith('/admin/orders')} ? 'text-white' : ''">
+                            <span class="flex items-center space-x-3">
+                                <i class="ri-user-settings-line w-5 h-5"></i> 
+                                <span>User Management</span>
+                            </span>
+                            <i class="ri-arrow-down-s-line arrow-icon"
+                               th:classappend="${currentUri.startsWith('/admin/users') or currentUri.startsWith('/admin/orders')} ? 'rotate-180' : ''"></i>
+                        </button>
+
+                        <div class="pl-8 space-y-1 dropdown-menu">
+                            <a th:href="@{/admin/users}" 
+                               class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
+                               th:classappend="${currentUri.startsWith('/admin/users')} ? 'text-yellow-400 font-semibold' : ''">
+                               Manage Users
+                            </a>
+                            <a th:href="@{/admin/orders}" 
+                               class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
+                               th:classappend="${currentUri.startsWith('/admin/orders')} ? 'text-yellow-400 font-semibold' : ''">
+                               View All Orders
+                            </a>
+                        </div>
+                    </div>
                 </nav>
 
-                <div class="p-4 mt-auto border-t border-gray-700">
-                    <form th:action="@{/logout}" method="post">
-                        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors duration-200">
-                            Logout
+                <div class="p-4 mt-auto border-t border-gray-800 space-y-2">
+                    <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg font-medium hover:bg-gray-800 hover:text-white transition-colors duration-200">
+                        <i class="ri-question-line w-5 h-5"></i>
+                        <span>Help</span>
+                    </a>
+                    <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg font-medium hover:bg-gray-800 hover:text-white transition-colors duration-200">
+                        <i class="ri-mail-line w-5 h-5"></i>
+                        <span>Contact Us</span>
+                    </a>
+                    <form th:action="@{/logout}" method="post" class="w-full">
+                        <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-medium text-red-500 hover:bg-red-900/50 hover:text-red-400 transition-colors duration-200">
+                            <i class="ri-logout-box-r-line w-5 h-5"></i>
+                            <span>Logout</span>
                         </button>
                     </form>
                 </div>
             </div>
 
             <div class="flex-1 flex flex-col overflow-hidden">
-                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+                <header class="bg-black text-white p-4 flex justify-between items-center border-b border-gray-800">
+                    <div>
+                        <h1 class="text-2xl font-semibold">Welcome, Admin</h1>
+                        <p class="text-sm text-gray-400">Here's what's happening with your store today</p>
+                    </div>
+                    <div class="flex items-center space-x-5">
+                        <button class="hover:text-gray-300"><i class="ri-search-line text-xl"></i></button>
+                        <button class="hover:text-gray-300 relative">
+                            <i class="ri-notification-3-line text-xl"></i>
+                            <span class-="absolute -top-2 -right-2 bg-red-500 text-xs text-white rounded-full w-4 h-4 flex items-center justify-center">2</span>
+                        </button>
+                        <img src="https://i.pravatar.cc/150?u=admin" alt="Admin" class="w-10 h-10 rounded-full border-2 border-gray-700">
+                    </div>
+                </header>
+                
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-6">
                     <div th:replace="${content}"></div>
                 </main>
             </div>
         </div>
+   
    <script>
         if (!window.adminScriptLoaded) {
             document.addEventListener("DOMContentLoaded", function() {

@@ -10,19 +10,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.travelapp.travel_app.model.Attraction;
-import com.travelapp.travel_app.model.AttractionTicket; // <-- IMPORT BARU
+import com.travelapp.travel_app.model.AttractionTicket; 
 import com.travelapp.travel_app.model.Category;
 import com.travelapp.travel_app.model.Hotel;
-import com.travelapp.travel_app.model.HotelRoom; // <-- IMPORT BARU
+import com.travelapp.travel_app.model.HotelRoom; 
+import com.travelapp.travel_app.model.Role;
 import com.travelapp.travel_app.model.Transport;
-import com.travelapp.travel_app.model.TransportTicket; // <-- IMPORT BARU
+import com.travelapp.travel_app.model.TransportTicket; 
+import com.travelapp.travel_app.model.User;
+import com.travelapp.travel_app.repository.UserRepository;
+import com.travelapp.travel_app.repository.order.OrderRepository;
 import com.travelapp.travel_app.repository.transport.TransportProviderRepository;
 import com.travelapp.travel_app.service.attraction.AttractionService;
-import com.travelapp.travel_app.service.attraction.AttractionTicketService; // <-- IMPORT BARU
-import com.travelapp.travel_app.service.hotel.HotelRoomService; // <-- IMPORT BARU
+import com.travelapp.travel_app.service.attraction.AttractionTicketService; 
+import com.travelapp.travel_app.service.hotel.HotelRoomService;
 import com.travelapp.travel_app.service.hotel.HotelService;
 import com.travelapp.travel_app.service.transport.TransportService;
-import com.travelapp.travel_app.service.transport.TransportTicketService; // <-- IMPORT BARU
+import com.travelapp.travel_app.service.transport.TransportTicketService;
+import com.travelapp.travel_app.service.user.UserService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/admin")
@@ -33,11 +40,19 @@ public class AdminController {
     @Autowired private TransportService transportService;
     @Autowired private AttractionService attractionService;
     @Autowired private TransportProviderRepository transportProviderRepository; 
+    @Autowired private UserRepository userRepository; 
+    @Autowired private OrderRepository orderRepository;
 
     // --- SERVICE BARU UNTUK SUB-ITEM ---
     @Autowired private HotelRoomService hotelRoomService;
     @Autowired private TransportTicketService transportTicketService;
     @Autowired private AttractionTicketService attractionTicketService;
+    @Autowired private UserService userService;
+
+    @ModelAttribute("currentUri")
+    public String getCurrentUri(HttpServletRequest request) {
+        return request.getRequestURI();
+    }
 
     // (Dashboard)
     @GetMapping("/dashboard")
@@ -45,6 +60,7 @@ public class AdminController {
         model.addAttribute("hotelCount", hotelService.getHotelCount());
         model.addAttribute("transportCount", transportService.getTransportCount());
         model.addAttribute("attractionCount", attractionService.getAttractionCount());
+        model.addAttribute("userCount", userService.getUserCount());
         return "admin/dashboard"; 
     }
 
@@ -259,5 +275,55 @@ public class AdminController {
     public String deleteAttractionTicket(@PathVariable("id") Integer id) {
         attractionTicketService.deleteById(id);
         return "redirect:/admin/attraction-tickets";
+    }
+
+   @GetMapping("/users")
+    public String showUserList(Model model) {
+        // MODIFIKASI: Gunakan UserService
+        model.addAttribute("allUsers", userService.findAll());
+        return "admin/user/users-list"; 
+    }
+
+    @GetMapping("/orders")
+    public String showAllOrders(Model model) {
+        model.addAttribute("allOrders", orderRepository.findAll());
+        return "admin/order/order-list";
+    }
+
+    // --- TAMBAHKAN METHOD-METHOD BARU DI BAWAH INI ---
+
+    @GetMapping("/users/add")
+    public String showAddUserForm(Model model) {
+        model.addAttribute("user", new User());
+        model.addAttribute("allRoles", Role.values()); // Mengirim enum Role ke form
+        model.addAttribute("pageTitle", "Add New User");
+        return "admin/user/user-form"; // Mengarah ke form baru
+    }
+
+    @GetMapping("/users/edit/{id}")
+    public String showEditUserForm(@PathVariable("id") Integer id, Model model) {
+        User user = userService.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        
+        // PENTING: Kosongkan password agar tidak terkirim ke HTML
+        user.setPassword(""); 
+        
+        model.addAttribute("user", user);
+        model.addAttribute("allRoles", Role.values()); // Mengirim enum Role ke form
+        model.addAttribute("pageTitle", "Edit User");
+        return "admin/user/user-form"; // Mengarah ke form baru
+    }
+
+    @PostMapping("/users/save")
+    public String saveUser(@ModelAttribute("user") User user) {
+        // Logika kompleks (enkripsi, update, create) sudah dihandle oleh service
+        userService.saveUser(user);
+        return "redirect:/admin/users";
+    }
+
+    @GetMapping("/users/delete/{id}")
+    public String deleteUser(@PathVariable("id") Integer id) {
+        userService.deleteById(id);
+        return "redirect:/admin/users";
     }
 }
