@@ -1,129 +1,183 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <title>Select User Order</title>
+ <head>
+    <title>Manage Hotels</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-    <style>
-      .sidebar {
-        font-family: "Poppins", sans-serif;
-      }
-      .dropdown-menu {
-        overflow: hidden;
-        max-height: 0;
-        opacity: 0;
-        visibility: hidden;
-        transition: max-height 0.4s ease-out, opacity 0.3s ease-out,
-          visibility 0s linear 0.4s;
-        background-color: #1f2937;
-      }
-      .dropdown-parent.open .dropdown-menu {
-        max-height: 200px;
-        opacity: 1;
-        visibility: visible;
-        transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
-      }
-      .arrow-icon {
-        transition: transform 0.3s ease;
-      }
-    </style>
-  </head>
-  <body>
-    <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
-      <div th:fragment="content">
-        <h1 class="text-2xl font-semibold text-white mb-6">
-          Pilih User untuk Melihat Pesanan
-        </h1>
+    
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
-        <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-          <table class="min-w-full divide-y divide-gray-700">
-            <thead class="bg-gray-700">
-              <tr>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase"
-                >
-                  ID
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase"
-                >
-                  Nama User
-                </th>
-                <th
-                  class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase"
-                >
-                  Email
-                </th>
-                <th
-                  class="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase"
-                >
-                  Aksi
-                </th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-700">
-              <tr th:each="user : ${users}" class="hover:bg-gray-700/50">
-                <td
-                  class="px-6 py-4 text-sm text-gray-400"
-                  th:text="${user.userId}"
-                >
-                  1
-                </td>
-                <td
-                  class="px-6 py-4 text-sm text-white font-medium"
-                  th:text="${user.name}"
-                >
-                  Nama
-                </td>
-                <td
-                  class="px-6 py-4 text-sm text-gray-300"
-                  th:text="${user.email}"
-                >
-                  email@mail.com
-                </td>
-                <td class="px-6 py-4 text-center">
-                  <a
-                    th:href="@{/admin/orders/{id}(id=${user.userId})}"
-                    class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-                  >
-                    <i class="ri-eye-line mr-2"></i> Lihat Detail Order
-                  </a>
-                </td>
-              </tr>
-              <tr th:if="${#lists.isEmpty(users)}">
-                <td colspan="4" class="px-6 py-4 text-center text-gray-500">
-                  Belum ada user.
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    <script>
-      if (!window.adminScriptLoaded) {
-        document.addEventListener("DOMContentLoaded", function () {
-          const dropdownToggles = document.querySelectorAll(".dropdown-toggle");
-          dropdownToggles.forEach(function (toggle) {
-            toggle.addEventListener("click", function (e) {
-              const parentDiv = e.currentTarget.closest(".dropdown-parent");
-              const icon = e.currentTarget.querySelector(".arrow-icon");
-              parentDiv.classList.toggle("open");
-              if (icon) {
-                icon.classList.toggle("rotate-180");
-              }
-            });
-          });
-        });
-        window.adminScriptLoaded = true;
+    <style>
+        .sidebar {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Sembunyikan menu dropdown (transisi) */
+        .dropdown-menu {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
+        }
+        
+        /* Tampilkan menu saat parent-nya punya class .open */
+        .dropdown-parent.open .dropdown-menu {
+            max-height: 200px; /* Cukup tinggi untuk 2 item */
+            opacity: 1;
+            visibility: visible;
+            transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
+        }
+        
+        /* Transisi untuk panah */
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+         .custom-scrollbar::-webkit-scrollbar {
+        height: 8px;
+        width: 8px;
       }
-    </script>
-  </body>
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #1f2937;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #4b5563;
+        border-radius: 4px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #6b7280;
+      }
+        /* Class .rotate-180 akan ditambahkan oleh JS */
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
+        <div th:fragment="content">
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-white tracking-tight">Pilih User</h1>
+                    <p class="text-gray-400 text-sm mt-1">Pilih user untuk melihat detail riwayat pesanan mereka.</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+                
+                <div class="p-5 border-b border-gray-700 flex items-center gap-4 bg-gray-800/50">
+                    <div class="relative w-full sm:w-72">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ri-search-line text-gray-400"></i>
+                        </div>
+                        <input type="text" id="tableSearch" 
+                               class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500 transition-colors" 
+                               placeholder="Cari nama atau email...">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-sm text-left text-gray-400 datatable">
+                        <thead class="text-xs text-gray-400 uppercase bg-gray-900/50 border-b border-gray-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Info User</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Kontak</th>
+                                <th scope="col" class="px-6 py-4 text-center font-semibold tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr th:each="user : ${users}" class="hover:bg-gray-700/30 transition-colors duration-150 group">
+                                
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md border border-blue-500/30">
+                                            <span th:text="${#strings.substring(user.name, 0, 1)}">A</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-white font-medium text-base" th:text="${user.name}">Nama User</div>
+                                            <div class="text-xs text-gray-500">User ID: <span class="font-mono text-blue-400" th:text="'#' + ${user.userId}">#1</span></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col gap-1">
+                                        <div class="flex items-center gap-2 text-gray-300">
+                                            <i class="ri-mail-line text-gray-500"></i>
+                                            <span th:text="${user.email}">email@mail.com</span>
+                                        </div>
+                                        <div class="flex items-center gap-2 text-gray-400 text-xs" th:if="${user.phone}">
+                                            <i class="ri-phone-line text-gray-600"></i>
+                                            <span th:text="${user.phone}">0812...</span>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
+                                    <a th:href="@{/admin/orders/{id}(id=${user.userId})}" 
+                                       class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-all shadow-lg shadow-blue-900/20 hover:-translate-y-0.5">
+                                        <span>Lihat Order</span>
+                                        <i class="ri-arrow-right-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            
+                            <tr th:if="${#lists.isEmpty(users)}">
+                                <td colspan="3" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center text-gray-500">
+                                        <i class="ri-user-search-line text-5xl mb-3"></i>
+                                        <p class="text-lg">Belum ada user terdaftar.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="p-4 border-t border-gray-700 bg-gray-900/30 flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Total User: <span class="font-semibold text-white" th:text="${#lists.size(users)}">0</span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const statusFilter = document.getElementById('statusFilter');
+                    const searchInput = document.getElementById('tableSearch');
+                    const tableRows = document.querySelectorAll('.datatable tbody tr');
+
+                    function filterTable() {
+                        const statusValue = statusFilter.value.toUpperCase();
+                        const searchValue = searchInput.value.toLowerCase();
+
+                        tableRows.forEach(row => {
+                            // Ambil text dari seluruh baris untuk search
+                            const rowText = row.textContent.toLowerCase();
+                            
+                            // Ambil status spesifik dari badge (kita pakai atribut data-status biar akurat)
+                            const statusBadge = row.querySelector('.status-badge');
+                            const rowStatus = statusBadge ? statusBadge.getAttribute('data-status').toUpperCase() : '';
+
+                            // Cek kondisi Search AND Filter
+                            const matchesSearch = rowText.includes(searchValue);
+                            const matchesStatus = statusValue === "" || rowStatus === statusValue;
+
+                            if (matchesSearch && matchesStatus) {
+                                row.style.display = "";
+                            } else {
+                                row.style.display = "none";
+                            }
+                        });
+                    }
+
+                    // Event Listeners
+                    statusFilter.addEventListener('change', filterTable);
+                    
+                    // Kita juga pasang listener di search input (menimpa/melengkapi script global jika ada)
+                    searchInput.addEventListener('keyup', filterTable);
+                });
+            </script>
+</body>
 </html>

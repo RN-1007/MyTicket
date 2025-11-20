@@ -1,16 +1,21 @@
 package com.travelapp.travel_app.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller; 
+import org.springframework.data.domain.Sort; 
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute; 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.travelapp.travel_app.model.Attraction;
 import com.travelapp.travel_app.model.AttractionTicket; 
@@ -32,7 +37,8 @@ import com.travelapp.travel_app.service.hotel.HotelRoomService;
 import com.travelapp.travel_app.service.hotel.HotelService;
 import com.travelapp.travel_app.service.transport.TransportService;
 import com.travelapp.travel_app.service.transport.TransportTicketService;
-import com.travelapp.travel_app.service.user.UserService;
+import com.travelapp.travel_app.service.user.UserService; // Import util kita
+import com.travelapp.travel_app.util.FileUploadUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -46,7 +52,6 @@ public class AdminController {
     @Autowired private TransportProviderRepository transportProviderRepository; 
     @Autowired private UserRepository userRepository; 
     @Autowired private OrderRepository orderRepository;
-
     @Autowired private HotelRoomService hotelRoomService;
     @Autowired private TransportTicketService transportTicketService;
     @Autowired private AttractionTicketService attractionTicketService;
@@ -57,7 +62,6 @@ public class AdminController {
         return request.getRequestURI();
     }
 
-    // (Dashboard)
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         model.addAttribute("hotelCount", hotelService.getHotelCount());
@@ -67,7 +71,7 @@ public class AdminController {
         return "admin/dashboard"; 
     }
 
-    // == CRUD HOTEL ==
+    // == CRUD HOTEL (UPDATED) ==
     @GetMapping("/hotels")
     public String showHotelList(Model model) {
         model.addAttribute("hotels", hotelService.getAllHotels());
@@ -79,15 +83,36 @@ public class AdminController {
         model.addAttribute("pageTitle", "Add New Hotel");
         return "admin/hotel/hotel-form"; 
     }
+    
     @PostMapping("/hotels/save")
-    public String saveHotel(@ModelAttribute("hotel") Hotel hotel) {
-        hotelService.saveHotel(hotel); 
+    public String saveHotel(@ModelAttribute("hotel") Hotel hotel, 
+                            @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
+        
+        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        
+        // Logika: Jika upload gambar baru, pakai itu. Jika tidak, cek apakah ini edit data lama.
+        if (!fileName.isEmpty()) {
+            hotel.setImage(fileName);
+            Hotel savedHotel = hotelService.saveHotel(hotel);
+            String uploadDir = "hotel-photos/" + savedHotel.getHotelId();
+            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+        } else {
+            // Jika edit dan tidak ganti gambar, kita perlu ambil gambar lama (jika ada)
+            if (hotel.getHotelId() != null) {
+                Hotel existingHotel = hotelService.getHotelById(hotel.getHotelId()).orElse(null);
+                if (existingHotel != null) {
+                    hotel.setImage(existingHotel.getImage());
+                }
+            }
+            hotelService.saveHotel(hotel);
+        }
+
         return "redirect:/admin/hotels"; 
     }
+    
     @GetMapping("/hotels/edit/{id}")
     public String showEditHotelForm(@PathVariable("id") Integer id, Model model) {
-        Hotel hotel = hotelService.getHotelById(id) 
-                .orElseThrow(() -> new IllegalArgumentException("Invalid hotel Id:" + id));
+        Hotel hotel = hotelService.getHotelById(id).orElseThrow(() -> new IllegalArgumentException("Invalid hotel Id:" + id));
         model.addAttribute("hotel", hotel);
         model.addAttribute("pageTitle", "Edit Hotel");
         return "admin/hotel/hotel-form"; 
@@ -98,7 +123,7 @@ public class AdminController {
         return "redirect:/admin/hotels"; 
     }
     
-    // == CRUD HOTEL ROOMS ==
+    // == CRUD HOTEL ROOMS (Tetap) ==
     @GetMapping("/hotel-rooms")
     public String showHotelRoomList(Model model) {
         model.addAttribute("hotelRooms", hotelRoomService.findAll());
@@ -118,8 +143,7 @@ public class AdminController {
     }
     @GetMapping("/hotel-rooms/edit/{id}")
     public String showEditHotelRoomForm(@PathVariable("id") Integer id, Model model) {
-        HotelRoom hotelRoom = hotelRoomService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid hotel room Id:" + id));
+        HotelRoom hotelRoom = hotelRoomService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid room Id:" + id));
         model.addAttribute("hotelRoom", hotelRoom);
         model.addAttribute("allHotels", hotelService.getAllHotels());
         model.addAttribute("pageTitle", "Edit Hotel Room");
@@ -131,7 +155,7 @@ public class AdminController {
         return "redirect:/admin/hotel-rooms";
     }
 
-    // == CRUD TRANSPORT ==
+    // == CRUD TRANSPORT (UPDATED) ==
     @GetMapping("/transports")
     public String showTransportList(Model model) {
         model.addAttribute("transports", transportService.getAllTransports());
@@ -144,15 +168,31 @@ public class AdminController {
         model.addAttribute("pageTitle", "Add New Transport");
         return "admin/transport/transport-form"; 
     }
+    
     @PostMapping("/transports/save")
-    public String saveTransport(@ModelAttribute("transport") Transport transport) {
-        transportService.saveTransport(transport);
+    public String saveTransport(@ModelAttribute("transport") Transport transport,
+                                @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
+        
+        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        
+        if (!fileName.isEmpty()) {
+            transport.setImage(fileName);
+            Transport savedTransport = transportService.saveTransport(transport);
+            String uploadDir = "transport-photos/" + savedTransport.getTransportId();
+            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+        } else {
+            if (transport.getTransportId() != null) {
+                Transport existing = transportService.getTransportById(transport.getTransportId()).orElse(null);
+                if (existing != null) transport.setImage(existing.getImage());
+            }
+            transportService.saveTransport(transport);
+        }
         return "redirect:/admin/transports"; 
     }
+    
     @GetMapping("/transports/edit/{id}")
     public String showEditTransportForm(@PathVariable("id") Integer id, Model model) {
-        Transport transport = transportService.getTransportById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid transport Id:" + id));
+        Transport transport = transportService.getTransportById(id).orElseThrow(() -> new IllegalArgumentException("Invalid transport Id:" + id));
         model.addAttribute("transport", transport);
         model.addAttribute("allProviders", transportProviderRepository.findAll()); 
         model.addAttribute("pageTitle", "Edit Transport");
@@ -164,7 +204,7 @@ public class AdminController {
         return "redirect:/admin/transports"; 
     }
 
-    // == CRUD TRANSPORT TICKETS ==
+    // == CRUD TRANSPORT TICKETS (Tetap) ==
     @GetMapping("/transport-tickets")
     public String showTransportTicketList(Model model) {
         model.addAttribute("transportTickets", transportTicketService.findAll());
@@ -184,8 +224,7 @@ public class AdminController {
     }
     @GetMapping("/transport-tickets/edit/{id}")
     public String showEditTransportTicketForm(@PathVariable("id") Integer id, Model model) {
-        TransportTicket ticket = transportTicketService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid transport ticket Id:" + id));
+        TransportTicket ticket = transportTicketService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid ticket Id:" + id));
         model.addAttribute("transportTicket", ticket);
         model.addAttribute("allTransports", transportService.getAllTransports());
         model.addAttribute("pageTitle", "Edit Transport Ticket");
@@ -197,7 +236,7 @@ public class AdminController {
         return "redirect:/admin/transport-tickets";
     }
 
-    // == CRUD ATTRACTION ==
+    // == CRUD ATTRACTION (UPDATED) ==
     @GetMapping("/attractions")
     public String showAttractionList(Model model) {
         model.addAttribute("attractions", attractionService.getAllAttractions());
@@ -210,15 +249,31 @@ public class AdminController {
         model.addAttribute("pageTitle", "Add New Attraction");
         return "admin/attraction/attraction-form"; 
     }
+    
     @PostMapping("/attractions/save")
-    public String saveAttraction(@ModelAttribute("attraction") Attraction attraction) {
-        attractionService.saveAttraction(attraction);
+    public String saveAttraction(@ModelAttribute("attraction") Attraction attraction,
+                                 @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
+        
+        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+        
+        if (!fileName.isEmpty()) {
+            attraction.setImage(fileName);
+            Attraction savedAttraction = attractionService.saveAttraction(attraction);
+            String uploadDir = "attraction-photos/" + savedAttraction.getAttractionId();
+            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+        } else {
+             if (attraction.getAttractionId() != null) {
+                Attraction existing = attractionService.getAttractionById(attraction.getAttractionId()).orElse(null);
+                if (existing != null) attraction.setImage(existing.getImage());
+            }
+            attractionService.saveAttraction(attraction);
+        }
         return "redirect:/admin/attractions"; 
     }
+    
     @GetMapping("/attractions/edit/{id}")
     public String showEditAttractionForm(@PathVariable("id") Integer id, Model model) {
-        Attraction attraction = attractionService.getAttractionById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid attraction Id:" + id));
+        Attraction attraction = attractionService.getAttractionById(id).orElseThrow(() -> new IllegalArgumentException("Invalid attraction Id:" + id));
         model.addAttribute("attraction", attraction);
         model.addAttribute("allCategories", Category.values()); 
         model.addAttribute("pageTitle", "Edit Attraction");
@@ -230,7 +285,7 @@ public class AdminController {
         return "redirect:/admin/attractions"; 
     }
 
-    // == CRUD ATTRACTION TICKETS ==
+    // == CRUD ATTRACTION TICKETS (Tetap) ==
     @GetMapping("/attraction-tickets")
     public String showAttractionTicketList(Model model) {
         model.addAttribute("attractionTickets", attractionTicketService.findAll());
@@ -250,8 +305,7 @@ public class AdminController {
     }
     @GetMapping("/attraction-tickets/edit/{id}")
     public String showEditAttractionTicketForm(@PathVariable("id") Integer id, Model model) {
-        AttractionTicket ticket = attractionTicketService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid attraction ticket Id:" + id));
+        AttractionTicket ticket = attractionTicketService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid ticket Id:" + id));
         model.addAttribute("attractionTicket", ticket);
         model.addAttribute("allAttractions", attractionService.getAllAttractions());
         model.addAttribute("pageTitle", "Edit Attraction Ticket");
@@ -263,7 +317,7 @@ public class AdminController {
         return "redirect:/admin/attraction-tickets";
     }
 
-    // == USER MANAGEMENT ==
+    // == USER MANAGEMENT (Tetap) ==
     @GetMapping("/users")
     public String showUserList(Model model) {
         model.addAttribute("allUsers", userService.findAll());
@@ -278,8 +332,7 @@ public class AdminController {
     }
     @GetMapping("/users/edit/{id}")
     public String showEditUserForm(@PathVariable("id") Integer id, Model model) {
-        User user = userService.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
+        User user = userService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
         user.setPassword(""); 
         model.addAttribute("user", user);
         model.addAttribute("allRoles", Role.values());
@@ -301,36 +354,28 @@ public class AdminController {
         userService.toggleUserStatus(id);
         return "redirect:/admin/users";
     }
+    // == ORDER TRANSACTION LIST ==
+    @GetMapping("/transactions")
+    public String showTransactionList(Model model) {
+        // Mengambil semua order, diurutkan dari yang terbaru (DESC)
+        List<Order> allOrders = orderRepository.findAll(Sort.by(Sort.Direction.DESC, "orderDate"));
+        model.addAttribute("allOrders", allOrders);
+        return "admin/order/order-list"; 
+    }
 
-
-    // == ORDER MANAGEMENT (VIEW BY USER) ==
-    
-    /**
-     * Halaman 1: Menampilkan Daftar User yang Memiliki Order
-     */
+    // == ORDER MANAGEMENT (Tetap) ==
     @GetMapping("/orders")
     public String showUsersForOrders(Model model) {
         model.addAttribute("users", userService.findAll());
         return "admin/order/order-users"; 
     }
-
-    /**
-     * Halaman 2: Detail Pesanan User (Dipisah per Kategori)
-     */
     @GetMapping("/orders/{userId}")
     public String showUserOrderDetails(@PathVariable("userId") Integer userId, Model model) {
-        User user = userService.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + userId));
-        
-        // Ambil semua order milik user ini
+        User user = userService.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + userId));
         List<Order> userOrders = orderRepository.findByUser(user);
-
-        // Wadah untuk memisahkan item
         List<OrderDetail> hotelDetails = new ArrayList<>();
         List<OrderDetail> transportDetails = new ArrayList<>();
         List<OrderDetail> attractionDetails = new ArrayList<>();
-
-        // Logika Pemisahan
         for (Order order : userOrders) {
             for (OrderDetail detail : order.getOrderDetails()) {
                 if (detail.getHotelRoom() != null) {
@@ -342,12 +387,11 @@ public class AdminController {
                 }
             }
         }
-
+    
         model.addAttribute("user", user);
         model.addAttribute("hotelDetails", hotelDetails);
         model.addAttribute("transportDetails", transportDetails);
         model.addAttribute("attractionDetails", attractionDetails);
-
         return "admin/order/user-order-details"; 
     }
 }

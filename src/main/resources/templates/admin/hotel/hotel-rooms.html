@@ -2,10 +2,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Manage Hotel Rooms</title>
-<script src="https://cdn.tailwindcss.com"></script>
-    
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,90 +12,168 @@
         .sidebar {
             font-family: 'Poppins', sans-serif;
         }
-
-        /* Sembunyikan menu dropdown (transisi) */
         .dropdown-menu {
             overflow: hidden;
             max-height: 0;
             opacity: 0;
             visibility: hidden;
             transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
+            /* background-color: #1F2937; <-- BARIS INI DIHAPUS */
         }
-        
-        /* Tampilkan menu saat parent-nya punya class .open */
         .dropdown-parent.open .dropdown-menu {
-            max-height: 200px; /* Cukup tinggi untuk 2 item */
+            max-height: 200px; 
             opacity: 1;
             visibility: visible;
             transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
         }
-        
-        /* Transisi untuk panah */
         .arrow-icon {
             transition: transform 0.3s ease;
         }
-        /* Class .rotate-180 akan ditambahkan oleh JS */
-    </style></head>
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    </style>
+</head>
 <body>
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
         <div th:fragment="content">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-semibold text-white">Manage Hotel Rooms</h1>
-                <a th:href="@{/admin/hotel-rooms/add}" 
-                   class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium">
-                    + Tambah Kamar Baru
-                </a>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-white tracking-tight">Manage Hotel Rooms</h1>
+                    <p class="text-gray-400 text-sm mt-1">Atur tipe kamar, harga, dan kapasitas.</p>
+                </div>
+                <div class="flex gap-3">
+                     <a th:href="@{/admin/hotel-rooms/add}"
+                       class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-lg font-medium transition shadow-lg shadow-blue-900/20 flex items-center gap-2">
+                        <i class="ri-door-open-line text-lg"></i>
+                        <span>Tambah Kamar</span>
+                    </a>
+                </div>
             </div>
 
-            <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-700">
-                    <thead class="bg-gray-700">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Tipe Kamar</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Harga</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Hotel Induk</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-700">
-                        <tr th:each="room : ${hotelRooms}" class="hover:bg-gray-700/50">
-                            <td class="px-6 py-4 text-sm text-gray-200" th:text="${room.roomId}">1</td>
-                            <td class="px-6 py-4 text-sm text-white font-medium" th:text="${room.roomType}">Tipe Kamar</td>
-                            <td class="px-6 py-4 text-sm text-gray-300" th:text="'Rp ' + ${#numbers.formatDecimal(room.price, 0, 'POINT', 0, 'COMMA')}">Harga</td>
-                            <td class="px-6 py-4 text-sm text-gray-300" th:text="${room.hotel?.name}">Nama Hotel</td>
-                            <td class="px-6 py-4 space-x-4">
-                                <a th:href="@{/admin/hotel-rooms/edit/{id}(id=${room.roomId})}" 
-                                   class="text-yellow-400 hover:text-yellow-300 text-xl"><i class="ri-pencil-fill"></i></a>
-                                <a th:href="@{/admin/hotel-rooms/delete/{id}(id=${room.roomId})}" 
-                                   class="text-red-500 hover:text-red-400 text-xl"
-                                   onclick="return confirm('Apakah Anda yakin ingin menghapus kamar ini?');"><i class="ri-delete-bin-line"></i></a>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(hotelRooms)}">
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada data kamar hotel.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+                
+                <div class="p-5 border-b border-gray-700 flex items-center gap-4 bg-gray-800/50">
+                    <div class="relative w-full sm:w-72">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ri-search-line text-gray-400"></i>
+                        </div>
+                        <input type="text" id="tableSearch" 
+                               class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500 transition-colors" 
+                               placeholder="Cari tipe kamar atau hotel...">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-sm text-left text-gray-400 datatable">
+                        <thead class="text-xs text-gray-400 uppercase bg-gray-900/50 border-b border-gray-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">ID</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Info Kamar</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Kapasitas</th>
+                                <th scope="col" class="px-6 py-4 text-right font-semibold tracking-wider">Harga / Malam</th>
+                                <th scope="col" class="px-6 py-4 text-center font-semibold tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr th:each="room : ${hotelRooms}" class="hover:bg-gray-700/30 transition-colors duration-150">
+                                
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-500 font-mono" th:text="'#' + ${room.roomId}">#1</td>
+
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <div class="p-2 bg-blue-900/30 rounded-lg text-blue-400 border border-blue-800/50">
+                                            <i class="ri-hotel-bed-fill text-lg"></i>
+                                        </div>
+                                        <div>
+                                            <div class="text-white font-medium text-base" th:text="${room.roomType}">Deluxe Room</div>
+                                            <div class="text-xs text-gray-500 flex items-center gap-1">
+                                                <i class="ri-building-line"></i>
+                                                <span th:text="${room.hotel?.name}">Hotel Name</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    <div class="flex items-center gap-2 text-gray-300">
+                                        <i class="ri-user-line"></i>
+                                        <span th:text="${room.capacity} != null ? ${room.capacity} + ' Orang' : '-'">2 Orang</span>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <span class="text-emerald-400 font-bold text-base" 
+                                          th:text="'Rp ' + ${#numbers.formatDecimal(room.price, 0, 'POINT', 0, 'COMMA')}">
+                                        Rp 500.000
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <a th:href="@{/admin/hotel-rooms/edit/{id}(id=${room.roomId})}" 
+                                           class="p-2 bg-gray-700 hover:bg-yellow-600 text-white rounded-lg transition-colors shadow-sm" title="Edit">
+                                           <i class="ri-pencil-fill"></i>
+                                        </a>
+                                        <a th:href="@{/admin/hotel-rooms/delete/{id}(id=${room.roomId})}" 
+                                           class="p-2 bg-gray-700 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm"
+                                           onclick="return confirm('Hapus kamar ini?');" title="Delete">
+                                           <i class="ri-delete-bin-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            <tr th:if="${#lists.isEmpty(hotelRooms)}">
+                                <td colspan="5" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center text-gray-500">
+                                        <i class="ri-door-lock-line text-5xl mb-3"></i>
+                                        <p class="text-lg">Belum ada data kamar hotel.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="p-4 border-t border-gray-700 bg-gray-900/30 flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Total Kamar: <span class="font-semibold text-white" th:text="${#lists.size(hotelRooms)}">0</span></span>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        if (!window.adminScriptLoaded) {
-            document.addEventListener("DOMContentLoaded", function() {
-                const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-                dropdownToggles.forEach(function(toggle) {
-                    toggle.addEventListener('click', function(e) {
-                        const parentDiv = e.currentTarget.closest('.dropdown-parent');
-                        const icon = e.currentTarget.querySelector('.arrow-icon');
-                        parentDiv.classList.toggle('open');
-                        if(icon) { icon.classList.toggle('rotate-180'); }
+            if (!window.adminScriptLoaded) {
+                document.addEventListener("DOMContentLoaded", function() {
+                    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+                    dropdownToggles.forEach(function(toggle) {
+                        toggle.addEventListener('click', function(e) {
+                            const parentDiv = e.currentTarget.closest('.dropdown-parent');
+                            const icon = e.currentTarget.querySelector('.arrow-icon');
+                            parentDiv.classList.toggle('open');
+                            if(icon) { icon.classList.toggle('rotate-180'); }
+                        });
                     });
+
+                    const searchInput = document.getElementById('tableSearch');
+                    if (searchInput) {
+                        searchInput.addEventListener('keyup', function() {
+                            const filter = searchInput.value.toLowerCase();
+                            const rows = document.querySelectorAll('.datatable tbody tr');
+
+                            rows.forEach(row => {
+                                const text = row.textContent.toLowerCase();
+                                row.style.display = text.includes(filter) ? '' : 'none';
+                            });
+                        });
+                    }
                 });
-            });
-            window.adminScriptLoaded = true;
-        }
-    </script>
+                window.adminScriptLoaded = true;
+            }
+        </script>
 </body>
 </html>

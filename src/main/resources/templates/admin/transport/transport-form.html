@@ -3,14 +3,9 @@
 <head>
     <title th:text="${pageTitle}">Form Transport</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
-    <style>
+<style>
         .sidebar {
             font-family: 'Poppins', sans-serif;
         }
@@ -38,14 +33,14 @@
         }
         /* Class .rotate-180 akan ditambahkan oleh JS */
     </style>
-</head>
+    </head>
 <body>
-   <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
+    <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
         <div th:fragment="content">
             <h1 class="text-2xl font-semibold text-white mb-6" th:text="${pageTitle}">Judul Halaman</h1>
 
             <div class="bg-gray-800 p-8 rounded-lg shadow-lg max-w-2xl">
-                <form th:action="@{/admin/transports/save}" th:object="${transport}" method="POST">
+                <form th:action="@{/admin/transports/save}" th:object="${transport}" method="POST" enctype="multipart/form-data">
                     <input type="hidden" th:field="*{transportId}" />
 
                     <div class="mb-5">
@@ -58,45 +53,27 @@
                         <input type="number" id="capacity" th:field="*{capacity}" class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                     </div>
 
-                    <div class="mb-8">
+                    <div class="mb-5">
                         <label for="provider" class="block text-gray-300 font-semibold mb-2">Provider</label>
                         <select id="provider" th:field="*{provider}" class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                             <option value="">-- Pilih Provider --</option>
-                            <option th:each="p : ${allProviders}" 
-                                    th:value="${p.providerId}" 
-                                    th:text="${p.name}">
-                                Nama Provider
-                            </option>
+                            <option th:each="p : ${allProviders}" th:value="${p.providerId}" th:text="${p.name}">Nama Provider</option>
                         </select>
                     </div>
 
+                    <div class="mb-8">
+                        <label for="image" class="block text-gray-300 font-semibold mb-2">Foto Transport</label>
+                        <input type="file" name="imageFile" accept="image/png, image/jpeg" class="w-full text-gray-300" />
+                    </div>
+
                     <div class="flex justify-end space-x-4">
-                        <a th:href="@{/admin/transports}" class="bg-gray-600 hover:bg-gray-500 text-gray-200 px-5 py-2.5 rounded-lg font-medium">
-                            Batal
-                        </a>
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium">
-                            Simpan
-                        </button>
+                        <a th:href="@{/admin/transports}" class="bg-gray-600 hover:bg-gray-500 text-gray-200 px-5 py-2.5 rounded-lg font-medium">Batal</a>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium">Simpan</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    <script>
-        if (!window.adminScriptLoaded) {
-            document.addEventListener("DOMContentLoaded", function() {
-                const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-                dropdownToggles.forEach(function(toggle) {
-                    toggle.addEventListener('click', function(e) {
-                        const parentDiv = e.currentTarget.closest('.dropdown-parent');
-                        const icon = e.currentTarget.querySelector('.arrow-icon');
-                        parentDiv.classList.toggle('open');
-                        if(icon) { icon.classList.toggle('rotate-180'); }
-                    });
-                });
-            });
-            window.adminScriptLoaded = true;
-        }
-    </script>
+    <script> /* Script JS */ </script>
 </body>
 </html>

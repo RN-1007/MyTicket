@@ -1,10 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
     <title>Manage Users</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
         .sidebar {
             font-family: 'Poppins', sans-serif;
@@ -15,9 +19,10 @@
             opacity: 0;
             visibility: hidden;
             transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
+            /* background-color: #1F2937;  <-- SAYA HAPUS BARIS INI AGAR TRANSPARAN */
         }
         .dropdown-parent.open .dropdown-menu {
-            max-height: 200px;
+            max-height: 200px; 
             opacity: 1;
             visibility: visible;
             transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
@@ -25,95 +30,171 @@
         .arrow-icon {
             transition: transform 0.3s ease;
         }
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
     </style>
 </head>
 <body>
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
         <div th:fragment="content">
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-2xl font-semibold text-white">Manage Users</h1>
-                <a th:href="@{/admin/users/add}"
-                   class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition">
-                    + Tambah User Baru
-                </a>
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-white tracking-tight">Users Management</h1>
+                    <p class="text-gray-400 text-sm mt-1">Kelola data pengguna dan hak akses aplikasi.</p>
+                </div>
+                <div class="flex gap-3">
+                     <a th:href="@{/admin/users/add}"
+                       class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-lg font-medium transition shadow-lg shadow-blue-900/20 flex items-center gap-2">
+                        <i class="ri-user-add-line text-lg"></i>
+                        <span>Tambah User</span>
+                    </a>
+                </div>
             </div>
 
-            <div class="bg-gray-800 shadow-lg rounded-lg overflow-hidden">
-                <table class="min-w-full divide-y divide-gray-700">
-                    <thead class="bg-gray-700">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">ID</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Nama</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase">Role</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase">Status</th> 
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-300 uppercase">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-700">
-                        <tr th:each="user : ${allUsers}" class="hover:bg-gray-700/50 transition">
-                            <td class="px-6 py-4 text-sm text-gray-200" th:text="${user.userId}">1</td>
-                            <td class="px-6 py-4 text-sm text-white font-medium" th:text="${user.name}">Nama User</td>
-                            <td class="px-6 py-4 text-sm text-gray-300" th:text="${user.email}">user@email.com</td>
-                            <td class="px-6 py-4 text-sm text-gray-300">
-                                <span th:text="${user.role}" 
-                                      class="px-2 py-1 rounded text-xs font-semibold bg-gray-600 text-gray-200">
-                                </span>
-                            </td>
+            <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+                
+                <div class="p-5 border-b border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-800/50">
+                    <div class="relative w-full sm:w-72">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ri-search-line text-gray-400"></i>
+                        </div>
+                        <input type="text" id="tableSearch" 
+                               class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500 transition-colors" 
+                               placeholder="Cari nama, email...">
+                    </div>
+                    
+                    <div class="flex gap-2">
+                         <select class="bg-gray-900 border border-gray-600 text-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                            <option value="">Semua Role</option>
+                            <option value="ADMIN">Admin</option>
+                            <option value="USER">User</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-sm text-left text-gray-400 datatable">
+                        <thead class="text-xs text-gray-400 uppercase bg-gray-900/50 border-b border-gray-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Info User</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Kontak</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Role</th>
+                                <th scope="col" class="px-6 py-4 text-center font-semibold tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-4 text-center font-semibold tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr th:each="user : ${allUsers}" class="hover:bg-gray-700/30 transition-colors duration-150 group">
+                                
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-4">
+                                        <div class="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-md">
+                                            <span th:text="${#strings.substring(user.name, 0, 1)}">A</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-white font-medium text-base" th:text="${user.name}">Nama User</div>
+                                            <div class="text-xs text-gray-500">ID: <span th:text="${user.userId}">#1</span></div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-gray-300 flex items-center gap-2"><i class="ri-mail-line text-gray-500"></i> <span th:text="${user.email}">email@mail.com</span></span>
+                                        <span class="text-gray-500 text-xs flex items-center gap-2 mt-1" th:if="${user.phone}"><i class="ri-phone-line"></i> <span th:text="${user.phone}">0812...</span></span>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    <span th:text="${user.role}" 
+                                          th:classappend="${user.role.name() == 'ROLE_ADMIN'} ? 'bg-purple-900/30 text-purple-300 border-purple-800' : 'bg-blue-900/30 text-blue-300 border-blue-800'"
+                                          class="px-3 py-1 rounded-full text-xs font-medium border uppercase tracking-wide">
+                                    </span>
+                                </td>
+                                
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex justify-center">
+                                        <label class="relative inline-flex items-center cursor-pointer group-hover:opacity-100">
+                                            <a th:href="@{/admin/users/status/{id}(id=${user.userId})}" class="peer sr-only">Toggle</a>
+                                            <div th:class="${user.isActive} 
+                                                    ? 'w-11 h-6 bg-green-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all'
+                                                    : 'w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-800 rounded-full peer after:translate-x-0 peer-checked:after:border-white after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all'">
+                                            </div>
+                                            <span class="ml-3 text-xs font-medium" 
+                                                  th:text="${user.isActive} ? 'Active' : 'Inactive'"
+                                                  th:classappend="${user.isActive} ? 'text-green-400' : 'text-gray-500'">Status</span>
+                                        </label>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4 text-center">
+                                    <div class="flex items-center justify-center gap-3">
+                                        <a th:href="@{/admin/users/edit/{id}(id=${user.userId})}" 
+                                           class="p-2 bg-gray-700 hover:bg-yellow-600 text-white rounded-lg transition-colors shadow-sm tooltip-trigger" title="Edit">
+                                           <i class="ri-pencil-fill"></i>
+                                        </a>
+                                        <a th:href="@{/admin/users/delete/{id}(id=${user.userId})}" 
+                                           class="p-2 bg-gray-700 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm"
+                                           onclick="return confirm('Hapus user ini secara permanen?');" title="Delete">
+                                           <i class="ri-delete-bin-line"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                             
-                            <td class="px-6 py-4 text-center">
-                                <span th:if="${user.isActive}" 
-                                      class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-900/50 text-green-400 border border-green-700">
-                                    Active
-                                </span>
-                                <span th:unless="${user.isActive}" 
-                                      class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-900/50 text-red-400 border border-red-700">
-                                    Inactive
-                                </span>
-                            </td>
-
-                            <td class="px-6 py-4 flex justify-center items-center space-x-3">
-                                <a th:href="@{/admin/users/status/{id}(id=${user.userId})}"
-                                   th:title="${user.isActive} ? 'Nonaktifkan User' : 'Aktifkan User'"
-                                   class="p-2 rounded-lg transition-colors duration-200"
-                                   th:classappend="${user.isActive} ? 'text-green-500 hover:bg-green-900/30' : 'text-gray-500 hover:bg-gray-700'">
-                                    <i th:class="${user.isActive} ? 'ri-toggle-fill text-2xl' : 'ri-toggle-line text-2xl'"></i>
-                                </a>
-
-                                <a th:href="@{/admin/users/edit/{id}(id=${user.userId})}" 
-                                   class="text-yellow-400 hover:text-yellow-300 text-xl" title="Edit">
-                                   <i class="ri-pencil-fill"></i>
-                                </a>
-                                <a th:href="@{/admin/users/delete/{id}(id=${user.userId})}" 
-                                   class="text-red-500 hover:text-red-400 text-xl"
-                                   onclick="return confirm('Apakah Anda yakin ingin menghapus user ini?');" title="Delete">
-                                   <i class="ri-delete-bin-line"></i>
-                                </a>
-                            </td>
-                        </tr>
-                        <tr th:if="${#lists.isEmpty(allUsers)}">
-                            <td colspan="7" class="px-6 py-8 text-center text-gray-500 italic">Belum ada data user.</td>
-                        </tr>
-                    </tbody>
-                </table>
+                            <tr th:if="${#lists.isEmpty(allUsers)}">
+                                <td colspan="5" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center text-gray-500">
+                                        <i class="ri-inbox-archive-line text-5xl mb-3"></i>
+                                        <p class="text-lg">Belum ada data user.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="p-4 border-t border-gray-700 bg-gray-900/30 flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Menampilkan <span class="font-semibold text-white" th:text="${#lists.size(allUsers)}">0</span> data</span>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 text-xs font-medium text-gray-400 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700 hover:text-white disabled:opacity-50" disabled>Prev</button>
+                        <button class="px-3 py-1 text-xs font-medium text-gray-400 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700 hover:text-white" disabled>Next</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     <script>
-        if (!window.adminScriptLoaded) {
-            document.addEventListener("DOMContentLoaded", function() {
-                const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-                dropdownToggles.forEach(function(toggle) {
-                    toggle.addEventListener('click', function(e) {
-                        const parentDiv = e.currentTarget.closest('.dropdown-parent');
-                        const icon = e.currentTarget.querySelector('.arrow-icon');
-                        parentDiv.classList.toggle('open');
-                        if(icon) { icon.classList.toggle('rotate-180'); }
+            if (!window.adminScriptLoaded) {
+                document.addEventListener("DOMContentLoaded", function() {
+                    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+                    dropdownToggles.forEach(function(toggle) {
+                        toggle.addEventListener('click', function(e) {
+                            const parentDiv = e.currentTarget.closest('.dropdown-parent');
+                            const icon = e.currentTarget.querySelector('.arrow-icon');
+                            parentDiv.classList.toggle('open');
+                            if(icon) { icon.classList.toggle('rotate-180'); }
+                        });
                     });
+
+                    const searchInput = document.getElementById('tableSearch');
+                    if (searchInput) {
+                        searchInput.addEventListener('keyup', function() {
+                            const filter = searchInput.value.toLowerCase();
+                            const rows = document.querySelectorAll('.datatable tbody tr');
+
+                            rows.forEach(row => {
+                                const text = row.textContent.toLowerCase();
+                                row.style.display = text.includes(filter) ? '' : 'none';
+                            });
+                        });
+                    }
                 });
-            });
-            window.adminScriptLoaded = true;
-        }
-    </script>
+                window.adminScriptLoaded = true;
+            }
+        </script>
 </body>
 </html>
