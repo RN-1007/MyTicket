@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Riwayat Transaksi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        .sidebar {
+            font-family: 'Poppins', sans-serif;
+        }
+        /* PERBAIKAN DI SINI: background-color dihapus agar transparan mengikuti sidebar */
+        .dropdown-menu {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            visibility: hidden;
+            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
+            /* background-color: #1F2937;  <-- Baris ini yang sebelumnya menyebabkan bug abu-abu */
+        }
+        .dropdown-parent.open .dropdown-menu {
+            max-height: 200px;
+            opacity: 1;
+            visibility: visible;
+            transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
+        }
+        .arrow-icon {
+            transition: transform 0.3s ease;
+        }
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+    </style>
+</head>
+<body>
+    <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
+        <div th:fragment="content">
+            
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                <div>
+                    <h1 class="text-3xl font-bold text-white tracking-tight">Riwayat Transaksi</h1>
+                    <p class="text-gray-400 text-sm mt-1">Pantau semua pesanan masuk dari pengguna aplikasi.</p>
+                </div>
+                <div class="flex gap-3">
+                    <button class="bg-gray-700 hover:bg-gray-600 text-white px-5 py-2.5 rounded-lg font-medium transition flex items-center gap-2 shadow-lg">
+                        <i class="ri-file-excel-2-line text-green-400"></i>
+                        <span>Export Data</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+                
+                <div class="p-5 border-b border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-800/50">
+                    
+                    <div class="relative w-full sm:w-72">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ri-search-line text-gray-400"></i>
+                        </div>
+                        <input type="text" id="tableSearch" 
+                               class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500 transition-colors" 
+                               placeholder="Cari ID, User, atau Item...">
+                    </div>
+                    
+                    <div class="flex gap-2">
+                         <select id="statusFilter" class="bg-gray-900 border border-gray-600 text-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 cursor-pointer">
+                            <option value="">Semua Status</option>
+                            <option value="PAID">Paid</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-sm text-left text-gray-400 datatable">
+                        <thead class="text-xs text-gray-400 uppercase bg-gray-900/50 border-b border-gray-700">
+                            <tr>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Order ID</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Info User</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Tanggal Order</th>
+                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Detail Item</th>
+                                <th scope="col" class="px-6 py-4 text-right font-semibold tracking-wider">Total</th>
+                                <th scope="col" class="px-6 py-4 text-center font-semibold tracking-wider">Status</th>
+                                <th scope="col" class="px-6 py-4 text-center font-semibold tracking-wider">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr th:each="order : ${allOrders}" class="hover:bg-gray-700/30 transition-colors duration-150 group">
+                                
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="font-mono text-blue-400 font-semibold" th:text="'#' + ${order.orderId}">#1</span>
+                                </td>
+
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex-shrink-0 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold text-gray-300 border border-gray-600">
+                                            <span th:text="${order.user != null ? #strings.substring(order.user.name, 0, 1) : '?'}">U</span>
+                                        </div>
+                                        <div>
+                                            <div class="text-white font-medium" th:text="${order.user?.name}">Nama User</div>
+                                            <div class="text-xs text-gray-500" th:text="${order.user?.email}">email@mail.com</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-300">
+                                    <div class="flex flex-col">
+                                        <span class="font-medium" th:text="${#dates.format(order.orderDate, 'dd MMM yyyy')}">01 Jan 2024</span>
+                                        <span class="text-xs text-gray-500" th:text="${#dates.format(order.orderDate, 'HH:mm')} + ' WIB'">12:00</span>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4">
+                                    <div class="max-w-xs">
+                                        <ul class="space-y-1">
+                                            <li th:each="detail : ${order.orderDetails}" class="text-xs flex items-start gap-2">
+                                                <i th:if="${detail.hotelRoom != null}" class="ri-hotel-bed-line text-blue-400 mt-0.5"></i>
+                                                <i th:if="${detail.transportTicket != null}" class="ri-bus-line text-purple-400 mt-0.5"></i>
+                                                <i th:if="${detail.attractionTicket != null}" class="ri-ticket-2-line text-green-400 mt-0.5"></i>
+                                                
+                                                <span class="text-gray-300">
+                                                    <span class="font-semibold text-white" th:text="${detail.quantity} + 'x'">1x</span>
+                                                    <span th:if="${detail.hotelRoom != null}" 
+                                                          th:text="${detail.hotelRoom.roomType} + ' - ' + ${detail.hotelRoom.hotel.name}">Hotel</span>
+                                                    <span th:if="${detail.attractionTicket != null}" 
+                                                          th:text="'Tiket ' + ${detail.attractionTicket.attraction.name}">Atraksi</span>
+                                                    <span th:if="${detail.transportTicket != null}" 
+                                                          th:text="'Tiket ' + ${detail.transportTicket.transport.name}">Transport</span>
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4 text-right whitespace-nowrap">
+                                    <span class="text-emerald-400 font-bold text-base" 
+                                          th:text="'Rp ' + ${#numbers.formatDecimal(#aggregates.sum(order.orderDetails.![totalPrice]), 0, 'POINT', 0, 'COMMA')}">
+                                        Rp 1.000.000
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
+                                    <span th:data-status="${order.status}"
+                                          th:text="${order.status}"
+                                          th:classappend="${order.status.name() == 'PAID'} ? 'bg-green-900/30 text-green-400 border-green-800' : 
+                                                          ((${order.status.name() == 'PENDING'} or ${order.status.name() == 'WAITING_PAYMENT'}) ? 'bg-yellow-900/30 text-yellow-400 border-yellow-800' : 
+                                                          'bg-red-900/30 text-red-400 border-red-800')"
+                                          class="status-badge px-3 py-1 rounded-full text-xs font-bold border uppercase tracking-wide inline-block min-w-[80px]">
+                                        Status
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
+                                    <a th:href="@{/admin/orders/{userId}(userId=${order.user.userId})}" 
+                                       class="text-blue-400 hover:text-blue-300 font-medium text-sm hover:underline flex items-center justify-center gap-1">
+                                       <span>Detail</span> <i class="ri-arrow-right-line"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            
+                            <tr th:if="${#lists.isEmpty(allOrders)}">
+                                <td colspan="7" class="px-6 py-12 text-center">
+                                    <div class="flex flex-col items-center justify-center text-gray-500">
+                                        <i class="ri-file-list-3-line text-5xl mb-3"></i>
+                                        <p class="text-lg">Belum ada riwayat transaksi.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="p-4 border-t border-gray-700 bg-gray-900/30 flex justify-between items-center">
+                    <span class="text-xs text-gray-500">Menampilkan <span class="font-semibold text-white" th:text="${#lists.size(allOrders)}">0</span> transaksi</span>
+                    <div class="flex gap-2">
+                        <button class="px-3 py-1 text-xs font-medium text-gray-400 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700 hover:text-white disabled:opacity-50" disabled>Prev</button>
+                        <button class="px-3 py-1 text-xs font-medium text-gray-400 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700 hover:text-white" disabled>Next</button>
+                    </div>
+                </div>
+            </div>
+            
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    const statusFilter = document.getElementById('statusFilter');
+                    const searchInput = document.getElementById('tableSearch');
+                    const tableRows = document.querySelectorAll('.datatable tbody tr');
+
+                    function filterTable() {
+                        const statusValue = statusFilter.value.toUpperCase();
+                        const searchValue = searchInput.value.toLowerCase();
+
+                        tableRows.forEach(row => {
+                            const rowText = row.textContent.toLowerCase();
+                            const statusBadge = row.querySelector('.status-badge');
+                            const rowStatus = statusBadge ? statusBadge.getAttribute('data-status').toUpperCase() : '';
+
+                            const matchesSearch = rowText.includes(searchValue);
+                            const matchesStatus = statusValue === "" || rowStatus === statusValue;
+
+                            if (matchesSearch && matchesStatus) {
+                                row.style.display = "";
+                            } else {
+                                row.style.display = "none";
+                            }
+                        });
+                    }
+
+                    if(statusFilter) statusFilter.addEventListener('change', filterTable);
+                    if(searchInput) searchInput.addEventListener('keyup', filterTable);
+                });
+            </script>
+
+        </div>
+    </div>
+</body>
+</html>

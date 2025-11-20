@@ -1,7 +1,17 @@
 package com.travelapp.travel_app.model;
 
-import jakarta.persistence.*;
 import java.util.Set;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 
 @Entity
 @Table(name = "attractions")
@@ -12,6 +22,8 @@ public class Attraction {
     
     private String name;
     private String location;
+    @Column(nullable = true, length = 64)
+    private String image;
     
     @Enumerated(EnumType.STRING)
     private Category category;
@@ -59,5 +71,17 @@ public class Attraction {
 
     public void setTickets(Set<AttractionTicket> tickets) {
         this.tickets = tickets;
+    }
+    public String getImage() { 
+        return image; 
+    }
+
+    public void setImage(String image) {
+        this.image = image; 
+    }
+    @Transient
+    public String getImagePath() {
+        if (image == null || attractionId == null) return null;
+        return "/attraction-photos/" + attractionId + "/" + image;
     }
 }

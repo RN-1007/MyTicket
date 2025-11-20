@@ -28,10 +28,8 @@
 </head>
 <body class="bg-gray-100 text-gray-800">
 
-    <!-- Navbar -->
     <div th:replace="~{fragment/user-navbar :: navbar}"></div>
 
-    <!-- Hero -->
     <header class="relative text-white text-center py-48 md:py-64 overflow-hidden">
         <div class="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-600 to-purple-700 animate-gradient-x"></div>
         <div class="relative z-10 px-4">
@@ -54,10 +52,8 @@
         </div>
     </header>
 
-    <!-- Main -->
     <div class="container mx-auto p-6 md:p-8">
 
-        <!-- Kategori -->
         <section class="-mt-24 relative z-20 fade-in-section">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="bg-white p-8 rounded-2xl shadow-lg flex items-center space-x-6 card-hover">
@@ -84,7 +80,6 @@
             </div>
         </section>
 
-        <!-- Hotel -->
         <section id="hotels" class="mt-20 md:mt-28 fade-in-section">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl md:text-4xl font-bold">Hotel Impian Anda</h2>
@@ -93,7 +88,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div th:each="hotel, iterStat : ${hotels}" class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover flex flex-col group">
                     <div class="relative overflow-hidden">
-                        <img th:src="'https://source.unsplash.com/random/400x300/?hotel,luxury,' + ${iterStat.index}" alt="Hotel" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" alt="Hotel Image" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <img th:unless="${hotel.image != null}" th:src="'https://source.unsplash.com/random/400x300/?hotel,luxury,' + ${iterStat.index}" alt="Hotel Placeholder" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
                         <h3 class="text-xl font-bold mb-2 truncate" th:text="${hotel.name}">Nama Hotel</h3>
@@ -119,7 +115,6 @@
             </div>
         </section>
 
-        <!-- Tempat Wisata -->
         <section id="attractions" class="mt-20 md:mt-28 fade-in-section">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl md:text-4xl font-bold">Tempat Wisata Tak Terlupakan</h2>
@@ -128,7 +123,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <div th:each="attraction, iterStat : ${attractions}" class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover flex flex-col group">
                     <div class="relative overflow-hidden">
-                        <img th:src="'https://source.unsplash.com/random/400x300/?landmark,fun,' + ${iterStat.index}" alt="Atraksi" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <img th:if="${attraction.image != null}" th:src="@{${attraction.imagePath}}" alt="Attraction Image" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <img th:unless="${attraction.image != null}" th:src="'https://source.unsplash.com/random/400x300/?landmark,fun,' + ${iterStat.index}" alt="Attraction Placeholder" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
                         <h3 class="text-xl font-bold mb-2 truncate" th:text="${attraction.name}">Nama Atraksi</h3>
@@ -154,7 +150,6 @@
             </div>
         </section>
 
-        <!-- Transportasi -->
         <section id="transports" class="mt-20 md:mt-28 fade-in-section">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl md:text-4xl font-bold">Transportasi Nyaman & Cepat</h2>
@@ -163,7 +158,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div th:each="transport, iterStat : ${transports}" class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover flex flex-col group">
                     <div class="relative overflow-hidden">
-                        <img th:src="'https://source.unsplash.com/random/400x300/?transport,speed,' + ${iterStat.index}" alt="Transport" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <img th:if="${transport.image != null}" th:src="@{${transport.imagePath}}" alt="Transport Image" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
+                        <img th:unless="${transport.image != null}" th:src="'https://source.unsplash.com/random/400x300/?transport,speed,' + ${iterStat.index}" alt="Transport Placeholder" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
                     </div>
                     <div class="p-5 flex flex-col flex-grow">
                         <h3 class="text-xl font-bold mb-2 truncate" th:text="${transport.name}">Nama Transport</h3>
@@ -190,7 +186,6 @@
         </section>
     </div>
 
-    <!-- Footer -->
     <footer class="bg-gray-900 text-white mt-20 md:mt-28">
         <div class="container mx-auto py-16 px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-10">

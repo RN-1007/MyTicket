@@ -54,13 +54,13 @@ public class PageController {
         model.addAttribute("hotels", hotelService.getAllHotels());
         model.addAttribute("transports", transportService.getAllTransports());
         model.addAttribute("attractions", attractionService.getAllAttractions());
-        return "index"; 
+        return "user/index"; 
     }
 
     @GetMapping("/my-orders")
     public String myOrdersPage(Model model, Authentication authentication) {
         String email = authentication.getName();
         model.addAttribute("orders", orderService.findOrdersByUser(email));
-        return "my-orders";
+        return "user/my-orders";
     }
 }

@@ -1,7 +1,17 @@
 package com.travelapp.travel_app.model;
 
-import jakarta.persistence.*;
 import java.util.Set;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 // Jika Anda pakai Lombok, tambahkan @Data, @NoArgsConstructor, @AllArgsConstructor
 @Entity
 @Table(name = "transports")
@@ -12,6 +22,8 @@ public class Transport {
     
     private String name;
     private Integer capacity;
+    @Column(nullable = true, length = 64)
+    private String image;
 
     @ManyToOne
     @JoinColumn(name = "provider_id")
@@ -60,5 +72,18 @@ public class Transport {
 
     public void setTickets(Set<TransportTicket> tickets) {
         this.tickets = tickets;
+    }
+
+    public String getImage() { 
+        return image; 
+    }
+
+    public void setImage(String image) { 
+        this.image = image; 
+    }
+     @Transient
+    public String getImagePath() {
+        if (image == null || transportId == null) return null;
+        return "/transport-photos/" + transportId + "/" + image;
     }
 }
