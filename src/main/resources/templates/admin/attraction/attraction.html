@@ -1,39 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
     <title>Manage Attractions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-
     <style>
-        .sidebar {
-            font-family: 'Poppins', sans-serif;
-        }
-        .dropdown-menu {
-            overflow: hidden;
-            max-height: 0;
-            opacity: 0;
-            visibility: hidden;
-            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
-            /* background-color: #1F2937;  <-- SAYA HAPUS BARIS INI */
-        }
-        .dropdown-parent.open .dropdown-menu {
-            max-height: 200px; 
-            opacity: 1;
-            visibility: visible;
-            transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
-        }
-        .arrow-icon {
-            transition: transform 0.3s ease;
-        }
+        .sidebar { font-family: 'Poppins', sans-serif; }
+        .dropdown-menu { overflow: hidden; max-height: 0; opacity: 0; visibility: hidden; transition: all 0.4s ease; }
+        .dropdown-parent.open .dropdown-menu { max-height: 200px; opacity: 1; visibility: visible; }
+        .arrow-icon { transition: transform 0.3s ease; }
+        .modal { transition: opacity 0.25s ease; }
+        body.modal-active { overflow: hidden; }
         .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
     </style>
 </head>
 <body>
@@ -46,28 +27,21 @@
                     <p class="text-gray-400 text-sm mt-1">Kelola destinasi wisata dan tempat menarik.</p>
                 </div>
                 <div class="flex gap-3">
-                     <a th:href="@{/admin/attractions/add}"
-                       class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-lg font-medium transition shadow-lg shadow-blue-900/20 flex items-center gap-2">
+                     <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-lg font-medium transition shadow-lg shadow-blue-900/20 flex items-center gap-2 cursor-pointer">
                         <i class="ri-add-line text-lg"></i>
                         <span>Tambah Atraksi</span>
-                    </a>
+                    </button>
                 </div>
             </div>
 
             <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
-                
                 <div class="p-5 border-b border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-800/50">
                     <div class="relative w-full sm:w-72">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="ri-search-line text-gray-400"></i>
-                        </div>
-                        <input type="text" id="tableSearch" 
-                               class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500 transition-colors" 
-                               placeholder="Cari nama, lokasi...">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="ri-search-line text-gray-400"></i></div>
+                        <input type="text" id="tableSearch" class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500" placeholder="Cari nama, lokasi...">
                     </div>
-                    
                     <div class="flex gap-2">
-                         <select id="categoryFilter" class="bg-gray-900 border border-gray-600 text-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 cursor-pointer">
+                         <select id="categoryFilter" class="bg-gray-900 border border-gray-600 text-gray-300 text-sm rounded-lg focus:ring-blue-500 block p-2.5 cursor-pointer">
                             <option value="">Semua Kategori</option>
                             <option value="NATURE">Nature</option>
                             <option value="MUSEUM">Museum</option>
@@ -81,108 +55,129 @@
                     <table class="w-full text-sm text-left text-gray-400 datatable">
                         <thead class="text-xs text-gray-400 uppercase bg-gray-900/50 border-b border-gray-700">
                             <tr>
-                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Info Atraksi</th>
-                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Lokasi</th>
-                                <th scope="col" class="px-6 py-4 font-semibold tracking-wider">Kategori</th>
-                                <th scope="col" class="px-6 py-4 text-center font-semibold tracking-wider">Aksi</th>
+                                <th class="px-6 py-4 font-semibold">Info Atraksi</th>
+                                <th class="px-6 py-4 font-semibold">Lokasi</th>
+                                <th class="px-6 py-4 font-semibold">Kategori</th>
+                                <th class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-700">
-                            <tr th:each="attraction : ${attractions}" class="hover:bg-gray-700/30 transition-colors duration-150 group">
-                                
-                                <td class="px-6 py-4 whitespace-nowrap">
+                            <tr th:each="attraction : ${attractions}" class="hover:bg-gray-700/30 transition-colors">
+                                <td class="px-6 py-4">
                                     <div class="flex items-center gap-4">
-                                        <div class="flex-shrink-0 w-16 h-12 bg-gray-700 rounded-lg overflow-hidden border border-gray-600 relative">
-                                            <img th:if="${attraction.image != null}" 
-                                                 th:src="@{${attraction.imagePath}}" 
-                                                 class="w-full h-full object-cover" alt="Img">
-                                            <div th:unless="${attraction.image != null}" class="w-full h-full flex items-center justify-center text-gray-500">
-                                                <i class="ri-image-line"></i>
-                                            </div>
+                                        <div class="flex-shrink-0 w-16 h-12 bg-gray-700 rounded-lg overflow-hidden border border-gray-600">
+                                            <img th:if="${attraction.image != null}" th:src="@{${attraction.imagePath}}" class="w-full h-full object-cover">
+                                            <div th:unless="${attraction.image != null}" class="w-full h-full flex items-center justify-center text-gray-500"><i class="ri-image-line"></i></div>
                                         </div>
                                         <div>
-                                            <div class="text-white font-medium text-base" th:text="${attraction.name}">Nama Atraksi</div>
+                                            <div class="text-white font-medium" th:text="${attraction.name}">Nama</div>
                                             <div class="text-xs text-gray-500">ID: <span th:text="${attraction.attractionId}">#1</span></div>
                                         </div>
                                     </div>
                                 </td>
-
+                                <td class="px-6 py-4"><i class="ri-map-pin-line text-red-400"></i> <span th:text="${attraction.location}">Loc</span></td>
                                 <td class="px-6 py-4">
-                                    <div class="flex items-center gap-2 text-gray-300">
-                                        <i class="ri-map-pin-line text-red-400"></i>
-                                        <span th:text="${attraction.location}">Jakarta</span>
-                                    </div>
+                                    <span class="category-badge bg-gray-700 border border-gray-600 px-3 py-1 rounded-full text-xs font-bold uppercase" 
+                                          th:data-category="${attraction.category}"
+                                          th:text="${attraction.category}">Cat</span>
                                 </td>
-
-                                <td class="px-6 py-4">
-                                    <span th:data-category="${attraction.category}"
-                                          class="category-badge px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border"
-                                          th:classappend="${attraction.category.name() == 'Nature'} ? 'bg-green-900/30 text-green-400 border-green-800' : 
-                                                          (${attraction.category.name() == 'Museum'} ? 'bg-yellow-900/30 text-yellow-400 border-yellow-800' :
-                                                          (${attraction.category.name() == 'Park'} ? 'bg-blue-900/30 text-blue-400 border-blue-800' :
-                                                          'bg-purple-900/30 text-purple-400 border-purple-800'))"
-                                          th:text="${attraction.category}">
-                                        Category
-                                    </span>
-                                </td>
-
                                 <td class="px-6 py-4 text-center">
-                                    <div class="flex items-center justify-center gap-3">
-                                        <a th:href="@{/admin/attractions/edit/{id}(id=${attraction.attractionId})}" 
-                                           class="p-2 bg-gray-700 hover:bg-yellow-600 text-white rounded-lg transition-colors shadow-sm" title="Edit">
-                                           <i class="ri-pencil-fill"></i>
-                                        </a>
-                                        <a th:href="@{/admin/attractions/delete/{id}(id=${attraction.attractionId})}" 
-                                           class="p-2 bg-gray-700 hover:bg-red-600 text-white rounded-lg transition-colors shadow-sm"
-                                           onclick="return confirm('Hapus atraksi ini? Data tiket terkait mungkin akan hilang/error.');" title="Delete">
-                                           <i class="ri-delete-bin-line"></i>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            
-                            <tr th:if="${#lists.isEmpty(attractions)}">
-                                <td colspan="4" class="px-6 py-12 text-center">
-                                    <div class="flex flex-col items-center justify-center text-gray-500">
-                                        <i class="ri-camera-lens-line text-5xl mb-3"></i>
-                                        <p class="text-lg">Belum ada data atraksi.</p>
+                                    <div class="flex items-center justify-center gap-2">
+                                        <button onclick="openModal(this)"
+                                            th:data-id="${attraction.attractionId}"
+                                            th:data-name="${attraction.name}"
+                                            th:data-location="${attraction.location}"
+                                            th:data-category="${attraction.category}"
+                                            class="p-2 bg-gray-700 hover:bg-yellow-600 text-white rounded-lg transition-colors"><i class="ri-pencil-fill"></i></button>
+                                        <a th:href="@{/admin/attractions/delete/{id}(id=${attraction.attractionId})}" class="p-2 bg-gray-700 hover:bg-red-600 text-white rounded-lg transition-colors" onclick="return confirm('Hapus atraksi ini?');"><i class="ri-delete-bin-line"></i></a>
                                     </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                 <div class="p-4 border-t border-gray-700 bg-gray-900/30 flex justify-between items-center">
-                    <span class="text-xs text-gray-500">Total Data: <span class="font-semibold text-white" th:text="${#lists.size(attractions)}">0</span></span>
+            </div>
+
+             <div id="attractionModal" class="modal opacity-0 pointer-events-none fixed inset-0 flex items-center justify-center z-50">
+                <div class="absolute inset-0 bg-black bg-opacity-70" onclick="closeModal()"></div>
+                <div class="bg-gray-800 w-full max-w-lg mx-4 rounded-xl shadow-2xl z-50 overflow-hidden transform scale-95 transition-all duration-300 modal-container">
+                    <div class="px-6 py-4 border-b border-gray-700 flex justify-between items-center">
+                        <h3 class="text-xl font-bold text-white" id="modalTitle">Tambah Atraksi</h3>
+                        <button onclick="closeModal()" class="text-gray-400 hover:text-white"><i class="ri-close-line text-2xl"></i></button>
+                    </div>
+                    <form id="attractionForm" th:action="@{/admin/attractions/save}" method="POST" enctype="multipart/form-data" class="p-6 space-y-4">
+                        <input type="hidden" id="attractionId" name="attractionId" />
+                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Nama Atraksi</label><input type="text" id="name" name="name" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:outline-none" required></div>
+                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Lokasi</label><input type="text" id="location" name="location" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:outline-none" required></div>
+                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Kategori</label>
+                            <select id="category" name="category" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:outline-none" required>
+                                <option value="">-- Pilih Kategori --</option>
+                                <option value="Nature">Nature</option>
+                                <option value="Museum">Museum</option>
+                                <option value="Park">Park</option>
+                                <option value="Culture">Culture</option>
+                            </select>
+                        </div>
+                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Foto</label><input type="file" name="imageFile" accept="image/png, image/jpeg" class="w-full text-gray-300 bg-gray-700 rounded-lg border border-gray-600 cursor-pointer file:mr-4 file:py-2 file:px-4 file:rounded-l-lg file:border-0 file:bg-blue-600 file:text-white hover:file:bg-blue-700" /><p class="text-xs text-gray-500 mt-1">*Biarkan kosong jika tidak ubah foto.</p></div>
+                        <div class="flex justify-end pt-4 gap-3">
+                            <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 shadow-lg">Simpan</button>
+                        </div>
+                    </form>
                 </div>
             </div>
 
             <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    const categoryFilter = document.getElementById('categoryFilter');
-                    const searchInput = document.getElementById('tableSearch');
-                    const tableRows = document.querySelectorAll('.datatable tbody tr');
+                // FILTER LOGIC
+                const categoryFilter = document.getElementById('categoryFilter');
+                const searchInput = document.getElementById('tableSearch');
+                const rows = document.querySelectorAll('.datatable tbody tr');
 
-                    function filterTable() {
-                        const categoryVal = categoryFilter.value.toUpperCase();
-                        const searchVal = searchInput.value.toLowerCase();
+                function filterTable() {
+                    const categoryVal = categoryFilter.value.toUpperCase();
+                    const searchVal = searchInput.value.toLowerCase();
 
-                        tableRows.forEach(row => {
-                            const rowText = row.textContent.toLowerCase();
-                            const catBadge = row.querySelector('.category-badge');
-                            const rowCat = catBadge ? catBadge.getAttribute('data-category').toUpperCase() : '';
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        const catBadge = row.querySelector('.category-badge');
+                        const rowCat = catBadge ? catBadge.getAttribute('data-category').toUpperCase() : '';
 
-                            const matchSearch = rowText.includes(searchVal);
-                            const matchCat = categoryVal === "" || rowCat === categoryVal;
+                        const matchSearch = text.includes(searchVal);
+                        const matchCat = categoryVal === "" || rowCat === categoryVal;
 
-                            row.style.display = (matchSearch && matchCat) ? "" : "none";
-                        });
+                        row.style.display = (matchSearch && matchCat) ? "" : "none";
+                    });
+                }
+                if(categoryFilter) categoryFilter.addEventListener('change', filterTable);
+                if(searchInput) searchInput.addEventListener('keyup', filterTable);
+
+                // MODAL LOGIC
+                const modal = document.getElementById('attractionModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const form = document.getElementById('attractionForm');
+                function openModal(el = null) {
+                    modal.classList.remove('opacity-0', 'pointer-events-none');
+                    modal.querySelector('.modal-container').classList.replace('scale-95', 'scale-100');
+                    document.body.classList.add('modal-active');
+                    if(el) {
+                        modalTitle.innerText = 'Edit Atraksi';
+                        document.getElementById('attractionId').value = el.dataset.id;
+                        document.getElementById('name').value = el.dataset.name;
+                        document.getElementById('location').value = el.dataset.location;
+                        document.getElementById('category').value = el.dataset.category;
+                    } else {
+                        modalTitle.innerText = 'Tambah Atraksi';
+                        form.reset();
+                        document.getElementById('attractionId').value = '';
                     }
-
-                    categoryFilter.addEventListener('change', filterTable);
-                    searchInput.addEventListener('keyup', filterTable);
-                });
+                }
+                function closeModal() {
+                    modal.classList.add('opacity-0', 'pointer-events-none');
+                    modal.querySelector('.modal-container').classList.replace('scale-100', 'scale-95');
+                    document.body.classList.remove('modal-active');
+                }
             </script>
+             <script>if(!window.adminScriptLoaded){document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll('.dropdown-toggle').forEach(t=>{t.addEventListener('click',e=>{e.currentTarget.closest('.dropdown-parent').classList.toggle('open');const i=e.currentTarget.querySelector('.arrow-icon');if(i)i.classList.toggle('rotate-180')})})});window.adminScriptLoaded=true}</script>
         </div>
     </div>
 </body>
