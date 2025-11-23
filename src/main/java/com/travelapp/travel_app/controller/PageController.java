@@ -63,4 +63,9 @@ public class PageController {
         model.addAttribute("orders", orderService.findOrdersByUser(email));
         return "user/my-orders";
     }
+
+    @GetMapping("/about-us")
+    public String aboutUsPage() {
+        return "about-us";
+    }
 }
