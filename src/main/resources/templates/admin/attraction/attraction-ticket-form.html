@@ -2,20 +2,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="${pageTitle}">Form Tiket Atraksi</title>
-<script src="https://cdn.tailwindcss.com"></script>
-    
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        .sidebar {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* Sembunyikan menu dropdown (transisi) */
+        .sidebar { font-family: 'Poppins', sans-serif; }
         .dropdown-menu {
             overflow: hidden;
             max-height: 0;
@@ -23,27 +15,21 @@
             visibility: hidden;
             transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
         }
-        
-        /* Tampilkan menu saat parent-nya punya class .open */
         .dropdown-parent.open .dropdown-menu {
-            max-height: 200px; /* Cukup tinggi untuk 2 item */
+            max-height: 200px;
             opacity: 1;
             visibility: visible;
             transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
         }
-        
-        /* Transisi untuk panah */
-        .arrow-icon {
-            transition: transform 0.3s ease;
-        }
-        /* Class .rotate-180 akan ditambahkan oleh JS */
-    </style></head>
+        .arrow-icon { transition: transform 0.3s ease; }
+    </style>
+</head>
 <body>
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
         <div th:fragment="content">
             <h1 class="text-2xl font-semibold text-white mb-6" th:text="${pageTitle}">Judul Halaman</h1>
 
-            <div class="bg-gray-800 p-8 rounded-lg shadow-lg max-w-2xl">
+            <div class="bg-gray-800 p-8 rounded-lg shadow-lg max-w-2xl border border-gray-700">
                 <form th:action="@{/admin/attraction-tickets/save}" th:object="${attractionTicket}" method="POST">
                     <input type="hidden" th:field="*{attractionTicketId}" />
 
@@ -51,11 +37,7 @@
                         <label for="attraction" class="block text-gray-300 font-semibold mb-2">Atraksi Induk</label>
                         <select id="attraction" th:field="*{attraction}" class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                             <option value="">-- Pilih Atraksi --</option>
-                            <option th:each="a : ${allAttractions}" 
-                                    th:value="${a.attractionId}" 
-                                    th:text="${a.name}">
-                                Nama Atraksi
-                            </option>
+                            <option th:each="a : ${allAttractions}" th:value="${a.attractionId}" th:text="${a.name}">Nama Atraksi</option>
                         </select>
                     </div>
 
@@ -66,17 +48,13 @@
                     </div>
                     
                     <div class="mb-8">
-                        <label for="price" class="block text-gray-300 font-semibold mb-2">Harga</label>
+                        <label for="price" class="block text-gray-300 font-semibold mb-2">Harga (Rp)</label>
                         <input type="number" id="price" th:field="*{price}" class="w-full px-4 py-2.5 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                     </div>
 
-                    <div class="flex justify-end space-x-4">
-                        <a th:href="@{/admin/attraction-tickets}" class="bg-gray-600 hover:bg-gray-500 text-gray-200 px-5 py-2.5 rounded-lg font-medium">
-                            Batal
-                        </a>
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium">
-                            Simpan
-                        </button>
+                    <div class="flex justify-end space-x-4 pt-4 border-t border-gray-700">
+                        <a th:href="@{/admin/attraction-tickets}" class="bg-gray-600 hover:bg-gray-500 text-gray-200 px-5 py-2.5 rounded-lg font-medium transition-colors">Batal</a>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-blue-900/20">Simpan</button>
                     </div>
                 </form>
             </div>

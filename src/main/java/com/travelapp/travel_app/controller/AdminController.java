@@ -37,7 +37,7 @@ import com.travelapp.travel_app.service.hotel.HotelRoomService;
 import com.travelapp.travel_app.service.hotel.HotelService;
 import com.travelapp.travel_app.service.transport.TransportService;
 import com.travelapp.travel_app.service.transport.TransportTicketService;
-import com.travelapp.travel_app.service.user.UserService; // Import util kita
+import com.travelapp.travel_app.service.user.UserService;
 import com.travelapp.travel_app.util.FileUploadUtil;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,6 +57,7 @@ public class AdminController {
     @Autowired private AttractionTicketService attractionTicketService;
     @Autowired private UserService userService;
 
+    // Helper untuk menandai menu aktif di sidebar
     @ModelAttribute("currentUri")
     public String getCurrentUri(HttpServletRequest request) {
         return request.getRequestURI();
@@ -71,33 +72,50 @@ public class AdminController {
         return "admin/dashboard"; 
     }
 
-    // == CRUD HOTEL (UPDATED) ==
+    // ============================================================
+    // 1. MANAGE HOTELS
+    // ============================================================
+    
     @GetMapping("/hotels")
     public String showHotelList(Model model) {
         model.addAttribute("hotels", hotelService.getAllHotels());
+        // Objek kosong untuk form "Tambah Hotel" di Modal
+        model.addAttribute("hotel", new Hotel()); 
         return "admin/hotel/hotels"; 
     }
+
+    /* --- KOMENTAR: Method GET Form Lama (Tidak dipakai karena Modal) ---
     @GetMapping("/hotels/add")
     public String showAddHotelForm(Model model) {
         model.addAttribute("hotel", new Hotel());
         model.addAttribute("pageTitle", "Add New Hotel");
         return "admin/hotel/hotel-form"; 
     }
+
+    @GetMapping("/hotels/edit/{id}")
+    public String showEditHotelForm(@PathVariable("id") Integer id, Model model) {
+        Hotel hotel = hotelService.getHotelById(id).orElseThrow(() -> new IllegalArgumentException("Invalid hotel Id:" + id));
+        model.addAttribute("hotel", hotel);
+        model.addAttribute("pageTitle", "Edit Hotel");
+        return "admin/hotel/hotel-form"; 
+    }
+    ------------------------------------------------------------------- */
     
+    // TETAP AKTIF: Method POST untuk menyimpan data (dipanggil oleh Modal)
     @PostMapping("/hotels/save")
     public String saveHotel(@ModelAttribute("hotel") Hotel hotel, 
                             @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
         
         String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
         
-        // Logika: Jika upload gambar baru, pakai itu. Jika tidak, cek apakah ini edit data lama.
         if (!fileName.isEmpty()) {
+            // Jika ada upload gambar baru
             hotel.setImage(fileName);
             Hotel savedHotel = hotelService.saveHotel(hotel);
             String uploadDir = "hotel-photos/" + savedHotel.getHotelId();
             FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
         } else {
-            // Jika edit dan tidak ganti gambar, kita perlu ambil gambar lama (jika ada)
+            // Jika tidak ada upload baru, pertahankan gambar lama saat Edit
             if (hotel.getHotelId() != null) {
                 Hotel existingHotel = hotelService.getHotelById(hotel.getHotelId()).orElse(null);
                 if (existingHotel != null) {
@@ -106,29 +124,29 @@ public class AdminController {
             }
             hotelService.saveHotel(hotel);
         }
-
         return "redirect:/admin/hotels"; 
     }
     
-    @GetMapping("/hotels/edit/{id}")
-    public String showEditHotelForm(@PathVariable("id") Integer id, Model model) {
-        Hotel hotel = hotelService.getHotelById(id).orElseThrow(() -> new IllegalArgumentException("Invalid hotel Id:" + id));
-        model.addAttribute("hotel", hotel);
-        model.addAttribute("pageTitle", "Edit Hotel");
-        return "admin/hotel/hotel-form"; 
-    }
     @GetMapping("/hotels/delete/{id}")
     public String deleteHotel(@PathVariable("id") Integer id) {
         hotelService.deleteHotel(id); 
         return "redirect:/admin/hotels"; 
     }
     
-    // == CRUD HOTEL ROOMS (Tetap) ==
+    // ============================================================
+    // 2. MANAGE HOTEL ROOMS
+    // ============================================================
+
     @GetMapping("/hotel-rooms")
     public String showHotelRoomList(Model model) {
         model.addAttribute("hotelRooms", hotelRoomService.findAll());
+        // Objek untuk Modal
+        model.addAttribute("hotelRoom", new HotelRoom());
+        model.addAttribute("allHotels", hotelService.getAllHotels());
         return "admin/hotel/hotel-rooms";
     }
+
+    /* --- KOMENTAR: Method GET Form Lama ---
     @GetMapping("/hotel-rooms/add")
     public String showAddHotelRoomForm(Model model) {
         model.addAttribute("hotelRoom", new HotelRoom());
@@ -136,11 +154,7 @@ public class AdminController {
         model.addAttribute("pageTitle", "Add New Hotel Room");
         return "admin/hotel/hotel-room-form";
     }
-    @PostMapping("/hotel-rooms/save")
-    public String saveHotelRoom(@ModelAttribute("hotelRoom") HotelRoom hotelRoom) {
-        hotelRoomService.save(hotelRoom); 
-        return "redirect:/admin/hotel-rooms";
-    }
+
     @GetMapping("/hotel-rooms/edit/{id}")
     public String showEditHotelRoomForm(@PathVariable("id") Integer id, Model model) {
         HotelRoom hotelRoom = hotelRoomService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid room Id:" + id));
@@ -149,18 +163,34 @@ public class AdminController {
         model.addAttribute("pageTitle", "Edit Hotel Room");
         return "admin/hotel/hotel-room-form";
     }
+    ----------------------------------------- */
+
+    @PostMapping("/hotel-rooms/save")
+    public String saveHotelRoom(@ModelAttribute("hotelRoom") HotelRoom hotelRoom) {
+        hotelRoomService.save(hotelRoom); 
+        return "redirect:/admin/hotel-rooms";
+    }
+
     @GetMapping("/hotel-rooms/delete/{id}")
     public String deleteHotelRoom(@PathVariable("id") Integer id) {
         hotelRoomService.deleteById(id); 
         return "redirect:/admin/hotel-rooms";
     }
 
-    // == CRUD TRANSPORT (UPDATED) ==
+    // ============================================================
+    // 3. MANAGE TRANSPORTS
+    // ============================================================
+
     @GetMapping("/transports")
     public String showTransportList(Model model) {
         model.addAttribute("transports", transportService.getAllTransports());
+        // Objek Modal
+        model.addAttribute("transport", new Transport());
+        model.addAttribute("allProviders", transportProviderRepository.findAll()); 
         return "admin/transport/transport"; 
     }
+
+    /* --- KOMENTAR: Method GET Form Lama ---
     @GetMapping("/transports/add")
     public String showAddTransportForm(Model model) {
         model.addAttribute("transport", new Transport());
@@ -168,6 +198,16 @@ public class AdminController {
         model.addAttribute("pageTitle", "Add New Transport");
         return "admin/transport/transport-form"; 
     }
+
+    @GetMapping("/transports/edit/{id}")
+    public String showEditTransportForm(@PathVariable("id") Integer id, Model model) {
+        Transport transport = transportService.getTransportById(id).orElseThrow(() -> new IllegalArgumentException("Invalid transport Id:" + id));
+        model.addAttribute("transport", transport);
+        model.addAttribute("allProviders", transportProviderRepository.findAll()); 
+        model.addAttribute("pageTitle", "Edit Transport");
+        return "admin/transport/transport-form"; 
+    }
+    ----------------------------------------- */
     
     @PostMapping("/transports/save")
     public String saveTransport(@ModelAttribute("transport") Transport transport,
@@ -190,26 +230,26 @@ public class AdminController {
         return "redirect:/admin/transports"; 
     }
     
-    @GetMapping("/transports/edit/{id}")
-    public String showEditTransportForm(@PathVariable("id") Integer id, Model model) {
-        Transport transport = transportService.getTransportById(id).orElseThrow(() -> new IllegalArgumentException("Invalid transport Id:" + id));
-        model.addAttribute("transport", transport);
-        model.addAttribute("allProviders", transportProviderRepository.findAll()); 
-        model.addAttribute("pageTitle", "Edit Transport");
-        return "admin/transport/transport-form"; 
-    }
     @GetMapping("/transports/delete/{id}")
     public String deleteTransport(@PathVariable("id") Integer id) {
         transportService.deleteTransport(id);
         return "redirect:/admin/transports"; 
     }
 
-    // == CRUD TRANSPORT TICKETS (Tetap) ==
+    // ============================================================
+    // 4. MANAGE TRANSPORT TICKETS
+    // ============================================================
+
     @GetMapping("/transport-tickets")
     public String showTransportTicketList(Model model) {
         model.addAttribute("transportTickets", transportTicketService.findAll());
+        // Objek Modal
+        model.addAttribute("transportTicket", new TransportTicket());
+        model.addAttribute("allTransports", transportService.getAllTransports());
         return "admin/transport/transport-tickets";
     }
+
+    /* --- KOMENTAR: Method GET Form Lama ---
     @GetMapping("/transport-tickets/add")
     public String showAddTransportTicketForm(Model model) {
         model.addAttribute("transportTicket", new TransportTicket());
@@ -217,11 +257,7 @@ public class AdminController {
         model.addAttribute("pageTitle", "Add New Transport Ticket");
         return "admin/transport/transport-ticket-form";
     }
-    @PostMapping("/transport-tickets/save")
-    public String saveTransportTicket(@ModelAttribute("transportTicket") TransportTicket ticket) {
-        transportTicketService.save(ticket);
-        return "redirect:/admin/transport-tickets";
-    }
+
     @GetMapping("/transport-tickets/edit/{id}")
     public String showEditTransportTicketForm(@PathVariable("id") Integer id, Model model) {
         TransportTicket ticket = transportTicketService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid ticket Id:" + id));
@@ -230,18 +266,34 @@ public class AdminController {
         model.addAttribute("pageTitle", "Edit Transport Ticket");
         return "admin/transport/transport-ticket-form";
     }
+    ----------------------------------------- */
+
+    @PostMapping("/transport-tickets/save")
+    public String saveTransportTicket(@ModelAttribute("transportTicket") TransportTicket ticket) {
+        transportTicketService.save(ticket);
+        return "redirect:/admin/transport-tickets";
+    }
+
     @GetMapping("/transport-tickets/delete/{id}")
     public String deleteTransportTicket(@PathVariable("id") Integer id) {
         transportTicketService.deleteById(id);
         return "redirect:/admin/transport-tickets";
     }
 
-    // == CRUD ATTRACTION (UPDATED) ==
+    // ============================================================
+    // 5. MANAGE ATTRACTIONS
+    // ============================================================
+
     @GetMapping("/attractions")
     public String showAttractionList(Model model) {
         model.addAttribute("attractions", attractionService.getAllAttractions());
+        // Objek Modal
+        model.addAttribute("attraction", new Attraction());
+        model.addAttribute("allCategories", Category.values()); 
         return "admin/attraction/attraction"; 
     }
+
+    /* --- KOMENTAR: Method GET Form Lama ---
     @GetMapping("/attractions/add")
     public String showAddAttractionForm(Model model) {
         model.addAttribute("attraction", new Attraction());
@@ -249,6 +301,16 @@ public class AdminController {
         model.addAttribute("pageTitle", "Add New Attraction");
         return "admin/attraction/attraction-form"; 
     }
+
+    @GetMapping("/attractions/edit/{id}")
+    public String showEditAttractionForm(@PathVariable("id") Integer id, Model model) {
+        Attraction attraction = attractionService.getAttractionById(id).orElseThrow(() -> new IllegalArgumentException("Invalid attraction Id:" + id));
+        model.addAttribute("attraction", attraction);
+        model.addAttribute("allCategories", Category.values()); 
+        model.addAttribute("pageTitle", "Edit Attraction");
+        return "admin/attraction/attraction-form"; 
+    }
+    ----------------------------------------- */
     
     @PostMapping("/attractions/save")
     public String saveAttraction(@ModelAttribute("attraction") Attraction attraction,
@@ -271,26 +333,26 @@ public class AdminController {
         return "redirect:/admin/attractions"; 
     }
     
-    @GetMapping("/attractions/edit/{id}")
-    public String showEditAttractionForm(@PathVariable("id") Integer id, Model model) {
-        Attraction attraction = attractionService.getAttractionById(id).orElseThrow(() -> new IllegalArgumentException("Invalid attraction Id:" + id));
-        model.addAttribute("attraction", attraction);
-        model.addAttribute("allCategories", Category.values()); 
-        model.addAttribute("pageTitle", "Edit Attraction");
-        return "admin/attraction/attraction-form"; 
-    }
     @GetMapping("/attractions/delete/{id}")
     public String deleteAttraction(@PathVariable("id") Integer id) {
         attractionService.deleteAttraction(id);
         return "redirect:/admin/attractions"; 
     }
 
-    // == CRUD ATTRACTION TICKETS (Tetap) ==
+    // ============================================================
+    // 6. MANAGE ATTRACTION TICKETS
+    // ============================================================
+
     @GetMapping("/attraction-tickets")
     public String showAttractionTicketList(Model model) {
         model.addAttribute("attractionTickets", attractionTicketService.findAll());
+        // Objek Modal
+        model.addAttribute("attractionTicket", new AttractionTicket());
+        model.addAttribute("allAttractions", attractionService.getAllAttractions());
         return "admin/attraction/attraction-tickets";
     }
+
+    /* --- KOMENTAR: Method GET Form Lama ---
     @GetMapping("/attraction-tickets/add")
     public String showAddAttractionTicketForm(Model model) {
         model.addAttribute("attractionTicket", new AttractionTicket());
@@ -298,11 +360,7 @@ public class AdminController {
         model.addAttribute("pageTitle", "Add New Attraction Ticket");
         return "admin/attraction/attraction-ticket-form";
     }
-    @PostMapping("/attraction-tickets/save")
-    public String saveAttractionTicket(@ModelAttribute("attractionTicket") AttractionTicket ticket) {
-        attractionTicketService.save(ticket);
-        return "redirect:/admin/attraction-tickets";
-    }
+
     @GetMapping("/attraction-tickets/edit/{id}")
     public String showEditAttractionTicketForm(@PathVariable("id") Integer id, Model model) {
         AttractionTicket ticket = attractionTicketService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid ticket Id:" + id));
@@ -311,18 +369,34 @@ public class AdminController {
         model.addAttribute("pageTitle", "Edit Attraction Ticket");
         return "admin/attraction/attraction-ticket-form";
     }
+    ----------------------------------------- */
+
+    @PostMapping("/attraction-tickets/save")
+    public String saveAttractionTicket(@ModelAttribute("attractionTicket") AttractionTicket ticket) {
+        attractionTicketService.save(ticket);
+        return "redirect:/admin/attraction-tickets";
+    }
+
     @GetMapping("/attraction-tickets/delete/{id}")
     public String deleteAttractionTicket(@PathVariable("id") Integer id) {
         attractionTicketService.deleteById(id);
         return "redirect:/admin/attraction-tickets";
     }
 
-    // == USER MANAGEMENT (Tetap) ==
+    // ============================================================
+    // 7. MANAGE USERS
+    // ============================================================
+
     @GetMapping("/users")
     public String showUserList(Model model) {
         model.addAttribute("allUsers", userService.findAll());
+        // Objek Modal
+        model.addAttribute("user", new User());
+        model.addAttribute("allRoles", Role.values());
         return "admin/user/users-list"; 
     }
+
+    /* --- KOMENTAR: Method GET Form Lama ---
     @GetMapping("/users/add")
     public String showAddUserForm(Model model) {
         model.addAttribute("user", new User());
@@ -330,6 +404,7 @@ public class AdminController {
         model.addAttribute("pageTitle", "Add New User");
         return "admin/user/user-form";
     }
+
     @GetMapping("/users/edit/{id}")
     public String showEditUserForm(@PathVariable("id") Integer id, Model model) {
         User user = userService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
@@ -339,36 +414,43 @@ public class AdminController {
         model.addAttribute("pageTitle", "Edit User");
         return "admin/user/user-form";
     }
+    ----------------------------------------- */
+
     @PostMapping("/users/save")
     public String saveUser(@ModelAttribute("user") User user) {
         userService.saveUser(user);
         return "redirect:/admin/users";
     }
+
     @GetMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable("id") Integer id) {
         userService.deleteById(id);
         return "redirect:/admin/users";
     }
+
     @GetMapping("/users/status/{id}")
     public String toggleUserStatus(@PathVariable("id") Integer id) {
         userService.toggleUserStatus(id);
         return "redirect:/admin/users";
     }
-    // == ORDER TRANSACTION LIST ==
+
+    // ============================================================
+    // 8. TRANSACTION & ORDERS (Tidak Berubah)
+    // ============================================================
+
     @GetMapping("/transactions")
     public String showTransactionList(Model model) {
-        // Mengambil semua order, diurutkan dari yang terbaru (DESC)
         List<Order> allOrders = orderRepository.findAll(Sort.by(Sort.Direction.DESC, "orderDate"));
         model.addAttribute("allOrders", allOrders);
         return "admin/order/order-list"; 
     }
 
-    // == ORDER MANAGEMENT (Tetap) ==
     @GetMapping("/orders")
     public String showUsersForOrders(Model model) {
         model.addAttribute("users", userService.findAll());
         return "admin/order/order-users"; 
     }
+
     @GetMapping("/orders/{userId}")
     public String showUserOrderDetails(@PathVariable("userId") Integer userId, Model model) {
         User user = userService.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + userId));
