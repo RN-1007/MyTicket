@@ -66,6 +66,6 @@ public class PageController {
 
     @GetMapping("/about-us")
     public String aboutUsPage() {
-        return "about-us";
+        return "user/about-us";
     }
 }
