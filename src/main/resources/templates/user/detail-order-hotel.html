@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragment/user-layout :: layout(~{::title}, ~{::.content})}">
+<head>
+    <title>Detail Pesanan Hotel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-sans antialiased bg-gray-100">
+<div class="content p-6">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6">Detail Pesanan Hotel</h2>
+
+        <!-- Hotel Card -->
+        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6" th:object="${hotel}">
+            <div class="md:flex">
+                <div class="md:flex-shrink-0">
+                    <img th:if="*{image != null}" th:src="@{*{imagePath}}" class="h-48 w-full object-cover md:w-48" alt="Hotel Image">
+                    <img th:unless="*{image != null}" src="https://via.placeholder.com/350x250" class="h-48 w-full object-cover md:w-48" alt="Hotel Image">
+                </div>
+                <div class="p-8">
+                    <div class="uppercase tracking-wide text-sm text-indigo-500 font-semibold" th:text="*{name}">Nama Hotel</div>
+                    <p class="mt-2 text-gray-500"><small class="text-gray-500"><i class="fas fa-map-marker-alt"></i> <span th:text="*{location}">Lokasi Hotel</span></small></p>
+                    <p class="mt-2 text-gray-500">Deskripsi singkat mengenai hotel. Menawarkan pemandangan yang indah dan pelayanan terbaik untuk liburan Anda.</p>
+                    <p class="mt-2 text-lg leading-tight font-medium text-black" th:if="*{rooms != null && !rooms.isEmpty()}">
+                        <strong>Rp <span th:text="${#numbers.formatDecimal(rooms[0].price, 0, 'POINT', 0, 'COMMA')}">1.200.000</span> / malam</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Form -->
+        <form th:action="@{/order/create}" method="post" th:object="${hotel}">
+            <input type="hidden" name="itemType" value="Hotel" />
+            <input type="hidden" name="itemId" th:value="*{rooms[0].roomId}" />
+            <input type="hidden" name="quantity" value="1" />
+            
+            <!-- Date Selection -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div class="border-b pb-4 mb-4">
+                    <h3 class="text-xl font-semibold text-gray-700">Pilih Tanggal</h3>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="check-in-date" class="block text-gray-700 text-sm font-bold mb-2">Tanggal Check-in</label>
+                        <input type="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="check-in-date" name="checkInDate" required>
+                    </div>
+                    <div>
+                        <label for="check-out-date" class="block text-gray-700 text-sm font-bold mb-2">Tanggal Check-out</label>
+                        <input type="date" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="check-out-date" name="checkOutDate" required>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Room Details -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div class="border-b pb-4 mb-4">
+                    <h3 class="text-xl font-semibold text-gray-700">Detail & Fasilitas Kamar</h3>
+                </div>
+                <p class="mb-4 text-gray-600">Fasilitas berikut akan Anda dapatkan di setiap kamar yang kami tawarkan, tidak peduli hotel mana yang Anda pilih.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <ul class="list-none space-y-2">
+                            <li><i class="fas fa-wifi text-blue-500 mr-2"></i> Wi-Fi Gratis</li>
+                            <li><i class="fas fa-tv text-blue-500 mr-2"></i> TV Layar Datar</li>
+                            <li><i class="fas fa-air-conditioner text-blue-500 mr-2"></i> AC</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul class="list-none space-y-2">
+                            <li><i class="fas fa-shower text-blue-500 mr-2"></i> Kamar Mandi Pribadi</li>
+                            <li><i class="fas fa-coffee text-blue-500 mr-2"></i> Pembuat Kopi/Teh</li>
+                            <li><i class="fas fa-lock text-blue-500 mr-2"></i> Brankas</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul class="list-none space-y-2">
+                            <li><i class="fas fa-phone-alt text-blue-500 mr-2"></i> Telepon</li>
+                            <li><i class="fas fa-concierge-bell text-blue-500 mr-2"></i> Layanan Kamar 24 Jam</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bed Selection -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+                <div class="border-b pb-4 mb-4">
+                    <h3 class="text-xl font-semibold text-gray-700">Pilihan Tempat Tidur</h3>
+                </div>
+                <p class="mb-4 text-gray-600">Pilih jenis tempat tidur yang Anda inginkan.</p>
+                <div class="mb-2">
+                    <input class="mr-2 leading-tight" type="radio" name="bedType" id="singleBed" value="single" checked>
+                    <label class="text-gray-700" for="singleBed">
+                        Single Bed
+                    </label>
+                </div>
+                <div>
+                    <input class="mr-2 leading-tight" type="radio" name="bedType" id="doubleBed" value="double">
+                    <label class="text-gray-700" for="doubleBed">
+                        Double Bed
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full">Lanjutkan ke Pembayaran</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
+
+
+{% comment %} -pembatalan pesanan.
+-revisi halaman "pesanan saya"  tambahkan menu cheklist dan total pesanan ukuran menyesuaikan
+-detail order masih belum fix 
+-alur check out 
+- {% endcomment %}
