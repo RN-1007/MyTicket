@@ -51,6 +51,18 @@
       .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #6b7280;
       }
+
+      /* TOAST ANIMATION */
+      @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes fadeOut {
+        from { opacity: 1; }
+        to { opacity: 0; }
+      }
+      .toast-enter { animation: slideIn 0.5s ease-out forwards; }
+      .toast-exit { animation: fadeOut 0.5s ease-out forwards; }
     </style>
   </head>
   <body class="bg-gray-900 text-gray-200">
@@ -284,12 +296,18 @@
           </header>
 
           <main
-            class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-6"
+            class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-6 relative"
           >
             <div th:replace="${content}"></div>
           </main>
         </div>
       </div>
+
+      <input type="hidden" id="flash-success" th:value="${successMessage}" />
+      <input type="hidden" id="flash-error" th:value="${errorMessage}" />
+
+      <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none">
+        </div>
 
       <script>
         if (!window.adminScriptLoaded) {
@@ -321,6 +339,89 @@
                 });
               });
             }
+
+            // 3. TOAST LOGIC
+            function showToast(message, type) {
+                const container = document.getElementById('toast-container');
+                if(!container) return; // safety check
+
+                // Elemen Toast Wrapper
+                const toast = document.createElement('div');
+                toast.className = `toast-enter pointer-events-auto flex items-center w-full max-w-sm p-4 rounded-lg shadow-2xl border-l-4 text-white bg-gray-800 backdrop-blur-md bg-opacity-95 transform transition-all duration-300 hover:scale-105 cursor-pointer`;
+                
+                // Style Berdasarkan Tipe
+                let iconClass = '';
+                let title = '';
+                let borderColor = '';
+                let iconColor = '';
+
+                if (type === 'success') {
+                    borderColor = 'border-green-500';
+                    iconClass = 'ri-checkbox-circle-fill';
+                    iconColor = 'text-green-500';
+                    title = 'Berhasil';
+                    // Glow effect hijau halus
+                    toast.style.boxShadow = "0 10px 15px -3px rgba(34, 197, 94, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
+                } else {
+                    borderColor = 'border-red-500';
+                    iconClass = 'ri-error-warning-fill';
+                    iconColor = 'text-red-500';
+                    title = 'Gagal';
+                    // Glow effect merah halus
+                    toast.style.boxShadow = "0 10px 15px -3px rgba(239, 68, 68, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
+                }
+
+                toast.classList.add(borderColor);
+
+                // HTML Isi Toast
+                toast.innerHTML = `
+                    <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${iconColor}">
+                        <i class="${iconClass} text-2xl"></i>
+                    </div>
+                    <div class="ml-3 text-sm font-normal">
+                        <span class="block font-semibold text-base mb-0.5 ${iconColor}">${title}</span>
+                        <span class="text-gray-300 text-sm leading-tight">${message}</span>
+                    </div>
+                    <button type="button" class="ml-auto -mx-1.5 -my-1.5 text-gray-400 hover:text-white rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-700 inline-flex h-8 w-8" aria-label="Close">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                `;
+
+                // Event Close Button
+                const closeBtn = toast.querySelector('button');
+                closeBtn.addEventListener('click', () => {
+                    removeToast(toast);
+                });
+
+                // Auto Close setelah 5 detik
+                setTimeout(() => {
+                    removeToast(toast);
+                }, 5000);
+
+                container.appendChild(toast);
+            }
+
+            function removeToast(toast) {
+                if(!toast) return;
+                toast.classList.remove('toast-enter');
+                toast.classList.add('toast-exit');
+                toast.addEventListener('animationend', () => {
+                    toast.remove();
+                });
+            }
+
+            // Cek Flash Message dari Server saat halaman dimuat
+            const successEl = document.getElementById('flash-success');
+            const errorEl = document.getElementById('flash-error');
+
+            if (successEl && successEl.value) {
+                showToast(successEl.value, 'success');
+            }
+            
+            if (errorEl && errorEl.value) {
+                showToast(errorEl.value, 'error');
+            }
+
           });
           window.adminScriptLoaded = true;
         }

@@ -85,7 +85,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
                                 <div th:if="${order.status.name() == 'PENDING' or order.status.name() == 'WAITING_PAYMENT'}">
                                     <form th:action="@{/pesanan/batalkan/{id}(id=${order.orderId})}" method="post" 
-                                          onsubmit="return confirm('Apakah Anda yakin ingin membatalkan Pesanan ID ' + [[${order.orderId}]] + '?')">
+                                          onsubmit="return confirm('Apakah Anda yakin ingin membatalkan Pesanan ID ' + /*[[${order.orderId}]]*/ + '?')">
                                         
                                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" th:if="${_csrf}" />
                                         

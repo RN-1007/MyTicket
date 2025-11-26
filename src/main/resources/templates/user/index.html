@@ -99,16 +99,8 @@
                             <span class="ml-2 text-gray-600 text-sm font-medium">(4)</span>
                         </div>
                         <div class="mt-auto" th:if="${hotel.rooms != null && !hotel.rooms.isEmpty()}">
-                            <form th:action="@{/order/create}" method="post" class="space-y-4">
-                                <p class="text-blue-600 font-bold text-2xl" th:text="'Rp ' + ${#numbers.formatDecimal(hotel.rooms[0].price, 0, 'POINT', 0, 'COMMA')}"></p>
-                                <input type="hidden" name="itemType" value="Hotel" />
-                                <input type="hidden" name="itemId" th:value="${hotel.rooms[0].roomId}" />
-                                <div class="flex items-center space-x-3">
-                                    <label class="font-medium">Jumlah:</label>
-                                    <input type="number" name="quantity" value="1" class="w-20 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
-                                </div>
-                                <button type="submit" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:-translate-y-1">Pesan Sekarang</button>
-                            </form>
+                            <p class="text-blue-600 font-bold text-2xl" th:text="'Rp ' + ${#numbers.formatDecimal(hotel.rooms[0].price, 0, 'POINT', 0, 'COMMA')}"></p>
+                            <a th:href="@{/hotel/detail/{id}(id=${hotel.hotelId})}" class="mt-4 block w-full text-center bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:-translate-y-1">Lihat Detail</a>
                         </div>
                     </div>
                 </div>
