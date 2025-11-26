@@ -1,6 +1,5 @@
 package com.travelapp.travel_app.controller;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.travelapp.travel_app.model.Attraction;
 import com.travelapp.travel_app.model.AttractionTicket; 
@@ -26,7 +26,9 @@ import com.travelapp.travel_app.model.Order;
 import com.travelapp.travel_app.model.OrderDetail;
 import com.travelapp.travel_app.model.Role;
 import com.travelapp.travel_app.model.Transport;
+import com.travelapp.travel_app.model.TransportProvider; // Import Baru
 import com.travelapp.travel_app.model.TransportTicket; 
+import com.travelapp.travel_app.model.TransportType; // Import Baru
 import com.travelapp.travel_app.model.User;
 import com.travelapp.travel_app.repository.UserRepository;
 import com.travelapp.travel_app.repository.order.OrderRepository;
@@ -57,7 +59,6 @@ public class AdminController {
     @Autowired private AttractionTicketService attractionTicketService;
     @Autowired private UserService userService;
 
-    // Helper untuk menandai menu aktif di sidebar
     @ModelAttribute("currentUri")
     public String getCurrentUri(HttpServletRequest request) {
         return request.getRequestURI();
@@ -79,57 +80,45 @@ public class AdminController {
     @GetMapping("/hotels")
     public String showHotelList(Model model) {
         model.addAttribute("hotels", hotelService.getAllHotels());
-        // Objek kosong untuk form "Tambah Hotel" di Modal
         model.addAttribute("hotel", new Hotel()); 
         return "admin/hotel/hotels"; 
     }
-
-    /* --- KOMENTAR: Method GET Form Lama (Tidak dipakai karena Modal) ---
-    @GetMapping("/hotels/add")
-    public String showAddHotelForm(Model model) {
-        model.addAttribute("hotel", new Hotel());
-        model.addAttribute("pageTitle", "Add New Hotel");
-        return "admin/hotel/hotel-form"; 
-    }
-
-    @GetMapping("/hotels/edit/{id}")
-    public String showEditHotelForm(@PathVariable("id") Integer id, Model model) {
-        Hotel hotel = hotelService.getHotelById(id).orElseThrow(() -> new IllegalArgumentException("Invalid hotel Id:" + id));
-        model.addAttribute("hotel", hotel);
-        model.addAttribute("pageTitle", "Edit Hotel");
-        return "admin/hotel/hotel-form"; 
-    }
-    ------------------------------------------------------------------- */
     
-    // TETAP AKTIF: Method POST untuk menyimpan data (dipanggil oleh Modal)
     @PostMapping("/hotels/save")
     public String saveHotel(@ModelAttribute("hotel") Hotel hotel, 
-                            @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
-        
-        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        
-        if (!fileName.isEmpty()) {
-            // Jika ada upload gambar baru
-            hotel.setImage(fileName);
-            Hotel savedHotel = hotelService.saveHotel(hotel);
-            String uploadDir = "hotel-photos/" + savedHotel.getHotelId();
-            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-        } else {
-            // Jika tidak ada upload baru, pertahankan gambar lama saat Edit
-            if (hotel.getHotelId() != null) {
-                Hotel existingHotel = hotelService.getHotelById(hotel.getHotelId()).orElse(null);
-                if (existingHotel != null) {
-                    hotel.setImage(existingHotel.getImage());
+                            @RequestParam("imageFile") MultipartFile multipartFile,
+                            RedirectAttributes redirectAttributes) {
+        try {
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+            if (!fileName.isEmpty()) {
+                hotel.setImage(fileName);
+                Hotel savedHotel = hotelService.saveHotel(hotel);
+                String uploadDir = "hotel-photos/" + savedHotel.getHotelId();
+                FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+            } else {
+                if (hotel.getHotelId() != null) {
+                    Hotel existingHotel = hotelService.getHotelById(hotel.getHotelId()).orElse(null);
+                    if (existingHotel != null) {
+                        hotel.setImage(existingHotel.getImage());
+                    }
                 }
+                hotelService.saveHotel(hotel);
             }
-            hotelService.saveHotel(hotel);
+            redirectAttributes.addFlashAttribute("successMessage", "Data Hotel berhasil disimpan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menyimpan data: " + e.getMessage());
         }
         return "redirect:/admin/hotels"; 
     }
     
     @GetMapping("/hotels/delete/{id}")
-    public String deleteHotel(@PathVariable("id") Integer id) {
-        hotelService.deleteHotel(id); 
+    public String deleteHotel(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            hotelService.deleteHotel(id); 
+            redirectAttributes.addFlashAttribute("successMessage", "Data Hotel berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus data.");
+        }
         return "redirect:/admin/hotels"; 
     }
     
@@ -140,99 +129,95 @@ public class AdminController {
     @GetMapping("/hotel-rooms")
     public String showHotelRoomList(Model model) {
         model.addAttribute("hotelRooms", hotelRoomService.findAll());
-        // Objek untuk Modal
         model.addAttribute("hotelRoom", new HotelRoom());
         model.addAttribute("allHotels", hotelService.getAllHotels());
         return "admin/hotel/hotel-rooms";
     }
 
-    /* --- KOMENTAR: Method GET Form Lama ---
-    @GetMapping("/hotel-rooms/add")
-    public String showAddHotelRoomForm(Model model) {
-        model.addAttribute("hotelRoom", new HotelRoom());
-        model.addAttribute("allHotels", hotelService.getAllHotels());
-        model.addAttribute("pageTitle", "Add New Hotel Room");
-        return "admin/hotel/hotel-room-form";
-    }
-
-    @GetMapping("/hotel-rooms/edit/{id}")
-    public String showEditHotelRoomForm(@PathVariable("id") Integer id, Model model) {
-        HotelRoom hotelRoom = hotelRoomService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid room Id:" + id));
-        model.addAttribute("hotelRoom", hotelRoom);
-        model.addAttribute("allHotels", hotelService.getAllHotels());
-        model.addAttribute("pageTitle", "Edit Hotel Room");
-        return "admin/hotel/hotel-room-form";
-    }
-    ----------------------------------------- */
-
     @PostMapping("/hotel-rooms/save")
-    public String saveHotelRoom(@ModelAttribute("hotelRoom") HotelRoom hotelRoom) {
-        hotelRoomService.save(hotelRoom); 
+    public String saveHotelRoom(@ModelAttribute("hotelRoom") HotelRoom hotelRoom, RedirectAttributes redirectAttributes) {
+        try {
+            hotelRoomService.save(hotelRoom); 
+            redirectAttributes.addFlashAttribute("successMessage", "Data Kamar berhasil disimpan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menyimpan data.");
+        }
         return "redirect:/admin/hotel-rooms";
     }
 
     @GetMapping("/hotel-rooms/delete/{id}")
-    public String deleteHotelRoom(@PathVariable("id") Integer id) {
-        hotelRoomService.deleteById(id); 
+    public String deleteHotelRoom(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            hotelRoomService.deleteById(id); 
+            redirectAttributes.addFlashAttribute("successMessage", "Data Kamar berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus data.");
+        }
         return "redirect:/admin/hotel-rooms";
     }
 
     // ============================================================
-    // 3. MANAGE TRANSPORTS
+    // 3. MANAGE TRANSPORTS & PROVIDERS
     // ============================================================
 
     @GetMapping("/transports")
     public String showTransportList(Model model) {
         model.addAttribute("transports", transportService.getAllTransports());
-        // Objek Modal
         model.addAttribute("transport", new Transport());
+        
+        // Tambahan untuk Form Provider
+        model.addAttribute("provider", new TransportProvider()); 
         model.addAttribute("allProviders", transportProviderRepository.findAll()); 
+        model.addAttribute("allTransportTypes", TransportType.values()); // Enum untuk dropdown
+        
         return "admin/transport/transport"; 
     }
-
-    /* --- KOMENTAR: Method GET Form Lama ---
-    @GetMapping("/transports/add")
-    public String showAddTransportForm(Model model) {
-        model.addAttribute("transport", new Transport());
-        model.addAttribute("allProviders", transportProviderRepository.findAll()); 
-        model.addAttribute("pageTitle", "Add New Transport");
-        return "admin/transport/transport-form"; 
+    
+    // --- FITUR BARU: SAVE PROVIDER ---
+    @PostMapping("/transport-providers/save")
+    public String saveTransportProvider(@ModelAttribute("provider") TransportProvider provider, RedirectAttributes redirectAttributes) {
+        try {
+            transportProviderRepository.save(provider);
+            redirectAttributes.addFlashAttribute("successMessage", "Provider berhasil ditambahkan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menyimpan provider: " + e.getMessage());
+        }
+        return "redirect:/admin/transports";
     }
-
-    @GetMapping("/transports/edit/{id}")
-    public String showEditTransportForm(@PathVariable("id") Integer id, Model model) {
-        Transport transport = transportService.getTransportById(id).orElseThrow(() -> new IllegalArgumentException("Invalid transport Id:" + id));
-        model.addAttribute("transport", transport);
-        model.addAttribute("allProviders", transportProviderRepository.findAll()); 
-        model.addAttribute("pageTitle", "Edit Transport");
-        return "admin/transport/transport-form"; 
-    }
-    ----------------------------------------- */
     
     @PostMapping("/transports/save")
     public String saveTransport(@ModelAttribute("transport") Transport transport,
-                                @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
-        
-        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        
-        if (!fileName.isEmpty()) {
-            transport.setImage(fileName);
-            Transport savedTransport = transportService.saveTransport(transport);
-            String uploadDir = "transport-photos/" + savedTransport.getTransportId();
-            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-        } else {
-            if (transport.getTransportId() != null) {
-                Transport existing = transportService.getTransportById(transport.getTransportId()).orElse(null);
-                if (existing != null) transport.setImage(existing.getImage());
+                                @RequestParam("imageFile") MultipartFile multipartFile,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+            if (!fileName.isEmpty()) {
+                transport.setImage(fileName);
+                Transport savedTransport = transportService.saveTransport(transport);
+                String uploadDir = "transport-photos/" + savedTransport.getTransportId();
+                FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+            } else {
+                if (transport.getTransportId() != null) {
+                    Transport existing = transportService.getTransportById(transport.getTransportId()).orElse(null);
+                    if (existing != null) transport.setImage(existing.getImage());
+                }
+                transportService.saveTransport(transport);
             }
-            transportService.saveTransport(transport);
+            redirectAttributes.addFlashAttribute("successMessage", "Data Transport berhasil disimpan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menyimpan data: " + e.getMessage());
         }
         return "redirect:/admin/transports"; 
     }
     
     @GetMapping("/transports/delete/{id}")
-    public String deleteTransport(@PathVariable("id") Integer id) {
-        transportService.deleteTransport(id);
+    public String deleteTransport(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            transportService.deleteTransport(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Data Transport berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus data.");
+        }
         return "redirect:/admin/transports"; 
     }
 
@@ -243,40 +228,30 @@ public class AdminController {
     @GetMapping("/transport-tickets")
     public String showTransportTicketList(Model model) {
         model.addAttribute("transportTickets", transportTicketService.findAll());
-        // Objek Modal
         model.addAttribute("transportTicket", new TransportTicket());
         model.addAttribute("allTransports", transportService.getAllTransports());
         return "admin/transport/transport-tickets";
     }
 
-    /* --- KOMENTAR: Method GET Form Lama ---
-    @GetMapping("/transport-tickets/add")
-    public String showAddTransportTicketForm(Model model) {
-        model.addAttribute("transportTicket", new TransportTicket());
-        model.addAttribute("allTransports", transportService.getAllTransports());
-        model.addAttribute("pageTitle", "Add New Transport Ticket");
-        return "admin/transport/transport-ticket-form";
-    }
-
-    @GetMapping("/transport-tickets/edit/{id}")
-    public String showEditTransportTicketForm(@PathVariable("id") Integer id, Model model) {
-        TransportTicket ticket = transportTicketService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid ticket Id:" + id));
-        model.addAttribute("transportTicket", ticket);
-        model.addAttribute("allTransports", transportService.getAllTransports());
-        model.addAttribute("pageTitle", "Edit Transport Ticket");
-        return "admin/transport/transport-ticket-form";
-    }
-    ----------------------------------------- */
-
     @PostMapping("/transport-tickets/save")
-    public String saveTransportTicket(@ModelAttribute("transportTicket") TransportTicket ticket) {
-        transportTicketService.save(ticket);
+    public String saveTransportTicket(@ModelAttribute("transportTicket") TransportTicket ticket, RedirectAttributes redirectAttributes) {
+        try {
+            transportTicketService.save(ticket);
+            redirectAttributes.addFlashAttribute("successMessage", "Tiket Transport berhasil disimpan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menyimpan tiket.");
+        }
         return "redirect:/admin/transport-tickets";
     }
 
     @GetMapping("/transport-tickets/delete/{id}")
-    public String deleteTransportTicket(@PathVariable("id") Integer id) {
-        transportTicketService.deleteById(id);
+    public String deleteTransportTicket(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            transportTicketService.deleteById(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Tiket Transport berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus tiket.");
+        }
         return "redirect:/admin/transport-tickets";
     }
 
@@ -287,55 +262,44 @@ public class AdminController {
     @GetMapping("/attractions")
     public String showAttractionList(Model model) {
         model.addAttribute("attractions", attractionService.getAllAttractions());
-        // Objek Modal
         model.addAttribute("attraction", new Attraction());
         model.addAttribute("allCategories", Category.values()); 
         return "admin/attraction/attraction"; 
     }
-
-    /* --- KOMENTAR: Method GET Form Lama ---
-    @GetMapping("/attractions/add")
-    public String showAddAttractionForm(Model model) {
-        model.addAttribute("attraction", new Attraction());
-        model.addAttribute("allCategories", Category.values()); 
-        model.addAttribute("pageTitle", "Add New Attraction");
-        return "admin/attraction/attraction-form"; 
-    }
-
-    @GetMapping("/attractions/edit/{id}")
-    public String showEditAttractionForm(@PathVariable("id") Integer id, Model model) {
-        Attraction attraction = attractionService.getAttractionById(id).orElseThrow(() -> new IllegalArgumentException("Invalid attraction Id:" + id));
-        model.addAttribute("attraction", attraction);
-        model.addAttribute("allCategories", Category.values()); 
-        model.addAttribute("pageTitle", "Edit Attraction");
-        return "admin/attraction/attraction-form"; 
-    }
-    ----------------------------------------- */
     
     @PostMapping("/attractions/save")
     public String saveAttraction(@ModelAttribute("attraction") Attraction attraction,
-                                 @RequestParam("imageFile") MultipartFile multipartFile) throws IOException {
-        
-        String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        
-        if (!fileName.isEmpty()) {
-            attraction.setImage(fileName);
-            Attraction savedAttraction = attractionService.saveAttraction(attraction);
-            String uploadDir = "attraction-photos/" + savedAttraction.getAttractionId();
-            FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-        } else {
-             if (attraction.getAttractionId() != null) {
-                Attraction existing = attractionService.getAttractionById(attraction.getAttractionId()).orElse(null);
-                if (existing != null) attraction.setImage(existing.getImage());
+                                 @RequestParam("imageFile") MultipartFile multipartFile,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
+            if (!fileName.isEmpty()) {
+                attraction.setImage(fileName);
+                Attraction savedAttraction = attractionService.saveAttraction(attraction);
+                String uploadDir = "attraction-photos/" + savedAttraction.getAttractionId();
+                FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+            } else {
+                 if (attraction.getAttractionId() != null) {
+                    Attraction existing = attractionService.getAttractionById(attraction.getAttractionId()).orElse(null);
+                    if (existing != null) attraction.setImage(existing.getImage());
+                }
+                attractionService.saveAttraction(attraction);
             }
-            attractionService.saveAttraction(attraction);
+            redirectAttributes.addFlashAttribute("successMessage", "Data Atraksi berhasil disimpan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menyimpan data: " + e.getMessage());
         }
         return "redirect:/admin/attractions"; 
     }
     
     @GetMapping("/attractions/delete/{id}")
-    public String deleteAttraction(@PathVariable("id") Integer id) {
-        attractionService.deleteAttraction(id);
+    public String deleteAttraction(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            attractionService.deleteAttraction(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Data Atraksi berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus data.");
+        }
         return "redirect:/admin/attractions"; 
     }
 
@@ -346,40 +310,30 @@ public class AdminController {
     @GetMapping("/attraction-tickets")
     public String showAttractionTicketList(Model model) {
         model.addAttribute("attractionTickets", attractionTicketService.findAll());
-        // Objek Modal
         model.addAttribute("attractionTicket", new AttractionTicket());
         model.addAttribute("allAttractions", attractionService.getAllAttractions());
         return "admin/attraction/attraction-tickets";
     }
 
-    /* --- KOMENTAR: Method GET Form Lama ---
-    @GetMapping("/attraction-tickets/add")
-    public String showAddAttractionTicketForm(Model model) {
-        model.addAttribute("attractionTicket", new AttractionTicket());
-        model.addAttribute("allAttractions", attractionService.getAllAttractions());
-        model.addAttribute("pageTitle", "Add New Attraction Ticket");
-        return "admin/attraction/attraction-ticket-form";
-    }
-
-    @GetMapping("/attraction-tickets/edit/{id}")
-    public String showEditAttractionTicketForm(@PathVariable("id") Integer id, Model model) {
-        AttractionTicket ticket = attractionTicketService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid ticket Id:" + id));
-        model.addAttribute("attractionTicket", ticket);
-        model.addAttribute("allAttractions", attractionService.getAllAttractions());
-        model.addAttribute("pageTitle", "Edit Attraction Ticket");
-        return "admin/attraction/attraction-ticket-form";
-    }
-    ----------------------------------------- */
-
     @PostMapping("/attraction-tickets/save")
-    public String saveAttractionTicket(@ModelAttribute("attractionTicket") AttractionTicket ticket) {
-        attractionTicketService.save(ticket);
+    public String saveAttractionTicket(@ModelAttribute("attractionTicket") AttractionTicket ticket, RedirectAttributes redirectAttributes) {
+        try {
+            attractionTicketService.save(ticket);
+            redirectAttributes.addFlashAttribute("successMessage", "Tiket Atraksi berhasil disimpan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menyimpan tiket.");
+        }
         return "redirect:/admin/attraction-tickets";
     }
 
     @GetMapping("/attraction-tickets/delete/{id}")
-    public String deleteAttractionTicket(@PathVariable("id") Integer id) {
-        attractionTicketService.deleteById(id);
+    public String deleteAttractionTicket(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            attractionTicketService.deleteById(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Tiket Atraksi berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus tiket.");
+        }
         return "redirect:/admin/attraction-tickets";
     }
 
@@ -390,52 +344,46 @@ public class AdminController {
     @GetMapping("/users")
     public String showUserList(Model model) {
         model.addAttribute("allUsers", userService.findAll());
-        // Objek Modal
         model.addAttribute("user", new User());
         model.addAttribute("allRoles", Role.values());
         return "admin/user/users-list"; 
     }
 
-    /* --- KOMENTAR: Method GET Form Lama ---
-    @GetMapping("/users/add")
-    public String showAddUserForm(Model model) {
-        model.addAttribute("user", new User());
-        model.addAttribute("allRoles", Role.values());
-        model.addAttribute("pageTitle", "Add New User");
-        return "admin/user/user-form";
-    }
-
-    @GetMapping("/users/edit/{id}")
-    public String showEditUserForm(@PathVariable("id") Integer id, Model model) {
-        User user = userService.findById(id).orElseThrow(() -> new IllegalArgumentException("Invalid user Id:" + id));
-        user.setPassword(""); 
-        model.addAttribute("user", user);
-        model.addAttribute("allRoles", Role.values());
-        model.addAttribute("pageTitle", "Edit User");
-        return "admin/user/user-form";
-    }
-    ----------------------------------------- */
-
     @PostMapping("/users/save")
-    public String saveUser(@ModelAttribute("user") User user) {
-        userService.saveUser(user);
+    public String saveUser(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) {
+        try {
+            userService.saveUser(user);
+            redirectAttributes.addFlashAttribute("successMessage", "Data User berhasil disimpan!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menyimpan user: " + e.getMessage());
+        }
         return "redirect:/admin/users";
     }
 
     @GetMapping("/users/delete/{id}")
-    public String deleteUser(@PathVariable("id") Integer id) {
-        userService.deleteById(id);
+    public String deleteUser(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.deleteById(id);
+            redirectAttributes.addFlashAttribute("successMessage", "User berhasil dihapus!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus user.");
+        }
         return "redirect:/admin/users";
     }
 
     @GetMapping("/users/status/{id}")
-    public String toggleUserStatus(@PathVariable("id") Integer id) {
-        userService.toggleUserStatus(id);
+    public String toggleUserStatus(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+        try {
+            userService.toggleUserStatus(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Status User berhasil diperbarui!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal memperbarui status user.");
+        }
         return "redirect:/admin/users";
     }
 
     // ============================================================
-    // 8. TRANSACTION & ORDERS (Tidak Berubah)
+    // 8. TRANSACTION & ORDERS
     // ============================================================
 
     @GetMapping("/transactions")

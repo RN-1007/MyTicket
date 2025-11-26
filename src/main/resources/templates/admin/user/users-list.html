@@ -55,7 +55,8 @@
                             <tr>
                                 <th class="px-6 py-4 font-semibold">Info User</th>
                                 <th class="px-6 py-4 font-semibold">Kontak</th>
-                                <th class="px-6 py-4 font-semibold">Role</th>
+                                <th class="px-6 py-4 font-semibold text-center">Role</th>
+                                <th class="px-6 py-4 font-semibold text-center">Status</th>
                                 <th class="px-6 py-4 text-center">Aksi</th>
                             </tr>
                         </thead>
@@ -63,36 +64,50 @@
                             <tr th:each="user : ${allUsers}" th:data-role="${user.role}" class="hover:bg-gray-700/30 transition-colors">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                                        <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition"
+                                             th:classappend="${user.isActive} ? 'bg-blue-600' : 'bg-gray-600'">
                                             <span th:text="${#strings.substring(user.name, 0, 1)}">A</span>
                                         </div>
-                                        <div>
+                                        <div th:classappend="${!user.isActive} ? 'opacity-50' : ''">
                                             <div class="text-white font-medium" th:text="${user.name}">Nama</div>
                                             <div class="text-xs text-gray-500">ID: <span th:text="${user.userId}">1</span></div>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4" th:classappend="${!user.isActive} ? 'opacity-50' : ''">
                                     <div class="flex flex-col">
                                         <span th:text="${user.email}">email</span>
                                         <span class="text-xs text-gray-500" th:text="${user.phone}">phone</span>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4">
+                                <td class="px-6 py-4 text-center" th:classappend="${!user.isActive} ? 'opacity-50' : ''">
                                     <span th:text="${user.role}" 
                                           th:classappend="${user.role.name() == 'ROLE_ADMIN'} ? 'bg-purple-900/30 text-purple-300 border-purple-800' : 'bg-blue-900/30 text-blue-300 border-blue-800'"
-                                          class="px-3 py-1 rounded-full text-xs font-medium border uppercase tracking-wide">Role</span>
+                                          class="w-28 py-1 inline-block text-center rounded-full text-xs font-medium border uppercase tracking-wide">Role</span>
+                                </td>
+                                <td class="px-6 py-4 text-center">
+                                    <span th:text="${user.isActive} ? 'Aktif' : 'Non-Aktif'"
+                                          th:classappend="${user.isActive} ? 'bg-green-900/30 text-green-400 border-green-800' : 'bg-red-900/30 text-red-400 border-red-800'"
+                                          class="w-24 py-1 inline-block text-center border rounded-full text-xs font-bold uppercase tracking-wide">Status</span>
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
+                                        <a th:href="@{/admin/users/status/{id}(id=${user.userId})}"
+                                           th:classappend="${user.isActive} ? 'hover:bg-red-600' : 'hover:bg-green-600'"
+                                           class="p-2 bg-gray-700 text-white rounded-lg transition-colors group"
+                                           th:title="${user.isActive} ? 'Nonaktifkan User' : 'Aktifkan User'">
+                                            <i th:class="${user.isActive} ? 'ri-toggle-fill text-green-400 group-hover:text-white' : 'ri-toggle-line text-gray-400 group-hover:text-white'"></i>
+                                        </a>
                                         <button onclick="openModal(this)"
-                                           th:data-id="${user.userId}"
-                                           th:data-name="${user.name}"
-                                           th:data-email="${user.email}"
-                                           th:data-phone="${user.phone}"
+                                           th:data-id="${user.userId}" th:data-name="${user.name}"
+                                           th:data-email="${user.email}" th:data-phone="${user.phone}"
                                            th:data-role="${user.role}"
                                            class="p-2 bg-gray-700 hover:bg-yellow-600 text-white rounded-lg transition-colors"><i class="ri-pencil-fill"></i></button>
-                                        <a th:href="@{/admin/users/delete/{id}(id=${user.userId})}" class="p-2 bg-gray-700 hover:bg-red-600 text-white rounded-lg transition-colors" onclick="return confirm('Hapus user ini?');"><i class="ri-delete-bin-line"></i></a>
+                                        
+                                        <button th:onclick="'openDeleteModal(\'' + @{/admin/users/delete/{id}(id=${user.userId})} + '\')'" 
+                                                class="p-2 bg-gray-700 hover:bg-red-600 text-white rounded-lg transition-colors">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -110,16 +125,16 @@
                     </div>
                     <form id="userForm" th:action="@{/admin/users/save}" method="POST" class="p-6 space-y-4">
                         <input type="hidden" id="userId" name="userId" />
-                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Nama Lengkap</label><input type="text" id="name" name="name" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:outline-none" required></div>
-                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Email</label><input type="email" id="email" name="email" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:outline-none" required></div>
-                        <div><label class="block text-gray-400 text-sm font-medium mb-1">No. Telepon</label><input type="text" id="phone" name="phone" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:outline-none"></div>
+                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Nama Lengkap</label><input type="text" id="name" name="name" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none" required></div>
+                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Email</label><input type="email" id="email" name="email" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none" required></div>
+                        <div><label class="block text-gray-400 text-sm font-medium mb-1">No. Telepon</label><input type="text" id="phone" name="phone" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none"></div>
                         <div><label class="block text-gray-400 text-sm font-medium mb-1">Role</label>
-                            <select id="role" name="role" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:outline-none">
+                            <select id="role" name="role" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none">
                                 <option value="ROLE_USER">ROLE_USER</option>
                                 <option value="ROLE_ADMIN">ROLE_ADMIN</option>
                             </select>
                         </div>
-                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Password</label><input type="password" id="password" name="password" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:outline-none"><p class="text-xs text-gray-500 mt-1">*Kosongkan jika tidak ingin ubah password.</p></div>
+                        <div><label class="block text-gray-400 text-sm font-medium mb-1">Password</label><input type="password" id="password" name="password" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:outline-none"><p class="text-xs text-gray-500 mt-1">*Kosongkan jika tidak ingin ubah password.</p></div>
                         <div class="flex justify-end pt-4 gap-3">
                             <button type="button" onclick="closeModal()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500">Batal</button>
                             <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 shadow-lg">Simpan</button>
@@ -128,42 +143,98 @@
                 </div>
             </div>
 
-            <script>
-                // 1. FILTER LOGIC
-                const searchInput = document.getElementById('tableSearch');
-                const roleFilter = document.getElementById('roleFilter');
-                const rows = document.querySelectorAll('.datatable tbody tr');
+            <div id="deleteModal" class="modal opacity-0 pointer-events-none fixed inset-0 flex items-center justify-center z-[60]">
+                <div class="absolute inset-0 bg-black bg-opacity-70" onclick="closeDeleteModal()"></div>
+                <div class="bg-gray-800 w-full max-w-sm mx-4 rounded-xl shadow-2xl z-50 overflow-hidden transform scale-95 transition-all duration-300 modal-container p-6 text-center border border-gray-700">
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-900/30 mb-6 border border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+                        <i class="ri-delete-bin-line text-3xl text-red-500"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-white mb-2">Hapus User Ini?</h3>
+                    <p class="text-gray-400 text-sm mb-6">Tindakan ini tidak dapat dibatalkan. Data user akan hilang permanen.</p>
+                    <div class="flex gap-3 justify-center">
+                        <button onclick="closeDeleteModal()" class="px-5 py-2.5 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition font-medium">Batal</button>
+                        <a id="confirmDeleteBtn" href="#" class="px-5 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 shadow-lg shadow-red-900/30 transition font-medium flex items-center gap-2">
+                            <span>Ya, Hapus</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
 
-                function filterTable() {
-                    const searchVal = searchInput.value.toLowerCase();
-                    const roleVal = roleFilter.value.toUpperCase(); // 'ADMIN' or 'USER'
+            <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        // Ambil role asli dari atribut data-role (misal: ROLE_ADMIN)
-                        const rowRole = row.getAttribute('data-role') || ''; 
+            <script th:inline="javascript">
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Toast Logic
+                    const successMsg = /*[[${successMessage}]]*/ null; 
+                    const errorMsg = /*[[${errorMessage}]]*/ null;
+
+                    if (successMsg) {
+                        if (successMsg.toLowerCase().includes('dihapus')) {
+                            showToast(successMsg, 'delete');
+                        } else {
+                            showToast(successMsg, 'success');
+                        }
+                    }
+                    if (errorMsg) showToast(errorMsg, 'error');
+
+                    function showToast(message, type) {
+                        const container = document.getElementById('toast-container');
+                        const toast = document.createElement('div');
                         
-                        const matchSearch = text.includes(searchVal);
-                        // Cek apakah role row mengandung filter yang dipilih (misal: ROLE_ADMIN mengandung ADMIN)
-                        const matchRole = roleVal === "" || rowRole.includes(roleVal);
+                        let borderClass, iconClass, title;
 
-                        row.style.display = (matchSearch && matchRole) ? '' : 'none';
-                    });
-                }
-                
-                if(searchInput) searchInput.addEventListener('keyup', filterTable);
-                if(roleFilter) roleFilter.addEventListener('change', filterTable);
+                        if (type === 'success') {
+                            borderClass = 'border-green-500';
+                            iconClass = 'ri-checkbox-circle-fill text-green-500';
+                            title = 'Berhasil';
+                        } else if (type === 'delete') {
+                            borderClass = 'border-red-500';
+                            iconClass = 'ri-delete-bin-5-fill text-red-500';
+                            title = 'Terhapus';
+                        } else {
+                            borderClass = 'border-red-500';
+                            iconClass = 'ri-error-warning-fill text-red-500';
+                            title = 'Gagal';
+                        }
 
-                // 2. MODAL LOGIC
+                        toast.className = `pointer-events-auto flex items-center w-full max-w-sm p-4 rounded-lg shadow-2xl border-l-4 bg-gray-800 text-white transform transition-all duration-500 translate-x-full opacity-0 ${borderClass}`;
+                        toast.innerHTML = `
+                            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8"><i class="${iconClass} text-2xl"></i></div>
+                            <div class="ml-3 text-sm font-normal"><span class="block font-semibold text-base mb-0.5">${title}</span><span class="text-gray-300">${message}</span></div>
+                            <button onclick="this.parentElement.remove()" class="ml-auto -mx-1.5 -my-1.5 text-gray-400 hover:text-white rounded-lg p-1.5 hover:bg-gray-700 inline-flex h-8 w-8"><i class="ri-close-line text-xl"></i></button>
+                        `;
+                        container.appendChild(toast);
+                        setTimeout(() => { toast.classList.remove('translate-x-full', 'opacity-0'); }, 10);
+                        setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); setTimeout(() => toast.remove(), 500); }, 5000);
+                    }
+
+                    // Table Filter
+                    const searchInput = document.getElementById('tableSearch');
+                    const roleFilter = document.getElementById('roleFilter');
+                    const rows = document.querySelectorAll('.datatable tbody tr');
+
+                    function filterTable() {
+                        const searchVal = searchInput.value.toLowerCase();
+                        const roleVal = roleFilter.value.toUpperCase();
+                        rows.forEach(row => {
+                            const text = row.textContent.toLowerCase();
+                            const rowRole = row.getAttribute('data-role') || '';
+                            row.style.display = (text.includes(searchVal) && (roleVal === "" || rowRole.includes(roleVal))) ? '' : 'none';
+                        });
+                    }
+                    if(searchInput) searchInput.addEventListener('keyup', filterTable);
+                    if(roleFilter) roleFilter.addEventListener('change', filterTable);
+                });
+
+                // User Modal Logic
                 const modal = document.getElementById('userModal');
                 const modalTitle = document.getElementById('modalTitle');
                 const form = document.getElementById('userForm');
 
-                function openModal(el = null) {
+                window.openModal = function(el = null) {
                     modal.classList.remove('opacity-0', 'pointer-events-none');
                     modal.querySelector('.modal-container').classList.replace('scale-95', 'scale-100');
                     document.body.classList.add('modal-active');
-
                     if(el) {
                         modalTitle.innerText = 'Edit User';
                         document.getElementById('userId').value = el.dataset.id;
@@ -179,9 +250,26 @@
                         document.getElementById('password').required = true;
                     }
                 }
-                function closeModal() {
+                window.closeModal = function() {
                     modal.classList.add('opacity-0', 'pointer-events-none');
                     modal.querySelector('.modal-container').classList.replace('scale-100', 'scale-95');
+                    document.body.classList.remove('modal-active');
+                }
+
+                // 🔥 DELETE MODAL LOGIC
+                const deleteModal = document.getElementById('deleteModal');
+                const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+                window.openDeleteModal = function(url) {
+                    confirmDeleteBtn.href = url;
+                    deleteModal.classList.remove('opacity-0', 'pointer-events-none');
+                    deleteModal.querySelector('.modal-container').classList.replace('scale-95', 'scale-100');
+                    document.body.classList.add('modal-active');
+                }
+
+                window.closeDeleteModal = function() {
+                    deleteModal.classList.add('opacity-0', 'pointer-events-none');
+                    deleteModal.querySelector('.modal-container').classList.replace('scale-100', 'scale-95');
                     document.body.classList.remove('modal-active');
                 }
             </script>
