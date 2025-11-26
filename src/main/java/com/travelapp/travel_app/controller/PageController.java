@@ -9,12 +9,14 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.travelapp.travel_app.model.Hotel;
 import com.travelapp.travel_app.model.User;
 import com.travelapp.travel_app.service.attraction.AttractionService;
 import com.travelapp.travel_app.service.hotel.HotelService;
 import com.travelapp.travel_app.service.transport.TransportService;
 import com.travelapp.travel_app.service.user.CustomUserDetailsService;
-import com.travelapp.travel_app.service.user.OrderService; 
+import com.travelapp.travel_app.service.user.OrderService;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class PageController {
@@ -64,8 +66,17 @@ public class PageController {
         return "user/my-orders";
     }
 
+
     @GetMapping("/about-us")
     public String aboutUsPage() {
         return "user/about-us";
+    }
+
+    @GetMapping("/hotel/detail/{id}")
+    public String hotelDetailPage(@PathVariable("id") Integer id, Model model) {
+        Hotel hotel = hotelService.getHotelById(id)
+                                  .orElseThrow(() -> new IllegalArgumentException("Invalid hotel Id:" + id));
+        model.addAttribute("hotel", hotel);
+        return "user/detail-order-hotel";
     }
 }
