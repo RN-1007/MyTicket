@@ -1,5 +1,7 @@
 package com.travelapp.travel_app.model;
 
+import java.math.BigDecimal;
+import java.util.Comparator; // Import penting
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -10,7 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-// Jika Anda pakai Lombok, tambahkan @Data, @NoArgsConstructor, @AllArgsConstructor
+
 @Entity
 @Table(name = "hotels")
 public class Hotel {
@@ -21,7 +23,9 @@ public class Hotel {
     private String name;
     private String location;
     private Integer stars;
-    @Column(nullable = true, length = 64)
+    
+    // Saya ubah jadi 255 agar aman untuk nama file panjang
+    @Column(nullable = true, length = 255)
     private String image;
 
     @OneToMany(mappedBy = "hotel")
@@ -62,10 +66,12 @@ public class Hotel {
     }
 
     public String getImage() { 
-        return image; }
+        return image; 
+    }
 
     public void setImage(String image) { 
-        this.image = image; }
+        this.image = image; 
+    }
 
     public Set<HotelRoom> getRooms() {
         return rooms;
@@ -74,9 +80,24 @@ public class Hotel {
     public void setRooms(Set<HotelRoom> rooms) {
         this.rooms = rooms;
     }
+
     @Transient
     public String getImagePath() {
         if (image == null || hotelId == null) return null;
         return "/hotel-photos/" + hotelId + "/" + image;
+    }
+
+    // --- METHOD BARU UNTUK MENGHITUNG HARGA TERENDAH ---
+    @Transient
+    public BigDecimal getStartingPrice() {
+        if (rooms == null || rooms.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        // Cari harga terendah dari daftar kamar
+        return rooms.stream()
+                .map(HotelRoom::getPrice)
+                .filter(price -> price != null)
+                .min(Comparator.naturalOrder())
+                .orElse(BigDecimal.ZERO);
     }
 }

@@ -9,34 +9,96 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
+        /* =========================================
+           1. CSS SIDEBAR & LAYOUT (WAJIB ADA DI SINI)
+           ========================================= */
         .sidebar {
             font-family: 'Poppins', sans-serif;
         }
-        /* PERBAIKAN DI SINI: background-color dihapus agar transparan mengikuti sidebar */
+
+        /* Dropdown Menu - Pastikan Transparan */
         .dropdown-menu {
             overflow: hidden;
             max-height: 0;
             opacity: 0;
             visibility: hidden;
             transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
-            /
+            background-color: transparent !important; /* Mencegah background abu-abu */
         }
+        
         .dropdown-parent.open .dropdown-menu {
-            max-height: 200px;
+            max-height: 500px;
             opacity: 1;
             visibility: visible;
             transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
         }
+        
         .arrow-icon {
             transition: transform 0.3s ease;
         }
-        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+
+        /* =========================================
+           2. SCROLLBAR SIDEBAR (Hitam/Gelap)
+           Class ini dipakai oleh elemen Sidebar di Layout
+           ========================================= */
+        .custom-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #374151 #000000;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #000000; /* Track HITAM agar menyatu dengan Sidebar */
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #374151;
+            border-radius: 10px;
+            border: 1px solid #000000;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #4b5563;
+        }
+
+        /* =========================================
+           3. SCROLLBAR TABEL (Abu-abu)
+           Class Baru Khusus Tabel di Halaman Ini
+           ========================================= */
+        .table-scrollbar {
+            scrollbar-width: thin;
+            scrollbar-color: #374151 #1f2937;
+        }
+        .table-scrollbar::-webkit-scrollbar {
+            height: 8px;
+            width: 8px;
+        }
+        .table-scrollbar::-webkit-scrollbar-track {
+            background: #1f2937; /* Track ABU-ABU agar menyatu dengan Tabel */
+        }
+        .table-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 4px;
+        }
+        .table-scrollbar::-webkit-scrollbar-thumb:hover {
+            background-color: #6b7280;
+        }
+
+        /* Toast Animation */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        .toast-enter { animation: slideIn 0.5s ease-out forwards; }
+        .toast-exit { animation: fadeOut 0.5s ease-out forwards; }
     </style>
 </head>
-<body>
+<body class="bg-gray-900 text-gray-200 overflow-hidden">
+    
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
         <div th:fragment="content">
             
@@ -56,7 +118,6 @@
             <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
                 
                 <div class="p-5 border-b border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-800/50">
-                    
                     <div class="relative w-full sm:w-72">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="ri-search-line text-gray-400"></i>
@@ -65,7 +126,6 @@
                                class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500 transition-colors" 
                                placeholder="Cari ID, User, atau Item...">
                     </div>
-                    
                     <div class="flex gap-2">
                          <select id="statusFilter" class="bg-gray-900 border border-gray-600 text-gray-300 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 cursor-pointer">
                             <option value="">Semua Status</option>
@@ -75,7 +135,7 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto custom-scrollbar">
+                <div class="overflow-x-auto table-scrollbar">
                     <table class="w-full text-sm text-left text-gray-400 datatable">
                         <thead class="text-xs text-gray-400 uppercase bg-gray-900/50 border-b border-gray-700">
                             <tr>
@@ -90,11 +150,9 @@
                         </thead>
                         <tbody class="divide-y divide-gray-700">
                             <tr th:each="order : ${allOrders}" class="hover:bg-gray-700/30 transition-colors duration-150 group">
-                                
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <span class="font-mono text-blue-400 font-semibold" th:text="'#' + ${order.orderId}">#1</span>
                                 </td>
-
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-3">
                                         <div class="flex-shrink-0 w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center text-xs font-bold text-gray-300 border border-gray-600">
@@ -106,14 +164,12 @@
                                         </div>
                                     </div>
                                 </td>
-
                                 <td class="px-6 py-4 whitespace-nowrap text-gray-300">
                                     <div class="flex flex-col">
                                         <span class="font-medium" th:text="${#dates.format(order.orderDate, 'dd MMM yyyy')}">01 Jan 2024</span>
                                         <span class="text-xs text-gray-500" th:text="${#dates.format(order.orderDate, 'HH:mm')} + ' WIB'">12:00</span>
                                     </div>
                                 </td>
-
                                 <td class="px-6 py-4">
                                     <div class="max-w-xs">
                                         <ul class="space-y-1">
@@ -121,7 +177,6 @@
                                                 <i th:if="${detail.hotelRoom != null}" class="ri-hotel-bed-line text-blue-400 mt-0.5"></i>
                                                 <i th:if="${detail.transportTicket != null}" class="ri-bus-line text-purple-400 mt-0.5"></i>
                                                 <i th:if="${detail.attractionTicket != null}" class="ri-ticket-2-line text-green-400 mt-0.5"></i>
-                                                
                                                 <span class="text-gray-300">
                                                     <span class="font-semibold text-white" th:text="${detail.quantity} + 'x'">1x</span>
                                                     <span th:if="${detail.hotelRoom != null}" 
@@ -135,14 +190,12 @@
                                         </ul>
                                     </div>
                                 </td>
-
                                 <td class="px-6 py-4 text-right whitespace-nowrap">
                                     <span class="text-emerald-400 font-bold text-base" 
                                           th:text="'Rp ' + ${#numbers.formatDecimal(#aggregates.sum(order.orderDetails.![totalPrice]), 0, 'POINT', 0, 'COMMA')}">
                                         Rp 1.000.000
                                     </span>
                                 </td>
-
                                 <td class="px-6 py-4 text-center whitespace-nowrap">
                                     <span th:data-status="${order.status}"
                                           th:text="${order.status}"
@@ -153,7 +206,6 @@
                                         Status
                                     </span>
                                 </td>
-
                                 <td class="px-6 py-4 text-center whitespace-nowrap">
                                     <a th:href="@{/admin/orders/{userId}(userId=${order.user.userId})}" 
                                        class="text-blue-400 hover:text-blue-300 font-medium text-sm hover:underline flex items-center justify-center gap-1">
@@ -161,7 +213,6 @@
                                     </a>
                                 </td>
                             </tr>
-                            
                             <tr th:if="${#lists.isEmpty(allOrders)}">
                                 <td colspan="7" class="px-6 py-12 text-center">
                                     <div class="flex flex-col items-center justify-center text-gray-500">
@@ -183,8 +234,11 @@
                 </div>
             </div>
             
-            <script>
+            <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
+
+            <script th:inline="javascript">
                 document.addEventListener("DOMContentLoaded", function() {
+                    // 1. FILTER LOGIC
                     const statusFilter = document.getElementById('statusFilter');
                     const searchInput = document.getElementById('tableSearch');
                     const tableRows = document.querySelectorAll('.datatable tbody tr');

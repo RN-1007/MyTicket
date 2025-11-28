@@ -1,232 +1,300 @@
 <!DOCTYPE html>
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>TravelApp - Teman Perjalanan Terbaik Anda!</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
-    <style>
-        body { font-family: 'Poppins', sans-serif; }
-        @keyframes gradient-x {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        .animate-gradient-x { background-size: 200% 200%; animation: gradient-x 15s ease infinite; }
-        @keyframes fade-in-down { 0% { opacity: 0; transform: translateY(-20px); } 100% { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in-down { animation: fade-in-down 0.8s ease-out forwards; }
-        @keyframes fade-in-up { 0% { opacity: 0; transform: translateY(20px); } 100% { opacity: 1; transform: translateY(0); } }
-        .animate-fade-in-up { animation: fade-in-up 0.8s ease-out forwards; }
-        .animation-delay-300 { animation-delay: 0.3s; }
-        .card-hover { transition: all 0.3s ease-in-out; }
-        .card-hover:hover { transform: translateY(-10px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); }
-        .fade-in-section { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
-        .fade-in-section.is-visible { opacity: 1; transform: translateY(0); }
-    </style>
+    <title>Explore the Universe - MyTicket</title>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body>
+    
+    <div th:replace="~{fragment/user-layout :: layout(title='MyTicket - Cosmic Travel', content=~{::content})}">
+        <div th:fragment="content">
+            
+            <section class="relative min-h-[95vh] flex flex-col justify-center items-center px-6 overflow-hidden py-20">
+                <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-accent/20 rounded-full blur-[128px] pointer-events-none animate-pulse z-0"></div>
+                <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
-    <div th:replace="~{fragment/user-navbar :: navbar}"></div>
-
-    <header class="relative text-white text-center py-48 md:py-64 overflow-hidden">
-        <div class="absolute inset-0 h-full w-full bg-gradient-to-r from-blue-600 to-purple-700 animate-gradient-x"></div>
-        <div class="relative z-10 px-4">
-            <h1 class="text-5xl md:text-7xl font-extrabold drop-shadow-lg animate-fade-in-down">Temukan Cerita Perjalananmu</h1>
-            <p class="text-lg md:text-xl mt-6 max-w-3xl mx-auto drop-shadow-md animate-fade-in-up">
-                Pesan hotel, tempat wisata, dan transportasi terbaik dengan mudah. Petualangan Anda dimulai di sini!
-            </p>
-            <div class="mt-12 max-w-2xl mx-auto animate-fade-in-up animation-delay-300">
-                <form class="flex items-center bg-white rounded-full shadow-2xl overflow-hidden transform hover:scale-105 transition duration-500">
-                    <div class="flex items-center pl-6 flex-grow">
-                        <i class="ri-search-line text-gray-500 text-2xl"></i>
-                        <input type="text" placeholder="Cari kota, hotel, atau tempat wisata..." class="w-full px-4 py-5 text-gray-800 focus:outline-none text-lg">
+                <div class="absolute inset-0 flex justify-center items-center z-5 pointer-events-none select-none opacity-60 mix-blend-overlay md:mix-blend-normal md:opacity-100">
+                    <div class="relative flex items-center justify-center scale-75 md:scale-100">
+                        <div class="hero-layered-img w-48 h-80 md:w-64 md:h-[28rem] rounded-[3rem] overflow-hidden border-2 border-white/10 shadow-2xl shadow-brand-accent/20 -rotate-[6deg] translate-x-12 md:translate-x-16 z-10 opacity-0 translate-y-20">
+                            <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[30%]" alt="Luxury Hotel">
+                            <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent"></div>
+                        </div>
+                        <div class="hero-layered-img w-56 h-96 md:w-72 md:h-[32rem] rounded-[3rem] overflow-hidden border-2 border-brand-accent/30 shadow-2xl shadow-brand-accent/30 z-20 -translate-y-4 opacity-0 translate-y-20">
+                            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop" class="w-full h-full object-cover" alt="Paradise Beach">
+                             <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/60 via-transparent to-transparent"></div>
+                        </div>
+                        <div class="hero-layered-img w-48 h-80 md:w-64 md:h-[28rem] rounded-[3rem] overflow-hidden border-2 border-white/10 shadow-2xl shadow-blue-500/20 rotate-[6deg] -translate-x-12 md:-translate-x-16 z-10 opacity-0 translate-y-20">
+                            <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2674&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[30%]" alt="Travel">
+                             <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent"></div>
+                        </div>
                     </div>
-                    <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold px-10 py-5 transition duration-300">
-                        <span class="hidden md:inline">Cari</span>
-                        <i class="ri-arrow-right-line md:hidden"></i>
-                    </button>
-                </form>
-            </div>
+                </div>
+
+                <div class="absolute left-[5%] lg:left-[8%] top-[35%] hidden lg:block z-20 hero-side-widget opacity-0 -translate-x-10">
+                    <div class="glass-panel p-4 rounded-3xl border border-brand-accent/20 bg-brand-dark/40 backdrop-blur-xl shadow-xl shadow-brand-accent/5 flex items-center gap-4 w-60 transform hover:scale-105 transition-transform duration-300">
+                        <div class="w-12 h-12 rounded-full bg-brand-accent/10 flex items-center justify-center text-brand-accent relative">
+                            <i class="ri-compass-discover-line text-2xl animate-spin-slow"></i>
+                            <div class="absolute top-0 right-0 w-2 h-2 bg-brand-accent rounded-full animate-ping"></div>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-bold text-sm leading-none">Destination</h4>
+                            <p class="text-accent-gradient text-xs font-bold mt-1">Mars Dunes, Sec-7</p>
+                            <p class="text-gray-500 text-[0.6rem] tracking-wider uppercase mt-0.5">Target Locked</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute left-[10%] lg:left-[14%] top-[65%] hidden lg:block z-20 hero-side-widget opacity-0 -translate-x-10">
+                    <div class="glass-panel p-3 rounded-2xl border border-purple-500/20 bg-brand-dark/40 backdrop-blur-xl shadow-xl shadow-purple-500/5 flex items-center gap-3 w-52 transform hover:scale-105 transition-transform duration-300">
+                        <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400">
+                            <i class="ri-mist-line text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-bold text-xs leading-none">Atmosphere</h4>
+                            <p class="text-purple-300 text-[0.65rem] mt-1 font-mono">Visibility: 98% <br> Temp: 24°C</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute right-[5%] lg:right-[8%] top-[45%] hidden lg:block z-20 hero-side-widget opacity-0 translate-x-10">
+                    <div class="glass-panel p-4 rounded-3xl border border-blue-400/20 bg-brand-dark/40 backdrop-blur-xl shadow-xl shadow-blue-500/5 flex items-center gap-4 w-60 justify-between transform hover:scale-105 transition-transform duration-300">
+                        <div>
+                            <h4 class="text-white font-bold text-sm leading-none text-right">Live Travelers</h4>
+                            <p class="text-blue-400 text-xs font-bold mt-1 text-right"><i class="ri-signal-tower-line inline-block mr-1 animate-pulse"></i> 1,240 Online</p>
+                             <div class="flex justify-end -space-x-2 mt-2">
+                                <img src="https://i.pravatar.cc/150?img=1" class="w-6 h-6 rounded-full border border-brand-dark">
+                                <img src="https://i.pravatar.cc/150?img=3" class="w-6 h-6 rounded-full border border-brand-dark">
+                                <div class="w-6 h-6 rounded-full bg-brand-surface border border-brand-dark flex items-center justify-center text-[0.5rem] text-gray-300">+1k</div>
+                            </div>
+                        </div>
+                        <div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+                            <i class="ri-earth-line text-2xl"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="absolute right-[12%] lg:right-[16%] top-[18%] hidden lg:block z-20 hero-side-widget opacity-0 translate-x-10">
+                    <div class="glass-panel p-3 rounded-2xl border border-green-500/20 bg-brand-dark/40 backdrop-blur-xl shadow-xl shadow-green-500/5 flex items-center gap-3 w-48 flex-row-reverse transform hover:scale-105 transition-transform duration-300">
+                        <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 relative">
+                            <i class="ri-rocket-2-line text-lg"></i>
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
+                        </div>
+                        <div class="text-right">
+                            <h4 class="text-white font-bold text-xs leading-none">Next Launch</h4>
+                            <p class="text-green-400 text-[0.65rem] font-mono mt-1 tracking-tighter">T-MINUS 04:20:00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-center z-20 max-w-4xl mx-auto space-y-6 hero-content opacity-0 translate-y-10 relative mt-10 md:mt-0">
+                    <div class="inline-block px-4 py-1.5 rounded-full border border-white/10 bg-brand-dark/50 backdrop-blur-md text-brand-accent text-xs font-bold tracking-widest uppercase mb-4 shadow-lg">
+                        The Future of Travel
+                    </div>
+                    <h1 class="text-5xl md:text-7xl lg:text-8xl font-serif italic font-medium leading-tight text-white drop-shadow-2xl">
+                        Bridging the <br>
+                        <span class="text-accent-gradient not-italic font-sans font-extrabold drop-shadow-sm">Gap to Paradise</span>
+                    </h1>
+                    <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed drop-shadow-md font-medium bg-brand-dark/30 p-2 rounded-xl backdrop-blur-sm">
+                        Temukan pengalaman perjalanan yang melampaui imajinasi. Hotel, Atraksi, dan Transportasi dalam satu sentuhan elegan.
+                    </p>
+                </div>
+
+                <div class="mt-12 w-full max-w-2xl z-30 hero-search opacity-0 translate-y-10">
+                    <div class="glass-panel p-2 rounded-full flex items-center shadow-2xl shadow-brand-accent/10 bg-brand-dark/60 backdrop-blur-xl border-brand-accent/20">
+                        <div class="pl-6 text-gray-400"><i class="ri-search-2-line text-xl"></i></div>
+                        <input type="text" placeholder="Cari destinasi impianmu..." class="w-full bg-transparent border-none text-white px-4 py-3 focus:ring-0 focus:outline-none placeholder-gray-400 text-lg">
+                        <button class="bg-brand-accent hover:bg-orange-600 text-brand-dark font-bold px-8 py-3 rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-brand-accent/20">
+                            Explore
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="py-20 px-6 relative z-20">
+                 <div class="container mx-auto">
+                    <div class="flex justify-between items-end mb-12">
+                        <h2 class="text-3xl md:text-4xl font-bold text-white section-title">Kategori <span class="text-brand-accent font-serif italic">Populer</span></h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-[500px] md:h-[400px]">
+                        <a href="#hotels" class="group relative col-span-1 md:col-span-1 md:row-span-2 rounded-3xl overflow-hidden cursor-pointer bento-item">
+                            <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2070&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Hotel">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                            <div class="absolute bottom-6 left-6">
+                                <div class="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white mb-3 group-hover:bg-brand-accent group-hover:text-brand-dark transition-colors">
+                                    <i class="ri-hotel-bed-fill text-xl"></i>
+                                </div>
+                                <h3 class="text-2xl font-bold text-white">Luxury Hotels</h3>
+                                <p class="text-gray-300 text-sm mt-1 opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">Istirahat dengan gaya.</p>
+                            </div>
+                        </a>
+                        <a href="#attractions" class="group relative rounded-3xl overflow-hidden cursor-pointer bento-item">
+                             <img src="https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=2572&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Attraction">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                            <div class="absolute bottom-6 left-6 flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-brand-accent group-hover:text-brand-dark transition-colors">
+                                    <i class="ri-camera-3-fill"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">Attractions</h3>
+                                </div>
+                            </div>
+                        </a>
+                        <a href="#transports" class="group relative rounded-3xl overflow-hidden cursor-pointer bento-item">
+                             <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2674&auto=format&fit=crop" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="Transport">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                            <div class="absolute bottom-6 left-6 flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white group-hover:bg-brand-accent group-hover:text-brand-dark transition-colors">
+                                    <i class="ri-plane-fill"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">Transports</h3>
+                                </div>
+                            </div>
+                        </a>
+                        <div class="relative md:col-span-2 bg-brand-accent rounded-3xl overflow-hidden flex items-center justify-between p-8 group cursor-pointer bento-item">
+                            <div class="z-10">
+                                <h3 class="text-2xl font-bold text-brand-dark">Order History</h3>
+                                <p class="text-brand-dark/80 text-sm mt-1">Cek kembali tiket perjalananmu.</p>
+                            </div>
+                            <div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center group-hover:scale-125 transition-transform duration-500">
+                                <i class="ri-arrow-right-up-line text-3xl text-brand-dark"></i>
+                            </div>
+                            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/20 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-700"></div>
+                            <a th:href="@{/my-orders}" class="absolute inset-0 z-20"></a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="hotels" class="py-20 border-t border-white/5 bg-brand-surface/30 relative z-20">
+                <div class="container mx-auto px-6">
+                    <div class="flex justify-between items-center mb-10">
+                        <h2 class="text-3xl font-bold text-white">Curated <span class="text-brand-accent font-serif italic">Stays</span></h2>
+                        <div class="flex gap-2">
+                            <button class="swiper-button-prev-custom w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition"><i class="ri-arrow-left-line"></i></button>
+                            <button class="swiper-button-next-custom w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition"><i class="ri-arrow-right-line"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="swiper hotelSwiper overflow-visible">
+                        <div class="swiper-wrapper">
+                            <div th:each="hotel : ${hotels}" class="swiper-slide w-[300px] md:w-[400px]">
+                                <div class="group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark">
+                                    <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                    <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/400x500/?luxury-hotel" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                    
+                                    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-90"></div>
+                                    
+                                    <div class="absolute bottom-0 left-0 w-full p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                        <div class="flex text-yellow-400 text-xs mb-2">
+                                            <i class="ri-star-fill" th:each="i : ${#numbers.sequence(1, hotel.stars)}"></i>
+                                        </div>
+                                        <h3 class="text-2xl font-bold text-white mb-1" th:text="${hotel.name}">Hotel Name</h3>
+                                        <p class="text-gray-400 text-sm flex items-center gap-1 mb-4">
+                                            <i class="ri-map-pin-line text-brand-accent"></i> <span th:text="${hotel.location}">Location</span>
+                                        </p>
+                                        
+                                        <div class="flex justify-between items-center border-t border-white/10 pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                                            <div>
+                                                <p class="text-xs text-gray-500 uppercase">Starts from</p>
+                                                <p class="text-lg font-bold text-white" th:text="'Rp ' + ${#numbers.formatDecimal(hotel.startingPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</p>
+                                            </div>
+                                            <a th:href="@{/hotel/detail/{id}(id=${hotel.hotelId})}" class="w-10 h-10 rounded-full bg-white text-brand-dark flex items-center justify-center hover:bg-brand-accent transition-colors">
+                                                <i class="ri-arrow-right-up-line"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", (event) => {
+                    // GSAP TIMELINE
+                    const tl = gsap.timeline({ delay: 0.2 });
+
+                    // 1. Animate Layered Images
+                    tl.to(".hero-layered-img", {
+                        y: 0,
+                        opacity: 1,
+                        duration: 1.4,
+                        stagger: 0.2,
+                        ease: "power4.out"
+                    }, "start")
+
+                    // 2. Animate Text Content
+                    .to(".hero-content", {
+                        y: 0,
+                        opacity: 1,
+                        duration: 1,
+                        ease: "power3.out"
+                    }, "-=0.8")
+
+                    // 3. NEW: Animate Side Widgets (Muncul dari samping & berurutan)
+                    .to(".hero-side-widget", {
+                        x: 0,
+                        opacity: 1,
+                        duration: 1,
+                        stagger: {
+                            amount: 0.5,
+                            from: "random" // Muncul secara acak agar terlihat alami
+                        },
+                        ease: "back.out(1.5)"
+                    }, "-=1")
+
+                    // 4. Animate Search Bar
+                    .to(".hero-search", {
+                        y: 0,
+                        opacity: 1,
+                        duration: 1,
+                        ease: "back.out(1.7)"
+                    }, "-=0.6");
+
+                    // Continuous Floating Animation for Side Widgets (Beda speed tiap widget)
+                    gsap.utils.toArray(".hero-side-widget").forEach((widget, i) => {
+                        gsap.to(widget, {
+                            y: -15,
+                            duration: 2 + (i * 0.5), // Durasi berbeda tiap widget
+                            repeat: -1,
+                            yoyo: true,
+                            ease: "sine.inOut",
+                            delay: i * 0.2
+                        });
+                    });
+
+
+                    // BENTO GRID ANIMATION
+                    gsap.from(".bento-item", {
+                        scrollTrigger: {
+                            trigger: ".bento-item",
+                            start: "top 85%",
+                        },
+                        y: 50,
+                        opacity: 0,
+                        duration: 0.8,
+                        stagger: 0.1,
+                        ease: "power2.out"
+                    });
+
+                    // SWIPER INITIALIZATION
+                    new Swiper(".hotelSwiper", {
+                        slidesPerView: 1.2,
+                        spaceBetween: 20,
+                        centeredSlides: false,
+                        navigation: {
+                            nextEl: ".swiper-button-next-custom",
+                            prevEl: ".swiper-button-prev-custom",
+                        },
+                        breakpoints: {
+                            640: { slidesPerView: 2.2, spaceBetween: 20 },
+                            1024: { slidesPerView: 3.2, spaceBetween: 30 },
+                        },
+                    });
+                });
+            </script>
         </div>
-    </header>
-
-    <div class="container mx-auto p-6 md:p-8">
-
-        <section class="-mt-24 relative z-20 fade-in-section">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-2xl shadow-lg flex items-center space-x-6 card-hover">
-                    <div class="bg-blue-100 text-blue-600 rounded-full p-4"><i class="ri-hotel-line text-4xl"></i></div>
-                    <div>
-                        <h3 class="text-2xl font-bold">Hotel</h3>
-                        <a href="#hotels" class="text-blue-600 font-semibold hover:underline">Lihat Semua <i class="ri-arrow-right-s-line"></i></a>
-                    </div>
-                </div>
-                <div class="bg-white p-8 rounded-2xl shadow-lg flex items-center space-x-6 card-hover">
-                    <div class="bg-green-100 text-green-600 rounded-full p-4"><i class="ri-camera-lens-line text-4xl"></i></div>
-                    <div>
-                        <h3 class="text-2xl font-bold">Tempat Wisata</h3>
-                        <a href="#attractions" class="text-green-600 font-semibold hover:underline">Jelajahi <i class="ri-arrow-right-s-line"></i></a>
-                    </div>
-                </div>
-                <div class="bg-white p-8 rounded-2xl shadow-lg flex items-center space-x-6 card-hover">
-                    <div class="bg-purple-100 text-purple-600 rounded-full p-4"><i class="ri-flight-takeoff-line text-4xl"></i></div>
-                    <div>
-                        <h3 class="text-2xl font-bold">Transportasi</h3>
-                        <a href="#transports" class="text-purple-600 font-semibold hover:underline">Pesan Sekarang <i class="ri-arrow-right-s-line"></i></a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="hotels" class="mt-20 md:mt-28 fade-in-section">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl md:text-4xl font-bold">Hotel Impian Anda</h2>
-                <a href="#" class="text-blue-600 font-semibold hover:underline flex items-center">Lihat Semua <i class="ri-arrow-right-s-line ml-1"></i></a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div th:each="hotel, iterStat : ${hotels}" class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover flex flex-col group">
-                    <div class="relative overflow-hidden">
-                        <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" alt="Hotel Image" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
-                        <img th:unless="${hotel.image != null}" th:src="'https://source.unsplash.com/random/400x300/?hotel,luxury,' + ${iterStat.index}" alt="Hotel Placeholder" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                    <div class="p-5 flex flex-col flex-grow">
-                        <h3 class="text-xl font-bold mb-2 truncate" th:text="${hotel.name}">Nama Hotel</h3>
-                        <p class="text-gray-500 text-sm mb-2 flex items-center"><i class="ri-map-pin-line mr-2"></i><span th:text="${hotel.location}">Lokasi</span></p>
-                        <div class="flex items-center mb-4 text-yellow-400 text-lg">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-line"></i>
-                            <span class="ml-2 text-gray-600 text-sm font-medium">(4)</span>
-                        </div>
-                        <div class="mt-auto" th:if="${hotel.rooms != null && !hotel.rooms.isEmpty()}">
-                            <p class="text-blue-600 font-bold text-2xl" th:text="'Rp ' + ${#numbers.formatDecimal(hotel.rooms[0].price, 0, 'POINT', 0, 'COMMA')}"></p>
-                            <a th:href="@{/hotel/detail/{id}(id=${hotel.hotelId})}" class="mt-4 block w-full text-center bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300 transform hover:-translate-y-1">Lihat Detail</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="attractions" class="mt-20 md:mt-28 fade-in-section">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl md:text-4xl font-bold">Tempat Wisata Tak Terlupakan</h2>
-                <a href="#" class="text-green-600 font-semibold hover:underline flex items-center">Lihat Semua <i class="ri-arrow-right-s-line ml-1"></i></a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div th:each="attraction, iterStat : ${attractions}" class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover flex flex-col group">
-                    <div class="relative overflow-hidden">
-                        <img th:if="${attraction.image != null}" th:src="@{${attraction.imagePath}}" alt="Attraction Image" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
-                        <img th:unless="${attraction.image != null}" th:src="'https://source.unsplash.com/random/400x300/?landmark,fun,' + ${iterStat.index}" alt="Attraction Placeholder" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                    <div class="p-5 flex flex-col flex-grow">
-                        <h3 class="text-xl font-bold mb-2 truncate" th:text="${attraction.name}">Nama Atraksi</h3>
-                        <p class="text-gray-500 text-sm mb-2 flex items-center"><i class="ri-map-pin-line mr-2"></i><span th:text="${attraction.location}">Lokasi</span></p>
-                        <div class="flex items-center mb-4 text-yellow-400 text-lg">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-half-fill"></i><i class="ri-star-line"></i>
-                            <span class="ml-2 text-gray-600 text-sm font-medium">(4.5)</span>
-                        </div>
-                        <div class="mt-auto" th:if="${attraction.tickets != null && !attraction.tickets.isEmpty()}">
-                            <form th:action="@{/order/create}" method="post" class="space-y-4">
-                                <p class="text-green-600 font-bold text-2xl" th:text="'Rp ' + ${#numbers.formatDecimal(attraction.tickets[0].price, 0, 'POINT', 0, 'COMMA')}"></p>
-                                <input type="hidden" name="itemType" value="Attraction" />
-                                <input type="hidden" name="itemId" th:value="${attraction.tickets[0].attractionTicketId}" />
-                                <div class="flex items-center space-x-3">
-                                    <label class="font-medium">Jumlah:</label>
-                                    <input type="number" name="quantity" value="1" class="w-20 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500" />
-                                </div>
-                                <button type="submit" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300 transform hover:-translate-y-1">Pesan Tiket</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section id="transports" class="mt-20 md:mt-28 fade-in-section">
-            <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl md:text-4xl font-bold">Transportasi Nyaman & Cepat</h2>
-                <a href="#" class="text-purple-600 font-semibold hover:underline flex items-center">Lihat Semua <i class="ri-arrow-right-s-line ml-1"></i></a>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                <div th:each="transport, iterStat : ${transports}" class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover flex flex-col group">
-                    <div class="relative overflow-hidden">
-                        <img th:if="${transport.image != null}" th:src="@{${transport.imagePath}}" alt="Transport Image" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
-                        <img th:unless="${transport.image != null}" th:src="'https://source.unsplash.com/random/400x300/?transport,speed,' + ${iterStat.index}" alt="Transport Placeholder" class="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                    <div class="p-5 flex flex-col flex-grow">
-                        <h3 class="text-xl font-bold mb-2 truncate" th:text="${transport.name}">Nama Transport</h3>
-                        <p class="text-gray-500 text-sm mb-2" th:text="${transport.provider.name}">Penyedia</p>
-                        <div class="flex items-center mb-4 text-yellow-400 text-lg">
-                            <i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-fill"></i><i class="ri-star-line"></i>
-                            <span class="ml-2 text-gray-600 text-sm font-medium">(4.1)</span>
-                        </div>
-                        <div class="mt-auto" th:if="${transport.tickets != null && !transport.tickets.isEmpty()}">
-                            <form th:action="@{/order/create}" method="post" class="space-y-4">
-                                <p class="text-purple-600 font-bold text-2xl" th:text="'Rp ' + ${#numbers.formatDecimal(transport.tickets[0].price, 0, 'POINT', 0, 'COMMA')}"></p>
-                                <input type="hidden" name="itemType" value="Transport" />
-                                <input type="hidden" name="itemId" th:value="${transport.tickets[0].ticketId}" />
-                                <div class="flex items-center space-x-3">
-                                    <label class="font-medium">Jumlah:</label>
-                                    <input type="number" name="quantity" value="1" class="w-20 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
-                                </div>
-                                <button type="submit" class="w-full bg-purple-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-purple-700 transition duration-300 transform hover:-translate-y-1">Pesan Tiket</button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
     </div>
-
-    <footer class="bg-gray-900 text-white mt-20 md:mt-28">
-        <div class="container mx-auto py-16 px-8">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-10">
-                <div>
-                    <h3 class="text-2xl font-bold mb-4">TravelApp</h3>
-                    <p class="text-gray-400">Petualangan Anda dimulai di sini. Temukan dan pesan perjalanan berikutnya dengan mudah.</p>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-lg mb-4">Tautan Cepat</h4>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="hover:text-blue-400 transition">Beranda</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition">Tentang Kami</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition">Kontak</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-lg mb-4">Bantuan</h4>
-                    <ul class="space-y-3">
-                        <li><a href="#" class="hover:text-blue-400 transition">FAQ</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition">Syarat & Ketentuan</a></li>
-                        <li><a href="#" class="hover:text-blue-400 transition">Kebijakan Privasi</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold text-lg mb-4">Ikuti Kami</h4>
-                    <div class="flex space-x-5">
-                        <a href="#" class="text-2xl hover:text-blue-500 transition transform hover:scale-125"><i class="ri-facebook-circle-fill"></i></a>
-                        <a href="#" class="text-2xl hover:text-blue-400 transition transform hover:scale-125"><i class="ri-twitter-x-line"></i></a>
-                        <a href="#" class="text-2xl hover:text-pink-500 transition transform hover:scale-125"><i class="ri-instagram-line"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="border-t border-gray-800 mt-10 pt-8 text-center text-gray-500">
-                <p>&copy; 2025 TravelApp. Semua Hak Dilindungi. Dibuat dengan <i class="ri-heart-fill text-red-500"></i> & Semangat.</p>
-            </div>
-        </div>
-    </footer>
-
-    <script>
-        const sections = document.querySelectorAll('.fade-in-section');
-        const observer = new IntersectionObserver(entries => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-        sections.forEach(section => observer.observe(section));
-    </script>
 </body>
 </html>

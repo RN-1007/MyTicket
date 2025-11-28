@@ -33,7 +33,7 @@
 
       /* Tampilkan menu saat parent-nya punya class .open */
       .dropdown-parent.open .dropdown-menu {
-        max-height: 200px; /* Cukup tinggi untuk 2 item */
+        max-height: 500px; 
         opacity: 1;
         visibility: visible;
         transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
@@ -43,14 +43,37 @@
       .arrow-icon {
         transition: transform 0.3s ease;
       }
-      /* Class .rotate-180 akan ditambahkan oleh JS */
+
+      /* --- CUSTOM SCROLLBAR (GELAP/DARK MODE) --- */
+      /* 1. Support Firefox */
+      .custom-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #374151 #000000;
+      }
+
+      /* 2. Support Chrome, Edge, Safari */
+      .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      .custom-scrollbar::-webkit-scrollbar-track {
+        background: #000000;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #374151;
+        border-radius: 10px;
+        border: 1px solid #000000;
+      }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background-color: #4b5563;
+      }
     </style>
   </head>
-  <body>
+  <body class="bg-gray-900 text-gray-200">
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
       <div th:fragment="content">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
             <h2 class="text-sm font-medium text-gray-400 mb-2">Total Hotels</h2>
             <p class="text-3xl font-bold text-white" th:text="${hotelCount}">
               0
@@ -61,7 +84,7 @@
             </p>
           </div>
 
-          <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
             <h2 class="text-sm font-medium text-gray-400 mb-2">
               Total Transports
             </h2>
@@ -77,7 +100,7 @@
             </p>
           </div>
 
-          <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
             <h2 class="text-sm font-medium text-gray-400 mb-2">
               Total Attractions
             </h2>
@@ -93,7 +116,7 @@
             </p>
           </div>
 
-          <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
             <h2 class="text-sm font-medium text-gray-400 mb-2">Total Users</h2>
             <p class="text-3xl font-bold text-white" th:text="${userCount}">
               0
@@ -105,12 +128,12 @@
           </div>
         </div>
 
-        <div class="mt-8 bg-gray-800 p-6 rounded-lg shadow-lg">
+        <div class="mt-8 bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
           <h2 class="text-xl font-semibold text-white mb-4">
             Revenue vs Orders (Placeholder)
           </h2>
           <div
-            class="h-64 bg-gray-700 rounded-lg flex items-center justify-center"
+            class="h-64 bg-gray-700/50 rounded-lg flex items-center justify-center border border-gray-600 border-dashed"
           >
             <p class="text-gray-400">Chart akan muncul di sini</p>
           </div>
