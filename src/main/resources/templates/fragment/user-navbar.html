@@ -1,23 +1,40 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
+    <nav th:fragment="navbar" class="w-full transition-all duration-300 py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            
+            <a th:href="@{/}" class="group flex items-center gap-2">
+                <div class="w-8 h-8 bg-brand-accent rounded-full flex items-center justify-center text-brand-dark">
+                    <i class="ri-rocket-2-fill text-lg"></i>
+                </div>
+                <span class="text-xl font-bold tracking-tight text-white group-hover:text-brand-accent transition-colors">MyTicket<span class="text-brand-accent">.</span></span>
+            </a>
 
-    <nav th:fragment="navbar" class="bg-white shadow-md w-full">
-        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a th:href="@{/}" class="text-2xl font-bold text-blue-600">TravelApp</a>
-            <div class="flex space-x-6 items-center">
-                <a th:href="@{/}" class="text-gray-700 hover:text-blue-600">Home</a>
-                <a th:href="@{/my-orders}" class="text-gray-700 hover:text-blue-600">Pesanan Saya</a>
-                <a th:href="@{/about-us}"  class="text-gray-700 hover:text-blue-600">About Us</a>
-                
+            <div class="hidden md:flex items-center gap-8">
+                <a th:href="@{/}" class="text-sm font-medium text-gray-300 hover:text-white relative group">
+                    Home
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a th:href="@{/my-orders}" class="text-sm font-medium text-gray-300 hover:text-white relative group">
+                    My Orders
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all duration-300 group-hover:w-full"></span>
+                </a>
+                <a th:href="@{/about-us}" class="text-sm font-medium text-gray-300 hover:text-white relative group">
+                    About
+                    <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all duration-300 group-hover:w-full"></span>
+                </a>
+            </div>
+
+            <div class="flex items-center gap-4">
                 <form th:action="@{/logout}" method="post">
-                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                        Logout
+                    <button type="submit" class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 hover:bg-white/10 hover:border-brand-accent/50 text-white text-sm font-medium transition-all group">
+                        <span>Logout</span>
+                        <i class="ri-logout-circle-r-line text-gray-400 group-hover:text-brand-accent transition-colors"></i>
                     </button>
                 </form>
             </div>
         </div>
     </nav>
-
 </body>
 </html>

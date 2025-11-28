@@ -22,7 +22,7 @@ public class Attraction {
     
     private String name;
     private String location;
-    @Column(nullable = true, length = 64)
+    @Column(nullable = true, length = 255)
     private String image;
     
     @Enumerated(EnumType.STRING)

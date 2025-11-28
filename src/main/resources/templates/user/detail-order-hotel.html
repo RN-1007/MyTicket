@@ -1,149 +1,136 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Detail Hotel</title>
+    <title th:text="${hotel.name} + ' - Detail'">Detail Hotel</title>
 </head>
 <body>
-    
     <th:block th:replace="~{fragment/user-layout :: layout(title=${hotel.name}, content=~{::content})}">
-        
         <div th:fragment="content">
             
-            <div class="relative w-full h-[500px] bg-gray-800">
-                <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" 
-                     class="w-full h-full object-cover opacity-80" alt="Hotel Image">
-                <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/1600x900/?hotel,luxury" 
-                     class="w-full h-full object-cover opacity-80" alt="Placeholder">
+            <div class="relative w-full h-[60vh]">
+                <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="w-full h-full object-cover" data-speed="0.5">
+                <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/1600x900/?luxury-hotel" class="w-full h-full object-cover" data-speed="0.5">
+                <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-dark/50 to-brand-dark"></div>
                 
-                <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-transparent flex items-end">
-                    <div class="container mx-auto px-6 pb-12">
-                        <div class="max-w-4xl">
-                            <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide mb-3 inline-block">Hotel</span>
-                            <h1 class="text-4xl md:text-5xl font-bold text-white mb-2 shadow-sm" th:text="${hotel.name}">Nama Hotel</h1>
-                            <p class="text-xl text-gray-200 flex items-center gap-2">
-                                <i class="ri-map-pin-line text-yellow-400"></i>
-                                <span th:text="${hotel.location}">Lokasi Hotel</span>
-                            </p>
-                            <div class="flex text-yellow-400 mt-3 text-lg">
-                                <i class="ri-star-fill" th:each="i : ${#numbers.sequence(1, hotel.stars)}"></i>
-                            </div>
-                        </div>
+                <div class="absolute bottom-0 left-0 w-full p-6 md:p-12 z-10">
+                    <div class="container mx-auto">
+                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/20 bg-white/10 backdrop-blur-md text-white text-xs mb-4">
+                             <i class="ri-hotel-line text-brand-accent"></i> Hotel Resort
+                         </div>
+                        <h1 class="text-5xl md:text-7xl font-serif italic text-white mb-2" th:text="${hotel.name}">Hotel Name</h1>
+                        <p class="text-xl text-gray-300 flex items-center gap-2">
+                            <i class="ri-map-pin-2-fill text-brand-accent"></i> <span th:text="${hotel.location}">Location</span>
+                        </p>
                     </div>
                 </div>
             </div>
 
-            <div class="container mx-auto px-6 py-12 -mt-10 relative z-10">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="container mx-auto px-6 py-12 relative z-20 -mt-20">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     
-                    <div class="lg:col-span-2 space-y-8">
-                        
-                        <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
-                            <h2 class="text-2xl font-bold mb-4 text-gray-900 border-b pb-4">Tentang Akomodasi</h2>
-                            <p class="text-gray-600 leading-relaxed text-lg">
-                                Nikmati pengalaman menginap yang tak terlupakan di <span class="font-semibold text-blue-600" th:text="${hotel.name}"></span>. 
-                                Terletak strategis di jantung <span th:text="${hotel.location}"></span>, hotel ini menawarkan 
-                                kenyamanan modern dengan sentuhan keramahan lokal. Pilihan tepat untuk perjalanan bisnis maupun liburan keluarga Anda.
+                    <div class="lg:col-span-2 space-y-10">
+                        <div class="glass-panel p-8 rounded-3xl">
+                            <h2 class="text-2xl font-bold text-white mb-4">Description</h2>
+                            <p class="text-gray-400 leading-relaxed text-lg">
+                                Rasakan kenyamanan tingkat tinggi di <span class="text-brand-accent" th:text="${hotel.name}"></span>. 
+                                Didesain untuk pelancong modern yang menginginkan perpaduan antara kemewahan dan fungsionalitas. 
+                                Nikmati pemandangan menakjubkan dan layanan kelas dunia kami.
                             </p>
                         </div>
-
-                        <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
-                            <h2 class="text-2xl font-bold mb-6 text-gray-900 border-b pb-4">Fasilitas Populer</h2>
-                            <div class="grid grid-cols-2 md:grid-cols-2 gap-6">
-                                <div class="flex items-center gap-4 p-4 bg-blue-50 rounded-xl">
-                                    <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xl"><i class="ri-wifi-line"></i></div>
-                                    <span class="font-medium text-gray-700">WiFi Gratis</span>
-                                </div>
-                                <div class="flex items-center gap-4 p-4 bg-orange-50 rounded-xl">
-                                    <div class="w-10 h-10 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xl"><i class="ri-restaurant-line"></i></div>
-                                    <span class="font-medium text-gray-700">Restoran & Kafe</span>
-                                </div>
-                                <div class="flex items-center gap-4 p-4 bg-green-50 rounded-xl">
-                                    <div class="w-10 h-10 bg-green-100 text-green-600 rounded-full flex items-center justify-center text-xl"><i class="ri-car-line"></i></div>
-                                    <span class="font-medium text-gray-700">Parkir Area Luas</span>
-                                </div>
-                                <div class="flex items-center gap-4 p-4 bg-purple-50 rounded-xl">
-                                    <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-xl"><i class="ri-customer-service-2-line"></i></div>
-                                    <span class="font-medium text-gray-700">Resepsionis 24 Jam</span>
-                                </div>
+                        
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:bg-white/5 transition">
+                                <i class="ri-wifi-line text-3xl text-brand-accent"></i>
+                                <span class="text-sm text-gray-300">Free WiFi</span>
+                            </div>
+                            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:bg-white/5 transition">
+                                <i class="ri-restaurant-2-line text-3xl text-brand-accent"></i>
+                                <span class="text-sm text-gray-300">Dining</span>
+                            </div>
+                            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:bg-white/5 transition">
+                                <i class="ri-goblet-line text-3xl text-brand-accent"></i>
+                                <span class="text-sm text-gray-300">Bar & Lounge</span>
+                            </div>
+                            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center text-center gap-3 hover:bg-white/5 transition">
+                                <i class="ri-customer-service-line text-3xl text-brand-accent"></i>
+                                <span class="text-sm text-gray-300">24/7 Service</span>
                             </div>
                         </div>
                     </div>
 
                     <div class="lg:col-span-1">
-                        <div class="bg-white p-6 rounded-2xl shadow-xl border-t-4 border-blue-600 sticky top-24">
-                            <h3 class="text-xl font-bold mb-6 text-gray-900">Pesan Kamar</h3>
+                        <div class="sticky top-28 glass-panel p-8 rounded-3xl border-t border-brand-accent/50 shadow-2xl shadow-brand-accent/5">
+                            <h3 class="text-2xl font-serif italic text-white mb-6">Reserve your stay</h3>
                             
-                            <div th:if="${rooms != null && !rooms.isEmpty()}">
-                                <form th:action="@{/order/create}" method="post" class="space-y-5">
-                                    <input type="hidden" name="itemType" value="Hotel" />
-                                    <input type="hidden" id="selectedItemId" name="itemId" th:value="${rooms[0].roomId}" />
-                                    
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-600 mb-2">Pilih Tipe Kamar</label>
+                            <form th:action="@{/order/create}" method="post" class="space-y-6">
+                                <input type="hidden" name="itemType" value="Hotel" />
+                                <input type="hidden" id="selectedItemId" name="itemId" th:value="${rooms != null and !rooms.isEmpty() ? rooms[0].roomId : ''}" />
+
+                                <div th:if="${rooms != null && !rooms.isEmpty()}">
+                                    <div class="space-y-2">
+                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Room Type</label>
                                         <div class="relative">
-                                            <select id="roomSelect" class="w-full p-3 pl-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition appearance-none cursor-pointer" onchange="updatePrice()">
+                                            <select id="roomSelect" onchange="updatePrice()" class="w-full bg-brand-surface border border-white/10 text-white rounded-xl p-4 appearance-none focus:border-brand-accent focus:ring-0 outline-none cursor-pointer">
                                                 <option th:each="room : ${rooms}" 
                                                         th:value="${room.roomId}" 
                                                         th:data-price="${room.price}"
-                                                        th:text="${room.roomType} + ' (' + ${room.capacity} + ' Orang)'">
+                                                        th:text="${room.roomType} + ' (' + ${room.capacity} + ' Pax)'">
                                                     Deluxe Room
                                                 </option>
                                             </select>
-                                            <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500">
-                                                <i class="ri-arrow-down-s-line"></i>
-                                            </div>
+                                            <i class="ri-arrow-down-s-line absolute right-4 top-4 text-gray-400 pointer-events-none"></i>
                                         </div>
                                     </div>
 
-                                    <div class="bg-gray-50 p-4 rounded-xl border border-dashed border-gray-300 flex justify-between items-center">
-                                        <span class="text-gray-500 text-sm">Harga per malam</span>
-                                        <span id="displayPrice" class="text-2xl font-bold text-blue-600"
-                                              th:text="'Rp ' + ${#numbers.formatDecimal(rooms[0].price, 0, 'POINT', 0, 'COMMA')}">
-                                            Rp 0
-                                        </span>
+                                    <div class="space-y-2 mt-4">
+                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Quantity</label>
+                                        <div class="flex items-center bg-brand-surface border border-white/10 rounded-xl p-2">
+                                            <button type="button" onclick="adjustQty(-1)" class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 text-white"><i class="ri-subtract-line"></i></button>
+                                            <input type="number" id="qtyInput" name="quantity" value="1" min="1" class="bg-transparent border-none text-center text-white font-bold w-full focus:ring-0">
+                                            <button type="button" onclick="adjustQty(1)" class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 text-white"><i class="ri-add-line"></i></button>
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <label class="block text-sm font-semibold text-gray-600 mb-2">Jumlah Kamar</label>
-                                        <input type="number" name="quantity" value="1" min="1" class="w-full p-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none text-center font-bold text-lg" />
+                                    <div class="py-6 border-b border-white/10 flex justify-between items-end">
+                                        <span class="text-gray-400 text-sm">Total / night</span>
+                                        <span id="displayPrice" class="text-3xl font-bold text-brand-accent" th:text="'Rp ' + ${#numbers.formatDecimal(rooms[0].price, 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
                                     </div>
 
-                                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition transform hover:-translate-y-1 shadow-lg shadow-blue-200 flex items-center justify-center gap-2">
-                                        <span>Lanjutkan Pemesanan</span>
+                                    <button type="submit" class="w-full bg-brand-accent hover:bg-orange-600 text-brand-dark font-bold py-4 rounded-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 mt-4">
+                                        <span>Book Now</span>
                                         <i class="ri-arrow-right-line"></i>
                                     </button>
-                                </form>
-                            </div>
-
-                            <div th:unless="${rooms != null && !rooms.isEmpty()}" class="text-center py-10">
-                                <div class="bg-red-50 text-red-500 p-4 rounded-full inline-block mb-3"><i class="ri-door-lock-line text-3xl"></i></div>
-                                <p class="text-gray-600 font-medium">Kamar tidak tersedia saat ini.</p>
-                            </div>
-
+                                </div>
+                                
+                                <div th:unless="${rooms != null && !rooms.isEmpty()}" class="text-center py-8">
+                                    <i class="ri-emotion-unhappy-line text-4xl text-gray-600 mb-2"></i>
+                                    <p class="text-gray-500">Kamar tidak tersedia.</p>
+                                </div>
+                            </form>
                         </div>
-                    </div> 
                     </div>
+
+                </div>
             </div>
 
-            <script th:inline="javascript">
+            <script>
                 function updatePrice() {
                     const select = document.getElementById('roomSelect');
                     const selectedOption = select.options[select.selectedIndex];
-                    
                     const price = selectedOption.getAttribute('data-price');
-                    const roomId = selectedOption.value;
+                    document.getElementById('selectedItemId').value = selectedOption.value;
+                    
+                    const formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
+                    document.getElementById('displayPrice').innerText = formatter.format(price);
+                }
 
-                    const formattedPrice = new Intl.NumberFormat('id-ID', { 
-                        style: 'currency', 
-                        currency: 'IDR', 
-                        minimumFractionDigits: 0 
-                    }).format(price);
-
-                    document.getElementById('displayPrice').innerText = formattedPrice;
-                    document.getElementById('selectedItemId').value = roomId;
+                function adjustQty(amount) {
+                    const input = document.getElementById('qtyInput');
+                    let val = parseInt(input.value) + amount;
+                    if(val < 1) val = 1;
+                    input.value = val;
                 }
             </script>
-
         </div>
     </th:block>
 </body>
