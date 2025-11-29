@@ -84,6 +84,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="text-center z-20 max-w-4xl mx-auto space-y-6 hero-content opacity-0 translate-y-10 relative mt-10 md:mt-0">
                     <div class="inline-block px-4 py-1.5 rounded-full border border-white/10 bg-brand-dark/50 backdrop-blur-md text-brand-accent text-xs font-bold tracking-widest uppercase mb-4 shadow-lg">
                         The Future of Travel
@@ -170,15 +171,15 @@
                     <div class="flex justify-between items-center mb-10">
                         <h2 class="text-3xl font-bold text-white">Curated <span class="text-brand-accent font-serif italic">Stays</span></h2>
                         <div class="flex gap-2">
-                            <button class="swiper-button-prev-custom w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition"><i class="ri-arrow-left-line"></i></button>
-                            <button class="swiper-button-next-custom w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition"><i class="ri-arrow-right-line"></i></button>
+                            <button class="swiper-prev-hotel w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition"><i class="ri-arrow-left-line"></i></button>
+                            <button class="swiper-next-hotel w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition"><i class="ri-arrow-right-line"></i></button>
                         </div>
                     </div>
 
                     <div class="swiper hotelSwiper overflow-visible">
                         <div class="swiper-wrapper">
                             <div th:each="hotel : ${hotels}" class="swiper-slide w-[300px] md:w-[400px]">
-                                <div class="group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark">
+                                <div class="group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-brand-accent/50 transition-colors">
                                     <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
                                     <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/400x500/?luxury-hotel" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
                                     
@@ -210,12 +211,109 @@
                 </div>
             </section>
 
+            <section id="attractions" class="py-20 relative z-20">
+                <div class="container mx-auto px-6">
+                    <div class="flex justify-between items-center mb-10">
+                        <h2 class="text-3xl font-bold text-white">Uncharted <span class="text-green-400 font-serif italic">Worlds</span></h2>
+                        <div class="flex gap-2">
+                            <button class="swiper-prev-attr w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-green-500 hover:text-brand-dark transition"><i class="ri-arrow-left-line"></i></button>
+                            <button class="swiper-next-attr w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-green-500 hover:text-brand-dark transition"><i class="ri-arrow-right-line"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="swiper attractionSwiper overflow-visible">
+                        <div class="swiper-wrapper">
+                            <div th:each="attraction : ${attractions}" class="swiper-slide w-[300px] md:w-[400px]">
+                                <div class="group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-green-500/50 transition-colors">
+                                    <img th:if="${attraction.image != null}" th:src="@{${attraction.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                    <img th:unless="${attraction.image != null}" src="https://source.unsplash.com/random/400x500/?nature,museum,park" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                    
+                                    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-90"></div>
+                                    
+                                    <div class="absolute top-6 right-6 z-10">
+                                        <span class="px-3 py-1 bg-green-500/20 border border-green-500/30 text-green-400 text-xs font-bold rounded-full uppercase backdrop-blur-md" 
+                                              th:text="${attraction.category}">Category</span>
+                                    </div>
+
+                                    <div class="absolute bottom-0 left-0 w-full p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                        <h3 class="text-2xl font-bold text-white mb-1" th:text="${attraction.name}">Attraction Name</h3>
+                                        <p class="text-gray-400 text-sm flex items-center gap-1 mb-4">
+                                            <i class="ri-map-pin-2-line text-green-400"></i> <span th:text="${attraction.location}">Location</span>
+                                        </p>
+                                        
+                                        <div class="flex justify-between items-center border-t border-white/10 pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                                            <div>
+                                                <p class="text-xs text-gray-500 uppercase">Entrance Fee</p>
+                                                <p class="text-lg font-bold text-white" 
+                                                   th:if="${not #lists.isEmpty(attraction.tickets)}"
+                                                   th:text="'Rp ' + ${#numbers.formatDecimal(attraction.tickets[0].price, 0, 'POINT', 0, 'COMMA')}">Rp 0</p>
+                                                <p class="text-lg font-bold text-gray-500" th:if="${#lists.isEmpty(attraction.tickets)}">Check Details</p>
+                                            </div>
+                                            <a th:href="@{/attraction/detail/{id}(id=${attraction.attractionId})}" class="w-10 h-10 rounded-full bg-white text-brand-dark flex items-center justify-center hover:bg-green-500 transition-colors">
+                                                <i class="ri-arrow-right-up-line"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="transports" class="py-20 border-t border-white/5 bg-brand-surface/30 relative z-20">
+                <div class="container mx-auto px-6">
+                    <div class="flex justify-between items-center mb-10">
+                        <h2 class="text-3xl font-bold text-white">Hyper-Speed <span class="text-purple-400 font-serif italic">Fleet</span></h2>
+                        <div class="flex gap-2">
+                            <button class="swiper-prev-trans w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-purple-500 hover:text-brand-dark transition"><i class="ri-arrow-left-line"></i></button>
+                            <button class="swiper-next-trans w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-purple-500 hover:text-brand-dark transition"><i class="ri-arrow-right-line"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="swiper transportSwiper overflow-visible">
+                        <div class="swiper-wrapper">
+                            <div th:each="transport : ${transports}" class="swiper-slide w-[300px] md:w-[400px]">
+                                <div class="group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-purple-500/50 transition-colors">
+                                    <img th:if="${transport.image != null}" th:src="@{${transport.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                    <img th:unless="${transport.image != null}" src="https://source.unsplash.com/random/400x500/?airplane,train,bus" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                    
+                                    <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-90"></div>
+                                    
+                                    <div class="absolute top-6 right-6 z-10">
+                                        <span class="px-3 py-1 bg-purple-500/20 border border-purple-500/30 text-purple-400 text-xs font-bold rounded-full uppercase backdrop-blur-md">
+                                            <i class="ri-steering-2-line mr-1"></i> <span th:text="${transport.provider.type}">Bus</span>
+                                        </span>
+                                    </div>
+
+                                    <div class="absolute bottom-0 left-0 w-full p-8 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
+                                        <h3 class="text-2xl font-bold text-white mb-1" th:text="${transport.name}">Transport Name</h3>
+                                        <p class="text-gray-400 text-sm flex items-center gap-1 mb-4">
+                                            <i class="ri-building-4-line text-purple-400"></i> <span th:text="${transport.provider.name}">Provider</span>
+                                        </p>
+                                        
+                                        <div class="flex justify-between items-center border-t border-white/10 pt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                                            <div>
+                                                <p class="text-xs text-gray-500 uppercase">Capacity</p>
+                                                <p class="text-lg font-bold text-white"><span th:text="${transport.capacity}">0</span> Seats</p>
+                                            </div>
+                                            <a th:href="@{/transport/detail/{id}(id=${transport.transportId})}" class="w-10 h-10 rounded-full bg-white text-brand-dark flex items-center justify-center hover:bg-purple-500 transition-colors">
+                                                <i class="ri-arrow-right-up-line"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <script>
                 document.addEventListener("DOMContentLoaded", (event) => {
-                    // GSAP TIMELINE
+                    // GSAP TIMELINE (HERO)
                     const tl = gsap.timeline({ delay: 0.2 });
 
-                    // 1. Animate Layered Images
                     tl.to(".hero-layered-img", {
                         y: 0,
                         opacity: 1,
@@ -223,28 +321,19 @@
                         stagger: 0.2,
                         ease: "power4.out"
                     }, "start")
-
-                    // 2. Animate Text Content
                     .to(".hero-content", {
                         y: 0,
                         opacity: 1,
                         duration: 1,
                         ease: "power3.out"
                     }, "-=0.8")
-
-                    // 3. NEW: Animate Side Widgets (Muncul dari samping & berurutan)
                     .to(".hero-side-widget", {
                         x: 0,
                         opacity: 1,
                         duration: 1,
-                        stagger: {
-                            amount: 0.5,
-                            from: "random" // Muncul secara acak agar terlihat alami
-                        },
+                        stagger: { amount: 0.5, from: "random" },
                         ease: "back.out(1.5)"
                     }, "-=1")
-
-                    // 4. Animate Search Bar
                     .to(".hero-search", {
                         y: 0,
                         opacity: 1,
@@ -252,18 +341,17 @@
                         ease: "back.out(1.7)"
                     }, "-=0.6");
 
-                    // Continuous Floating Animation for Side Widgets (Beda speed tiap widget)
+                    // Continuous Floating Animation for Side Widgets
                     gsap.utils.toArray(".hero-side-widget").forEach((widget, i) => {
                         gsap.to(widget, {
                             y: -15,
-                            duration: 2 + (i * 0.5), // Durasi berbeda tiap widget
+                            duration: 2 + (i * 0.5),
                             repeat: -1,
                             yoyo: true,
                             ease: "sine.inOut",
                             delay: i * 0.2
                         });
                     });
-
 
                     // BENTO GRID ANIMATION
                     gsap.from(".bento-item", {
@@ -278,18 +366,42 @@
                         ease: "power2.out"
                     });
 
-                    // SWIPER INITIALIZATION
-                    new Swiper(".hotelSwiper", {
+                    // --- SWIPER CONFIGURATIONS ---
+                    
+                    const swiperConfig = {
                         slidesPerView: 1.2,
                         spaceBetween: 20,
                         centeredSlides: false,
-                        navigation: {
-                            nextEl: ".swiper-button-next-custom",
-                            prevEl: ".swiper-button-prev-custom",
-                        },
                         breakpoints: {
                             640: { slidesPerView: 2.2, spaceBetween: 20 },
                             1024: { slidesPerView: 3.2, spaceBetween: 30 },
+                        },
+                    };
+
+                    // 1. Hotel Swiper
+                    new Swiper(".hotelSwiper", {
+                        ...swiperConfig,
+                        navigation: {
+                            nextEl: ".swiper-next-hotel",
+                            prevEl: ".swiper-prev-hotel",
+                        },
+                    });
+
+                    // 2. Attraction Swiper
+                    new Swiper(".attractionSwiper", {
+                        ...swiperConfig,
+                        navigation: {
+                            nextEl: ".swiper-next-attr",
+                            prevEl: ".swiper-prev-attr",
+                        },
+                    });
+
+                    // 3. Transport Swiper
+                    new Swiper(".transportSwiper", {
+                        ...swiperConfig,
+                        navigation: {
+                            nextEl: ".swiper-next-trans",
+                            prevEl: ".swiper-prev-trans",
                         },
                     });
                 });
