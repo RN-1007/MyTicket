@@ -1,8 +1,10 @@
-package com.travelapp.travel_app.service.user; // <-- PERBAIKAN DI SINI
+package com.travelapp.travel_app.service.user;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,100 +35,134 @@ public class OrderService {
     @Autowired private TransportTicketRepository transportTicketRepository;
     @Autowired private AttractionTicketRepository attractionTicketRepository;
 
-    /**
-     * (Sisa kode Anda sudah benar, tidak perlu diubah)
-     */
+    // --- CREATE ORDER (SUPPORT TANGGAL & HITUNG MALAM HOTEL) ---
     @Transactional
-    public Order createNewOrder(ItemType itemType, Integer itemId, int quantity, String userEmail) {
+    public Order createNewOrder(ItemType itemType, Integer itemId, int quantity, String userEmail, Date checkIn, Date checkOut) {
         
-        // 1. Dapatkan User (Tidak berubah)
         User currentUser = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 2. Buat Order (Tidak berubah)
         Order newOrder = new Order();
         newOrder.setUser(currentUser);
         newOrder.setOrderDate(new Date());
         newOrder.setStatus(OrderStatus.Pending);
         Order savedOrder = orderRepository.save(newOrder);
 
-
-        // 3. Ambil harga (Tidak berubah, kita tetap perlu memanggil helper getPrice)
         BigDecimal pricePerItem = getPrice(itemType, itemId);
         if (pricePerItem == null) {
-            throw new RuntimeException("Item (kamar/tiket) dengan ID " + itemId + " tidak ditemukan.");
+            throw new RuntimeException("Item dengan ID " + itemId + " tidak ditemukan.");
         }
-        BigDecimal totalPrice = pricePerItem.multiply(new BigDecimal(quantity));
 
-        // 4. Buat OrderDetail (--- INI BAGIAN YANG BERUBAH ---)
         OrderDetail newDetail = new OrderDetail();
         newDetail.setOrder(savedOrder);
         newDetail.setQuantity(quantity);
-        newDetail.setTotalPrice(totalPrice);
 
-        // Logika baru: set entity yang sesuai berdasarkan itemType, bukan ID mentah
-        switch (itemType) {
-            case Hotel:
-                // Ambil seluruh object HotelRoom
-                HotelRoom room = hotelRoomRepository.findById(itemId)
-                        .orElseThrow(() -> new RuntimeException("Kamar hotel tidak ditemukan"));
-                // Set relasinya
-                newDetail.setHotelRoom(room);
-                break;
-            case Transport:
-                // Ambil seluruh object TransportTicket
-                TransportTicket transportTicket = transportTicketRepository.findById(itemId)
-                        .orElseThrow(() -> new RuntimeException("Tiket transport tidak ditemukan"));
-                // Set relasinya
-                newDetail.setTransportTicket(transportTicket);
-                break;
-            case Attraction:
-                 // Ambil seluruh object AttractionTicket
-                AttractionTicket attractionTicket = attractionTicketRepository.findById(itemId)
-                        .orElseThrow(() -> new RuntimeException("Tiket atraksi tidak ditemukan"));
-                // Set relasinya
-                newDetail.setAttractionTicket(attractionTicket);
-                break;
-            default:
-                throw new RuntimeException("Tipe item tidak diketahui");
+        BigDecimal totalPrice;
+
+        // Logika Hotel (Hitung Malam)
+        if (itemType == ItemType.Hotel) {
+            if (checkIn == null || checkOut == null) {
+                throw new RuntimeException("Tanggal Check-in dan Check-out wajib diisi.");
+            }
+            if (!checkOut.after(checkIn)) {
+                throw new RuntimeException("Tanggal Check-out harus setelah Check-in.");
+            }
+
+            long diffInMillies = Math.abs(checkOut.getTime() - checkIn.getTime());
+            long nights = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+            if (nights < 1) nights = 1;
+
+            totalPrice = pricePerItem.multiply(new BigDecimal(quantity)).multiply(new BigDecimal(nights));
+            
+            newDetail.setCheckInDate(checkIn);
+            newDetail.setCheckOutDate(checkOut);
+            
+            HotelRoom room = hotelRoomRepository.findById(itemId).orElseThrow();
+            newDetail.setHotelRoom(room);
+
+        } else {
+            // Logika Transport & Attraction (Harga Flat per Tiket)
+            if (checkIn == null) {
+                throw new RuntimeException("Tanggal Keberangkatan/Kunjungan wajib dipilih.");
+            }
+
+            newDetail.setCheckInDate(checkIn); 
+            // checkOutDate null untuk tiket
+            
+            totalPrice = pricePerItem.multiply(new BigDecimal(quantity));
+            
+            if (itemType == ItemType.Transport) {
+                TransportTicket t = transportTicketRepository.findById(itemId).orElseThrow();
+                newDetail.setTransportTicket(t);
+            } else if (itemType == ItemType.Attraction) {
+                AttractionTicket a = attractionTicketRepository.findById(itemId).orElseThrow();
+                newDetail.setAttractionTicket(a);
+            }
         }
 
-        // Simpan OrderDetail yang sudah dimodifikasi
+        newDetail.setTotalPrice(totalPrice);
         orderDetailRepository.save(newDetail);
 
         return savedOrder;
     }
 
-    /**
-     * Logika bisnis untuk mengambil riwayat pesanan user.
-     * (Ini tidak berubah)
-     */
+    // --- GET ALL ORDERS ---
     public List<Order> findOrdersByUser(String userEmail) {
         User currentUser = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        
-        // Memanggil method repository
         return orderRepository.findByUser(currentUser);
     }
 
-    /**
-     * Fungsi helper privat untuk mendapatkan harga dari berbagai repository.
-     * (Ini tidak berubah)
-     */
+    // --- GET PENDING ORDERS (KERANJANG) ---
+    public List<Order> findPendingOrders(String userEmail) {
+        return findOrdersByUser(userEmail).stream()
+                .filter(o -> o.getStatus() == OrderStatus.Pending)
+                .collect(Collectors.toList());
+    }
+
+    // --- GET HISTORY ORDERS (SUDAH DIBAYAR/BATAL) ---
+    public List<Order> findHistoryOrders(String userEmail) {
+        return findOrdersByUser(userEmail).stream()
+                .filter(o -> o.getStatus() != OrderStatus.Pending)
+                .collect(Collectors.toList());
+    }
+
+    // --- PROCESS CHECKOUT (BULK PAYMENT) ---
+    @Transactional
+    public void payMultipleOrders(List<Integer> orderIds) {
+        List<Order> orders = orderRepository.findAllById(orderIds);
+        for (Order order : orders) {
+            if (order.getStatus() == OrderStatus.Pending) {
+                order.setStatus(OrderStatus.Paid);
+                orderRepository.save(order);
+            }
+        }
+    }
+
+    // --- CANCEL ORDER (DELETE ITEM) ---
+    @Transactional
+    public void cancelOrder(Integer orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+        
+        if (order.getStatus() == OrderStatus.Pending) {
+            order.setStatus(OrderStatus.Cancelled); 
+            // Opsional: orderRepository.delete(order); jika ingin hapus permanen
+            orderRepository.save(order);
+        } else {
+            throw new RuntimeException("Tidak bisa membatalkan pesanan yang sudah diproses.");
+        }
+    }
+
+    // --- HELPER PRICE ---
     private BigDecimal getPrice(ItemType itemType, Integer itemId) {
         switch (itemType) {
             case Hotel:
-                return hotelRoomRepository.findById(itemId)
-                        .map(HotelRoom::getPrice)
-                        .orElse(null);
+                return hotelRoomRepository.findById(itemId).map(HotelRoom::getPrice).orElse(null);
             case Transport:
-                return transportTicketRepository.findById(itemId)
-                        .map(TransportTicket::getPrice)
-                        .orElse(null);
+                return transportTicketRepository.findById(itemId).map(TransportTicket::getPrice).orElse(null);
             case Attraction:
-                return attractionTicketRepository.findById(itemId)
-                        .map(AttractionTicket::getPrice)
-                        .orElse(null);
+                return attractionTicketRepository.findById(itemId).map(AttractionTicket::getPrice).orElse(null);
             default:
                 throw new RuntimeException("Tipe item tidak diketahui");
         }

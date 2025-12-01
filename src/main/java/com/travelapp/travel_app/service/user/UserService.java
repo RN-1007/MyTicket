@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.travelapp.travel_app.model.Role; // Import Role
 import com.travelapp.travel_app.model.User;
 import com.travelapp.travel_app.repository.UserRepository;
 
@@ -22,6 +23,12 @@ public class UserService {
     public List<User> findAll() {
         return userRepository.findAll();
     }
+    
+    // --- METHOD BARU: HANYA AMBIL CUSTOMER (USER BIASA) ---
+    public List<User> findAllCustomers() {
+        return userRepository.findByRole(Role.ROLE_USER);
+    }
+    // -----------------------------------------------------
 
     public Optional<User> findById(Integer id) {
         return userRepository.findById(id);
@@ -35,18 +42,15 @@ public class UserService {
         return userRepository.count();
     }
 
-    // --- METHOD BARU: TOGGLE STATUS ---
     public void toggleUserStatus(Integer id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
         
-        // Jika null, anggap true, lalu dibalik jadi false. Jika true jadi false, dst.
         boolean currentStatus = user.getIsActive();
         user.setIsActive(!currentStatus);
         
         userRepository.save(user);
     }
-    // ----------------------------------
 
     public void saveUser(User user) {
         if (user.getUserId() == null) {
@@ -54,7 +58,6 @@ public class UserService {
                 throw new IllegalArgumentException("Password wajib diisi untuk user baru.");
             }
             user.setPassword(passwordEncoder.encode(user.getPassword()));
-            // Pastikan status default di-set saat create
             if (user.getIsActive() == null) user.setIsActive(true);
             
             userRepository.save(user);
@@ -68,7 +71,6 @@ public class UserService {
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
             }
             
-            // Jaga status lama jika tidak dikirim dari form (opsional, tapi aman)
             if (user.getIsActive() == null) {
                 user.setIsActive(existingUser.getIsActive());
             }
