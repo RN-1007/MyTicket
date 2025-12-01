@@ -17,6 +17,7 @@
                    title="Kembali ke Beranda">
                     <i class="ri-arrow-left-line text-xl font-bold"></i>
                 </a>
+
                 <img th:if="${attraction.image != null}" th:src="@{${attraction.imagePath}}" class="w-full h-full object-cover" data-speed="0.5">
                 <img th:unless="${attraction.image != null}" src="https://source.unsplash.com/random/1600x900/?amusement-park,nature" class="w-full h-full object-cover" data-speed="0.5">
                 <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-dark/50 to-brand-dark"></div>
@@ -84,33 +85,42 @@
                                 <input type="hidden" id="selectedItemId" name="itemId" th:value="${tickets != null and !tickets.isEmpty() ? tickets[0].attractionTicketId : ''}" />
 
                                 <div th:if="${tickets != null && !tickets.isEmpty()}">
+                                    
                                     <div class="space-y-2">
-                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Select Date & Ticket</label>
+                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Ticket Type</label>
                                         <div class="relative">
-                                            <select id="ticketSelect" onchange="updatePrice()" class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-4 appearance-none focus:border-green-500 focus:ring-0 outline-none cursor-pointer transition-colors hover:bg-brand-dark/70">
+                                            <select id="ticketSelect" name="itemId" onchange="updatePrice()" class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-4 appearance-none focus:border-green-500 focus:ring-0 outline-none cursor-pointer transition-colors hover:bg-brand-dark/70">
                                                 <option th:each="t : ${tickets}" 
                                                         th:value="${t.attractionTicketId}" 
                                                         th:data-price="${t.price}"
-                                                        th:text="'Valid: ' + ${#dates.format(t.validDate, 'dd MMM yyyy')}">
-                                                    Date
+                                                        th:text="${t.ticketType} + ' (Rp ' + ${#numbers.formatDecimal(t.price, 0, 'POINT', 0, 'COMMA')} + ')'">
+                                                    Ticket
                                                 </option>
                                             </select>
-                                            <i class="ri-calendar-event-line absolute right-4 top-4 text-green-500 pointer-events-none"></i>
+                                            <i class="ri-coupon-3-line absolute right-4 top-4 text-green-500 pointer-events-none"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Visit Date</label>
+                                        <div class="relative">
+                                            <input type="date" id="checkIn" name="checkIn" required 
+                                                   class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-4 focus:border-green-500 focus:ring-0 outline-none transition-colors [color-scheme:dark]">
                                         </div>
                                     </div>
 
                                     <div class="space-y-2 mt-4">
-                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Quantity</label>
+                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Visitors</label>
                                         <div class="flex items-center bg-brand-dark/50 border border-white/10 rounded-xl p-2">
                                             <button type="button" onclick="adjustQty(-1)" class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"><i class="ri-subtract-line"></i></button>
-                                            <input type="number" id="qtyInput" name="quantity" value="1" min="1" class="bg-transparent border-none text-center text-white font-bold w-full focus:ring-0 appearance-none">
+                                            <input type="number" id="qtyInput" name="quantity" value="1" min="1" onchange="updatePrice()" class="bg-transparent border-none text-center text-white font-bold w-full focus:ring-0 appearance-none">
                                             <button type="button" onclick="adjustQty(1)" class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"><i class="ri-add-line"></i></button>
                                         </div>
                                     </div>
 
                                     <div class="py-6 border-b border-white/10 flex justify-between items-end">
                                         <span class="text-gray-400 text-sm">Total Price</span>
-                                        <span id="displayPrice" class="text-3xl font-bold text-green-400" th:text="'Rp ' + ${#numbers.formatDecimal(tickets[0].price, 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
+                                        <span id="displayPrice" class="text-3xl font-bold text-green-400">Rp 0</span>
                                     </div>
 
                                     <button type="submit" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 mt-4 shadow-lg shadow-green-900/20">
@@ -133,14 +143,23 @@
             </div>
 
             <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('checkIn').valueAsDate = new Date();
+                    updatePrice();
+                });
+
                 function updatePrice() {
                     const select = document.getElementById('ticketSelect');
                     const selectedOption = select.options[select.selectedIndex];
-                    const price = selectedOption.getAttribute('data-price');
+                    const price = parseFloat(selectedOption.getAttribute('data-price'));
+                    const qty = parseInt(document.getElementById('qtyInput').value);
+
+                    // Update Hidden Input ID
                     document.getElementById('selectedItemId').value = selectedOption.value;
                     
+                    const total = price * qty;
                     const formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
-                    document.getElementById('displayPrice').innerText = formatter.format(price);
+                    document.getElementById('displayPrice').innerText = formatter.format(total);
                 }
 
                 function adjustQty(amount) {
@@ -148,6 +167,7 @@
                     let val = parseInt(input.value) + amount;
                     if(val < 1) val = 1;
                     input.value = val;
+                    updatePrice();
                 }
             </script>
         </div>

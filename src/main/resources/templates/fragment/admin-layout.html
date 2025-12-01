@@ -4,74 +4,28 @@
     <meta charset="UTF-8" />
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link
-      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
-      rel="stylesheet"
-    />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
 
     <style>
-      .sidebar {
-        font-family: "Poppins", sans-serif;
-      }
-      .dropdown-menu {
-        overflow: hidden;
-        max-height: 0;
-        opacity: 0;
-        visibility: hidden;
-        transition: max-height 0.4s ease-out, opacity 0.3s ease-out,
-        visibility 0s linear 0.4s;
-       
-      }
-      .dropdown-parent.open .dropdown-menu {
-        max-height: 500px; 
-        opacity: 1;
-        visibility: visible;
-        transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
-      }
-      .arrow-icon {
-        transition: transform 0.3s ease;
-      }
+      .sidebar { font-family: "Poppins", sans-serif; }
+      
+      /* Dropdown Transitions */
+      .dropdown-menu { overflow: hidden; max-height: 0; opacity: 0; visibility: hidden; transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s; }
+      .dropdown-parent.open .dropdown-menu { max-height: 500px; opacity: 1; visibility: visible; transition: max-height 0.4s ease-in, opacity 0.3s ease-in; }
+      .arrow-icon { transition: transform 0.3s ease; }
+      
+      /* Custom Scrollbar (Dark) */
+      .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: #000000; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #374151; border-radius: 10px; border: 1px solid #000000; }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #4b5563; }
 
-      /* --- CUSTOM SCROLLBAR (DARK THEME) --- */
-      /* Mengatur lebar scrollbar */
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;  /* Lebar Vertikal */
-        height: 6px; /* Tinggi Horizontal */
-      }
-
-      /* Track (Latar Belakang Scrollbar) - Hitam agar menyatu dengan sidebar */
-      .custom-scrollbar::-webkit-scrollbar-track {
-        background: #000000; 
-      }
-
-      /* Thumb (Batang Scrollbar) - Abu-abu Gelap */
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: #374151; /* Gray-700 */
-        border-radius: 10px;       /* Sudut membulat */
-        border: 1px solid #000000; /* Border hitam agar terlihat 'mengambang' */
-      }
-
-      /* Thumb saat Hover - Sedikit lebih terang */
-      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background-color: #4b5563; /* Gray-600 */
-      }
-      /* ------------------------------------- */
-
-      /* TOAST ANIMATION */
-      @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-      }
-      @keyframes fadeOut {
-        from { opacity: 1; }
-        to { opacity: 0; }
-      }
+      /* Toast Animation */
+      @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+      @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
       .toast-enter { animation: slideIn 0.5s ease-out forwards; }
       .toast-exit { animation: fadeOut 0.5s ease-out forwards; }
     </style>
@@ -82,234 +36,82 @@
       <div class="flex h-screen">
         
         <div class="w-64 bg-black text-gray-400 flex flex-col sidebar h-screen border-r border-gray-800 flex-shrink-0">
-          
           <div class="p-5 text-2xl font-semibold text-white border-b border-gray-800 flex-shrink-0">
             <a th:href="@{/admin/dashboard}">MyTicket</a>
           </div>
 
           <nav class="flex-1 px-4 py-4 space-y-2 overflow-y-auto custom-scrollbar">
-            <a
-              th:href="@{/admin/dashboard}"
-              class="flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-colors duration-200"
-              th:classappend="${currentUri == '/admin/dashboard'} 
-                           ? 'bg-gray-800 text-white border-l-4 border-yellow-500'
-                           : 'hover:bg-gray-800 hover:text-white'"
-            >
-              <i class="ri-dashboard-line w-5 h-5"></i>
-              <span>Dashboard</span>
+            <a th:href="@{/admin/dashboard}" class="flex items-center space-x-3 px-4 py-3 rounded-lg font-medium transition-colors duration-200" th:classappend="${currentUri == '/admin/dashboard'} ? 'bg-gray-800 text-white border-l-4 border-yellow-500' : 'hover:bg-gray-800 hover:text-white'">
+              <i class="ri-dashboard-line w-5 h-5"></i><span>Dashboard</span>
             </a>
 
-            <div
-              class="space-y-1 dropdown-parent"
-              th:classappend="${currentUri.startsWith('/admin/hotels') or currentUri.startsWith('/admin/hotel-rooms')} ? 'open' : ''"
-            >
-              <button
-                class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle"
-                th:classappend="${currentUri.startsWith('/admin/hotels') or currentUri.startsWith('/admin/hotel-rooms')} ? 'text-white' : ''"
-              >
-                <span class="flex items-center space-x-3">
-                  <i class="ri-hotel-line w-5 h-5"></i>
-                  <span>Hotel Management</span>
-                </span>
-                <i
-                  class="ri-arrow-down-s-line arrow-icon"
-                  th:classappend="${currentUri.startsWith('/admin/hotels') or currentUri.startsWith('/admin/hotel-rooms')} ? 'rotate-180' : ''"
-                ></i>
+            <div class="space-y-1 dropdown-parent" th:classappend="${currentUri.startsWith('/admin/hotels') or currentUri.startsWith('/admin/hotel-rooms')} ? 'open' : ''">
+              <button class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle" th:classappend="${currentUri.startsWith('/admin/hotels') or currentUri.startsWith('/admin/hotel-rooms')} ? 'text-white' : ''">
+                <span class="flex items-center space-x-3"><i class="ri-hotel-line w-5 h-5"></i><span>Hotel Management</span></span><i class="ri-arrow-down-s-line arrow-icon" th:classappend="${currentUri.startsWith('/admin/hotels') or currentUri.startsWith('/admin/hotel-rooms')} ? 'rotate-180' : ''"></i>
               </button>
-
               <div class="pl-8 space-y-1 dropdown-menu">
-                <a
-                  th:href="@{/admin/hotels}"
-                  class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
-                  th:classappend="${currentUri.startsWith('/admin/hotels')} ? 'text-yellow-400 font-semibold' : ''"
-                >
-                  Manage Hotels
-                </a>
-                <a
-                  th:href="@{/admin/hotel-rooms}"
-                  class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
-                  th:classappend="${currentUri.startsWith('/admin/hotel-rooms')} ? 'text-yellow-400 font-semibold' : ''"
-                >
-                  Manage Hotel Rooms
-                </a>
+                <a th:href="@{/admin/hotels}" class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm" th:classappend="${currentUri.startsWith('/admin/hotels')} ? 'text-yellow-400 font-semibold' : ''">Manage Hotels</a>
+                <a th:href="@{/admin/hotel-rooms}" class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm" th:classappend="${currentUri.startsWith('/admin/hotel-rooms')} ? 'text-yellow-400 font-semibold' : ''">Manage Hotel Rooms</a>
               </div>
             </div>
 
-            <div
-              class="space-y-1 dropdown-parent"
-              th:classappend="${currentUri.startsWith('/admin/transports') or currentUri.startsWith('/admin/transport-tickets')} ? 'open' : ''"
-            >
-              <button
-                class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle"
-                th:classappend="${currentUri.startsWith('/admin/transports') or currentUri.startsWith('/admin/transport-tickets')} ? 'text-white' : ''"
-              >
-                <span class="flex items-center space-x-3">
-                  <i class="ri-bus-line w-5 h-5"></i>
-                  <span>Transport Management</span>
-                </span>
-                <i
-                  class="ri-arrow-down-s-line arrow-icon"
-                  th:classappend="${currentUri.startsWith('/admin/transports') or currentUri.startsWith('/admin/transport-tickets')} ? 'rotate-180' : ''"
-                ></i>
+            <div class="space-y-1 dropdown-parent" th:classappend="${currentUri.startsWith('/admin/transports') or currentUri.startsWith('/admin/transport-tickets')} ? 'open' : ''">
+              <button class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle" th:classappend="${currentUri.startsWith('/admin/transports') or currentUri.startsWith('/admin/transport-tickets')} ? 'text-white' : ''">
+                <span class="flex items-center space-x-3"><i class="ri-bus-line w-5 h-5"></i><span>Transport Management</span></span><i class="ri-arrow-down-s-line arrow-icon" th:classappend="${currentUri.startsWith('/admin/transports') or currentUri.startsWith('/admin/transport-tickets')} ? 'rotate-180' : ''"></i>
               </button>
-
               <div class="pl-8 space-y-1 dropdown-menu">
-                <a
-                  th:href="@{/admin/transports}"
-                  class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
-                  th:classappend="${currentUri.startsWith('/admin/transports') and not currentUri.startsWith('/admin/transport-tickets')} ? 'text-yellow-400 font-semibold' : ''"
-                >
-                  Manage Transports
-                </a>
-                <a
-                  th:href="@{/admin/transport-tickets}"
-                  class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
-                  th:classappend="${currentUri.startsWith('/admin/transport-tickets')} ? 'text-yellow-400 font-semibold' : ''"
-                >
-                  Manage Transport Tickets
-                </a>
+                <a th:href="@{/admin/transports}" class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm" th:classappend="${currentUri.startsWith('/admin/transports') and not currentUri.startsWith('/admin/transport-tickets')} ? 'text-yellow-400 font-semibold' : ''">Manage Transports</a>
+                <a th:href="@{/admin/transport-tickets}" class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm" th:classappend="${currentUri.startsWith('/admin/transport-tickets')} ? 'text-yellow-400 font-semibold' : ''">Manage Transport Tickets</a>
               </div>
             </div>
 
-            <div
-              class="space-y-1 dropdown-parent"
-              th:classappend="${currentUri.startsWith('/admin/attractions') or currentUri.startsWith('/admin/attraction-tickets')} ? 'open' : ''"
-            >
-              <button
-                class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle"
-                th:classappend="${currentUri.startsWith('/admin/attractions') or currentUri.startsWith('/admin/attraction-tickets')} ? 'text-white' : ''"
-              >
-                <span class="flex items-center space-x-3">
-                  <i class="ri-camera-lens-line w-5 h-5"></i>
-                  <span>Attraction Management</span>
-                </span>
-                <i
-                  class="ri-arrow-down-s-line arrow-icon"
-                  th:classappend="${currentUri.startsWith('/admin/attractions') or currentUri.startsWith('/admin/attraction-tickets')} ? 'rotate-180' : ''"
-                ></i>
+            <div class="space-y-1 dropdown-parent" th:classappend="${currentUri.startsWith('/admin/attractions') or currentUri.startsWith('/admin/attraction-tickets')} ? 'open' : ''">
+              <button class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle" th:classappend="${currentUri.startsWith('/admin/attractions') or currentUri.startsWith('/admin/attraction-tickets')} ? 'text-white' : ''">
+                <span class="flex items-center space-x-3"><i class="ri-camera-lens-line w-5 h-5"></i><span>Attraction Management</span></span><i class="ri-arrow-down-s-line arrow-icon" th:classappend="${currentUri.startsWith('/admin/attractions') or currentUri.startsWith('/admin/attraction-tickets')} ? 'rotate-180' : ''"></i>
               </button>
-
               <div class="pl-8 space-y-1 dropdown-menu">
-                <a
-                  th:href="@{/admin/attractions}"
-                  class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
-                  th:classappend="${currentUri.startsWith('/admin/attractions') and not currentUri.startsWith('/admin/attraction-tickets')} ? 'text-yellow-400 font-semibold' : ''"
-                >
-                  Manage Attractions
-                </a>
-                <a
-                  th:href="@{/admin/attraction-tickets}"
-                  class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
-                  th:classappend="${currentUri.startsWith('/admin/attraction-tickets')} ? 'text-yellow-400 font-semibold' : ''"
-                >
-                  Manage Attraction Tickets
-                </a>
+                <a th:href="@{/admin/attractions}" class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm" th:classappend="${currentUri.startsWith('/admin/attractions') and not currentUri.startsWith('/admin/attraction-tickets')} ? 'text-yellow-400 font-semibold' : ''">Manage Attractions</a>
+                <a th:href="@{/admin/attraction-tickets}" class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm" th:classappend="${currentUri.startsWith('/admin/attraction-tickets')} ? 'text-yellow-400 font-semibold' : ''">Manage Attraction Tickets</a>
               </div>
             </div>
 
-            <div
-              class="space-y-1 dropdown-parent"
-              th:classappend="${currentUri.startsWith('/admin/users') or currentUri.startsWith('/admin/orders') or currentUri.startsWith('/admin/transactions')} ? 'open' : ''"
-            >
-              <button
-                class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle"
-                th:classappend="${currentUri.startsWith('/admin/users') or currentUri.startsWith('/admin/orders') or currentUri.startsWith('/admin/transactions')} ? 'text-white' : ''"
-              >
-                <span class="flex items-center space-x-3">
-                  <i class="ri-user-settings-line w-5 h-5"></i>
-                  <span>User Management</span>
-                </span>
-                <i
-                  class="ri-arrow-down-s-line arrow-icon"
-                  th:classappend="${currentUri.startsWith('/admin/users') or currentUri.startsWith('/admin/orders') or currentUri.startsWith('/admin/transactions')} ? 'rotate-180' : ''"
-                ></i>
+            <div class="space-y-1 dropdown-parent" th:classappend="${currentUri.startsWith('/admin/users') or currentUri.startsWith('/admin/orders') or currentUri.startsWith('/admin/transactions')} ? 'open' : ''">
+              <button class="w-full flex justify-between items-center px-4 py-3 rounded-lg font-medium transition-colors duration-200 hover:bg-gray-800 hover:text-white focus:outline-none dropdown-toggle" th:classappend="${currentUri.startsWith('/admin/users') or currentUri.startsWith('/admin/orders') or currentUri.startsWith('/admin/transactions')} ? 'text-white' : ''">
+                <span class="flex items-center space-x-3"><i class="ri-user-settings-line w-5 h-5"></i><span>User Management</span></span><i class="ri-arrow-down-s-line arrow-icon" th:classappend="${currentUri.startsWith('/admin/users') or currentUri.startsWith('/admin/orders') or currentUri.startsWith('/admin/transactions')} ? 'rotate-180' : ''"></i>
               </button>
-
               <div class="pl-8 space-y-1 dropdown-menu">
-                <a
-                  th:href="@{/admin/users}"
-                  class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
-                  th:classappend="${currentUri.startsWith('/admin/users')} ? 'text-yellow-400 font-semibold' : ''"
-                >
-                  Manage Users
-                </a>
-                <a
-                  th:href="@{/admin/orders}"
-                  class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
-                  th:classappend="${currentUri.startsWith('/admin/orders')} ? 'text-yellow-400 font-semibold' : ''"
-                >
-                  View All Orders
-                </a>
-                <a
-                  th:href="@{/admin/transactions}"
-                  class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm"
-                  th:classappend="${currentUri.startsWith('/admin/transactions')} ? 'text-yellow-400 font-semibold' : ''"
-                >
-                  Transactions
-                </a>
+                <a th:href="@{/admin/users}" class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm" th:classappend="${currentUri.startsWith('/admin/users')} ? 'text-yellow-400 font-semibold' : ''">Manage Users</a>
+                <a th:href="@{/admin/orders}" class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm" th:classappend="${currentUri.startsWith('/admin/orders')} ? 'text-yellow-400 font-semibold' : ''">View All Orders</a>
+                <a th:href="@{/admin/transactions}" class="block w-full px-4 py-2.5 rounded-lg hover:bg-gray-700 hover:text-white text-sm" th:classappend="${currentUri.startsWith('/admin/transactions')} ? 'text-yellow-400 font-semibold' : ''">Transactions</a>
               </div>
             </div>
           </nav>
 
           <div class="p-4 mt-auto border-t border-gray-800 space-y-2 flex-shrink-0">
-            <a
-              href="#"
-              class="flex items-center space-x-3 px-4 py-3 rounded-lg font-medium hover:bg-gray-800 hover:text-white transition-colors duration-200"
-            >
-              <i class="ri-question-line w-5 h-5"></i>
-              <span>Help</span>
-            </a>
-            <a
-              href="#"
-              class="flex items-center space-x-3 px-4 py-3 rounded-lg font-medium hover:bg-gray-800 hover:text-white transition-colors duration-200"
-            >
-              <i class="ri-mail-line w-5 h-5"></i>
-              <span>Contact Us</span>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-lg font-medium hover:bg-gray-800 hover:text-white transition-colors duration-200">
+              <i class="ri-question-line w-5 h-5"></i><span>Help</span>
             </a>
             <form th:action="@{/logout}" method="post" class="w-full">
-              <button
-                type="submit"
-                class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-medium text-red-500 hover:bg-red-900/50 hover:text-red-400 transition-colors duration-200"
-              >
-                <i class="ri-logout-box-r-line w-5 h-5"></i>
-                <span>Logout</span>
+              <button type="submit" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg font-medium text-red-500 hover:bg-red-900/50 hover:text-red-400 transition-colors duration-200">
+                <i class="ri-logout-box-r-line w-5 h-5"></i><span>Logout</span>
               </button>
             </form>
           </div>
         </div>
 
         <div class="flex-1 flex flex-col h-screen overflow-hidden">
-          <header
-            class="bg-black text-white p-4 flex justify-between items-center border-b border-gray-800 flex-shrink-0"
-          >
+          <header class="bg-black text-white p-4 flex justify-between items-center border-b border-gray-800 flex-shrink-0">
             <div>
               <h1 class="text-2xl font-semibold">Welcome, Admin</h1>
-              <p class="text-sm text-gray-400">
-                Here's what's happening with your Business today
-              </p>
+              <p class="text-sm text-gray-400">Here's what's happening with your Business today</p>
             </div>
             <div class="flex items-center space-x-5">
-              <button class="hover:text-gray-300">
-                <i class="ri-search-line text-xl"></i>
-              </button>
-              <button class="hover:text-gray-300 relative">
-                <i class="ri-notification-3-line text-xl"></i>
-                <span
-                  class="absolute -top-2 -right-2 bg-red-500 text-xs text-white rounded-full w-4 h-4 flex items-center justify-center"
-                  >2</span
-                >
-              </button>
-              <img
-                src="https://i.pravatar.cc/150?u=admin"
-                alt="Admin"
-                class="w-10 h-10 rounded-full border-2 border-gray-700"
-              />
+              <button class="hover:text-gray-300"><i class="ri-search-line text-xl"></i></button>
+               <img src="https://i.pravatar.cc/150?u=admin" alt="Admin" class="w-10 h-10 rounded-full border-2 border-gray-700" />
             </div>
           </header>
 
-          <main
-            class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-6 relative custom-scrollbar"
-          >
+          <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-900 p-6 relative custom-scrollbar">
             <div th:replace="${content}"></div>
           </main>
         </div>
@@ -317,115 +119,110 @@
 
       <input type="hidden" id="flash-success" th:value="${successMessage}" />
       <input type="hidden" id="flash-error" th:value="${errorMessage}" />
-
-      <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none">
-      </div>
+      <div id="toast-container" class="fixed top-5 right-5 z-[9999] flex flex-col gap-3 pointer-events-none"></div>
 
       <script>
         if (!window.adminScriptLoaded) {
           document.addEventListener("DOMContentLoaded", function () {
+            
             // 1. Dropdown Toggle Logic
-            const dropdownToggles =
-              document.querySelectorAll(".dropdown-toggle");
-            dropdownToggles.forEach(function (toggle) {
+            document.querySelectorAll(".dropdown-toggle").forEach(toggle => {
               toggle.addEventListener("click", function (e) {
                 const parentDiv = e.currentTarget.closest(".dropdown-parent");
                 const icon = e.currentTarget.querySelector(".arrow-icon");
                 parentDiv.classList.toggle("open");
-                if (icon) {
-                  icon.classList.toggle("rotate-180");
-                }
+                if (icon) icon.classList.toggle("rotate-180");
               });
             });
 
-            // 2. Table Search Logic
-            const searchInput = document.getElementById("tableSearch");
-            if (searchInput) {
-              searchInput.addEventListener("keyup", function () {
-                const filter = searchInput.value.toLowerCase();
-                const rows = document.querySelectorAll(".datatable tbody tr");
-
-                rows.forEach((row) => {
-                  const text = row.textContent.toLowerCase();
-                  row.style.display = text.includes(filter) ? "" : "none";
-                });
-              });
-            }
-
-            // 3. TOAST LOGIC
+            // 2. Toast Logic
             function showToast(message, type) {
                 const container = document.getElementById('toast-container');
-                if(!container) return; // safety check
-
+                if(!container) return;
                 const toast = document.createElement('div');
-                toast.className = `toast-enter pointer-events-auto flex items-center w-full max-w-sm p-4 rounded-lg shadow-2xl border-l-4 text-white bg-gray-800 backdrop-blur-md bg-opacity-95 transform transition-all duration-300 hover:scale-105 cursor-pointer`;
+                const borderClass = type === 'success' ? 'border-green-500' : 'border-red-500';
+                const iconClass = type === 'success' ? 'ri-checkbox-circle-fill text-green-500' : 'ri-error-warning-fill text-red-500';
+                const title = type === 'success' ? 'Berhasil' : 'Gagal';
+
+                toast.className = `toast-enter pointer-events-auto flex items-center w-full max-w-sm p-4 rounded-lg shadow-2xl border-l-4 text-white bg-gray-800 backdrop-blur-md bg-opacity-95 transform transition-all duration-300 hover:scale-105 cursor-pointer ${borderClass}`;
+                toast.innerHTML = `<div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8"><i class="${iconClass} text-2xl"></i></div><div class="ml-3 text-sm font-normal"><span class="block font-semibold text-base mb-0.5">${title}</span><span class="text-gray-300 text-sm leading-tight">${message}</span></div><button type="button" onclick="this.parentElement.remove()" class="ml-auto -mx-1.5 -my-1.5 text-gray-400 hover:text-white rounded-lg p-1.5 hover:bg-gray-700 inline-flex h-8 w-8"><i class="ri-close-line text-xl"></i></button>`;
                 
-                let iconClass = '';
-                let title = '';
-                let borderColor = '';
-                let iconColor = '';
-
-                if (type === 'success') {
-                    borderColor = 'border-green-500';
-                    iconClass = 'ri-checkbox-circle-fill';
-                    iconColor = 'text-green-500';
-                    title = 'Berhasil';
-                    toast.style.boxShadow = "0 10px 15px -3px rgba(34, 197, 94, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
-                } else {
-                    borderColor = 'border-red-500';
-                    iconClass = 'ri-error-warning-fill';
-                    iconColor = 'text-red-500';
-                    title = 'Gagal';
-                    toast.style.boxShadow = "0 10px 15px -3px rgba(239, 68, 68, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)";
-                }
-
-                toast.classList.add(borderColor);
-
-                toast.innerHTML = `
-                    <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 ${iconColor}">
-                        <i class="${iconClass} text-2xl"></i>
-                    </div>
-                    <div class="ml-3 text-sm font-normal">
-                        <span class="block font-semibold text-base mb-0.5 ${iconColor}">${title}</span>
-                        <span class="text-gray-300 text-sm leading-tight">${message}</span>
-                    </div>
-                    <button type="button" class="ml-auto -mx-1.5 -my-1.5 text-gray-400 hover:text-white rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-700 inline-flex h-8 w-8" aria-label="Close">
-                        <i class="ri-close-line text-xl"></i>
-                    </button>
-                `;
-
-                const closeBtn = toast.querySelector('button');
-                closeBtn.addEventListener('click', () => {
-                    removeToast(toast);
-                });
-
-                setTimeout(() => {
-                    removeToast(toast);
-                }, 5000);
-
                 container.appendChild(toast);
+                setTimeout(() => toast.remove(), 5000);
             }
-
-            function removeToast(toast) {
-                if(!toast) return;
-                toast.classList.remove('toast-enter');
-                toast.classList.add('toast-exit');
-                toast.addEventListener('animationend', () => {
-                    toast.remove();
-                });
-            }
-
             const successEl = document.getElementById('flash-success');
             const errorEl = document.getElementById('flash-error');
+            if (successEl && successEl.value) showToast(successEl.value, 'success');
+            if (errorEl && errorEl.value) showToast(errorEl.value, 'error');
 
-            if (successEl && successEl.value) {
-                showToast(successEl.value, 'success');
-            }
-            
-            if (errorEl && errorEl.value) {
-                showToast(errorEl.value, 'error');
-            }
+            // 3. UNIVERSAL PAGINATION, SEARCH & SORTING LOGIC
+            const tableContainers = document.querySelectorAll('.table-container');
+            tableContainers.forEach(container => {
+                const tbody = container.querySelector('table tbody');
+                if (!tbody) return;
 
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const searchInput = container.querySelector('.table-search');
+                const limitSelect = container.querySelector('.rows-per-page');
+                const prevBtn = container.querySelector('.btn-prev');
+                const nextBtn = container.querySelector('.btn-next');
+                const infoText = container.querySelector('.page-info');
+
+                let currentPage = 1;
+                let rowsPerPage = parseInt(limitSelect ? limitSelect.value : 10);
+                let filteredRows = rows;
+
+                function render() {
+                    // Filter
+                    const query = searchInput ? searchInput.value.toLowerCase() : '';
+                    filteredRows = rows.filter(row => {
+                        const text = row.textContent.toLowerCase();
+                        return text.includes(query);
+                    });
+
+                    // Pagination
+                    const totalItems = filteredRows.length;
+                    const totalPages = Math.ceil(totalItems / rowsPerPage);
+                    
+                    if (currentPage > totalPages) currentPage = totalPages > 0 ? totalPages : 1;
+                    if (currentPage < 1) currentPage = 1;
+
+                    const start = (currentPage - 1) * rowsPerPage;
+                    const end = start + rowsPerPage;
+
+                    // Render
+                    rows.forEach(row => row.style.display = 'none');
+                    if (totalItems > 0) {
+                        filteredRows.slice(start, end).forEach(row => row.style.display = '');
+                    }
+
+                    // Update UI Controls
+                    if (infoText) {
+                        const displayStart = totalItems === 0 ? 0 : start + 1;
+                        const displayEnd = Math.min(end, totalItems);
+                        infoText.textContent = `Menampilkan ${displayStart}-${displayEnd} dari ${totalItems} data`;
+                    }
+                    
+                    if (prevBtn) {
+                        prevBtn.disabled = currentPage === 1;
+                        prevBtn.classList.toggle('opacity-50', currentPage === 1);
+                        prevBtn.classList.toggle('cursor-not-allowed', currentPage === 1);
+                    }
+                    if (nextBtn) {
+                        const isLast = currentPage === totalPages || totalPages === 0;
+                        nextBtn.disabled = isLast;
+                        nextBtn.classList.toggle('opacity-50', isLast);
+                        nextBtn.classList.toggle('cursor-not-allowed', isLast);
+                    }
+                }
+
+                if (searchInput) searchInput.addEventListener('keyup', () => { currentPage = 1; render(); });
+                if (limitSelect) limitSelect.addEventListener('change', (e) => { rowsPerPage = parseInt(e.target.value); currentPage = 1; render(); });
+                if (prevBtn) prevBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; render(); } });
+                if (nextBtn) nextBtn.addEventListener('click', () => { if (currentPage < Math.ceil(filteredRows.length / rowsPerPage)) { currentPage++; render(); } });
+
+                render();
+            });
           });
           window.adminScriptLoaded = true;
         }

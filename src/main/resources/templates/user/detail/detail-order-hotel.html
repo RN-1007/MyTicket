@@ -17,6 +17,7 @@
                    title="Kembali ke Beranda">
                     <i class="ri-arrow-left-line text-xl font-bold"></i>
                 </a>
+
                 <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="w-full h-full object-cover" data-speed="0.5">
                 <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/1600x900/?luxury-hotel" class="w-full h-full object-cover" data-speed="0.5">
                 <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-dark/50 to-brand-dark"></div>
@@ -71,15 +72,16 @@
                         <div class="sticky top-28 glass-panel p-8 rounded-3xl border-t border-brand-accent/50 shadow-2xl shadow-brand-accent/5 bg-brand-surface/40 backdrop-blur-xl">
                             <h3 class="text-2xl font-serif italic text-white mb-6">Reserve your stay</h3>
                             
-                            <form th:action="@{/order/create}" method="post" class="space-y-6">
+                            <form th:action="@{/order/create}" method="post" class="space-y-5" onsubmit="return validateDates()">
                                 <input type="hidden" name="itemType" value="Hotel" />
                                 <input type="hidden" id="selectedItemId" name="itemId" th:value="${rooms != null and !rooms.isEmpty() ? rooms[0].roomId : ''}" />
 
                                 <div th:if="${rooms != null && !rooms.isEmpty()}">
+                                    
                                     <div class="space-y-2">
                                         <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Room Type</label>
                                         <div class="relative">
-                                            <select id="roomSelect" onchange="updatePrice()" class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-4 appearance-none focus:border-brand-accent focus:ring-0 outline-none cursor-pointer transition-colors hover:bg-brand-dark/70">
+                                            <select id="roomSelect" onchange="calculateTotal()" class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-4 appearance-none focus:border-brand-accent focus:ring-0 outline-none cursor-pointer transition-colors hover:bg-brand-dark/70">
                                                 <option th:each="room : ${rooms}" 
                                                         th:value="${room.roomId}" 
                                                         th:data-price="${room.price}"
@@ -91,18 +93,34 @@
                                         </div>
                                     </div>
 
-                                    <div class="space-y-2 mt-4">
-                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Quantity</label>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div class="space-y-2">
+                                            <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Check-In</label>
+                                            <input type="date" id="checkIn" name="checkIn" required onchange="calculateTotal()"
+                                                   class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-3 focus:border-brand-accent focus:ring-0 outline-none transition-colors [color-scheme:dark]">
+                                        </div>
+                                        <div class="space-y-2">
+                                            <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Check-Out</label>
+                                            <input type="date" id="checkOut" name="checkOut" required onchange="calculateTotal()"
+                                                   class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-3 focus:border-brand-accent focus:ring-0 outline-none transition-colors [color-scheme:dark]">
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-2 mt-2">
+                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Rooms</label>
                                         <div class="flex items-center bg-brand-dark/50 border border-white/10 rounded-xl p-2">
                                             <button type="button" onclick="adjustQty(-1)" class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"><i class="ri-subtract-line"></i></button>
-                                            <input type="number" id="qtyInput" name="quantity" value="1" min="1" class="bg-transparent border-none text-center text-white font-bold w-full focus:ring-0 appearance-none">
+                                            <input type="number" id="qtyInput" name="quantity" value="1" min="1" onchange="calculateTotal()" class="bg-transparent border-none text-center text-white font-bold w-full focus:ring-0 appearance-none">
                                             <button type="button" onclick="adjustQty(1)" class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"><i class="ri-add-line"></i></button>
                                         </div>
                                     </div>
 
-                                    <div class="py-6 border-b border-white/10 flex justify-between items-end">
-                                        <span class="text-gray-400 text-sm">Total / night</span>
-                                        <span id="displayPrice" class="text-3xl font-bold text-brand-accent" th:text="'Rp ' + ${#numbers.formatDecimal(rooms[0].price, 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
+                                    <div class="py-6 border-b border-white/10 flex flex-col gap-1">
+                                        <div class="flex justify-between items-end">
+                                            <span class="text-gray-400 text-sm">Total Estimate</span>
+                                            <span id="displayPrice" class="text-3xl font-bold text-brand-accent">Rp 0</span>
+                                        </div>
+                                        <span id="nightInfo" class="text-xs text-right text-gray-500">1 Night, 1 Room</span>
                                     </div>
 
                                     <button type="submit" class="w-full bg-brand-accent hover:bg-orange-600 text-brand-dark font-bold py-4 rounded-xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 mt-4 shadow-lg shadow-brand-accent/20">
@@ -112,9 +130,7 @@
                                 </div>
                                 
                                 <div th:unless="${rooms != null && !rooms.isEmpty()}" class="text-center py-8">
-                                    <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-500">
-                                        <i class="ri-door-lock-line text-2xl"></i>
-                                    </div>
+                                    <i class="ri-door-lock-line text-2xl text-gray-500 mb-2"></i>
                                     <p class="text-gray-500">Kamar tidak tersedia.</p>
                                 </div>
                             </form>
@@ -125,21 +141,61 @@
             </div>
 
             <script>
-                function updatePrice() {
-                    const select = document.getElementById('roomSelect');
-                    const selectedOption = select.options[select.selectedIndex];
-                    const price = selectedOption.getAttribute('data-price');
-                    document.getElementById('selectedItemId').value = selectedOption.value;
+                document.addEventListener('DOMContentLoaded', function() {
+                    // Set Default Date: Today & Tomorrow
+                    const today = new Date();
+                    const tomorrow = new Date(today);
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+
+                    document.getElementById('checkIn').valueAsDate = today;
+                    document.getElementById('checkOut').valueAsDate = tomorrow;
                     
-                    const formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
-                    document.getElementById('displayPrice').innerText = formatter.format(price);
-                }
+                    calculateTotal();
+                });
 
                 function adjustQty(amount) {
                     const input = document.getElementById('qtyInput');
                     let val = parseInt(input.value) + amount;
                     if(val < 1) val = 1;
                     input.value = val;
+                    calculateTotal();
+                }
+
+                function calculateTotal() {
+                    const select = document.getElementById('roomSelect');
+                    const pricePerNight = parseFloat(select.options[select.selectedIndex].getAttribute('data-price'));
+                    document.getElementById('selectedItemId').value = select.value;
+
+                    const qty = parseInt(document.getElementById('qtyInput').value);
+                    const checkIn = new Date(document.getElementById('checkIn').value);
+                    const checkOut = new Date(document.getElementById('checkOut').value);
+
+                    let nights = 0;
+                    if (checkIn && checkOut && checkOut > checkIn) {
+                        const diffTime = Math.abs(checkOut - checkIn);
+                        nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                    } else {
+                        nights = 0; // Jika tanggal tidak valid
+                    }
+
+                    // Update Teks Info
+                    document.getElementById('nightInfo').innerText = `${nights} Night(s), ${qty} Room(s)`;
+
+                    // Hitung Total
+                    const totalPrice = pricePerNight * qty * (nights > 0 ? nights : 0);
+
+                    const formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
+                    document.getElementById('displayPrice').innerText = formatter.format(totalPrice);
+                }
+
+                function validateDates() {
+                    const checkIn = new Date(document.getElementById('checkIn').value);
+                    const checkOut = new Date(document.getElementById('checkOut').value);
+                    if (checkOut <= checkIn) {
+                        alert("Tanggal Check-out harus setelah Check-in!");
+                        return false;
+                    }
+                    return true;
                 }
             </script>
         </div>

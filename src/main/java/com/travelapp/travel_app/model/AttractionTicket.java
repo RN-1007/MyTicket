@@ -12,7 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-// Jika Anda pakai Lombok, tambahkan @Data, @NoArgsConstructor, @AllArgsConstructor
+
 @Entity
 @Table(name = "attraction_tickets")
 public class AttractionTicket {
@@ -20,10 +20,13 @@ public class AttractionTicket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer attractionTicketId;
     
+    // Field baru untuk jenis tiket (Ex: "Regular", "Fast Track", "VIP")
+    private String ticketType;
+    
     private BigDecimal price;
     
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date validDate;
+    private Date validDate; // (Opsional)
 
     @ManyToOne
     @JoinColumn(name = "attraction_id")
@@ -37,6 +40,14 @@ public class AttractionTicket {
 
     public void setAttractionTicketId(Integer attractionTicketId) {
         this.attractionTicketId = attractionTicketId;
+    }
+
+    public String getTicketType() {
+        return ticketType;
+    }
+
+    public void setTicketType(String ticketType) {
+        this.ticketType = ticketType;
     }
 
     public BigDecimal getPrice() {

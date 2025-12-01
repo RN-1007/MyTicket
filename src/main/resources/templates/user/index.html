@@ -2,6 +2,19 @@
 <html lang="id" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Explore the Universe - MyTicket</title>
+    <style>
+        /* LOGIKA TOMBOL HILANG SAAT MENTOK */
+        .swiper-button-disabled {
+            opacity: 0 !important;
+            pointer-events: none;
+            cursor: auto;
+        }
+
+        /* Agar tombol transisi halus saat hilang/muncul */
+        .nav-btn-custom {
+            transition: all 0.3s ease;
+        }
+    </style>
 </head>
 <body>
     
@@ -167,13 +180,8 @@
             </section>
             
             <section id="hotels" class="py-20 border-t border-white/5 bg-brand-surface/30 relative z-20">
-                <div class="container mx-auto px-6">
-                    <div class="flex justify-between items-center mb-10">
+                <div class="container mx-auto px-6 relative group/swiper"> <div class="flex justify-between items-center mb-10">
                         <h2 class="text-3xl font-bold text-white">Curated <span class="text-brand-accent font-serif italic">Stays</span></h2>
-                        <div class="flex gap-2">
-                            <button class="swiper-prev-hotel w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition"><i class="ri-arrow-left-line"></i></button>
-                            <button class="swiper-next-hotel w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark transition"><i class="ri-arrow-right-line"></i></button>
-                        </div>
                     </div>
 
                     <div class="swiper hotelSwiper overflow-visible">
@@ -208,17 +216,21 @@
                             </div>
                         </div>
                     </div>
+
+                    <button class="swiper-prev-hotel nav-btn-custom absolute top-1/2 -translate-y-1/2 left-0 z-30 w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark text-white border border-white/10 shadow-lg md:-left-4">
+                        <i class="ri-arrow-left-line text-xl"></i>
+                    </button>
+                    <button class="swiper-next-hotel nav-btn-custom absolute top-1/2 -translate-y-1/2 right-0 z-30 w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:bg-brand-accent hover:text-brand-dark text-white border border-white/10 shadow-lg md:-right-4">
+                        <i class="ri-arrow-right-line text-xl"></i>
+                    </button>
+
                 </div>
             </section>
 
             <section id="attractions" class="py-20 relative z-20">
-                <div class="container mx-auto px-6">
+                <div class="container mx-auto px-6 relative group/swiper">
                     <div class="flex justify-between items-center mb-10">
                         <h2 class="text-3xl font-bold text-white">Uncharted <span class="text-green-400 font-serif italic">Worlds</span></h2>
-                        <div class="flex gap-2">
-                            <button class="swiper-prev-attr w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-green-500 hover:text-brand-dark transition"><i class="ri-arrow-left-line"></i></button>
-                            <button class="swiper-next-attr w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-green-500 hover:text-brand-dark transition"><i class="ri-arrow-right-line"></i></button>
-                        </div>
                     </div>
 
                     <div class="swiper attractionSwiper overflow-visible">
@@ -258,17 +270,20 @@
                             </div>
                         </div>
                     </div>
+
+                    <button class="swiper-prev-attr nav-btn-custom absolute top-1/2 -translate-y-1/2 left-0 z-30 w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:bg-green-500 hover:text-brand-dark text-white border border-white/10 shadow-lg md:-left-4">
+                        <i class="ri-arrow-left-line text-xl"></i>
+                    </button>
+                    <button class="swiper-next-attr nav-btn-custom absolute top-1/2 -translate-y-1/2 right-0 z-30 w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:bg-green-500 hover:text-brand-dark text-white border border-white/10 shadow-lg md:-right-4">
+                        <i class="ri-arrow-right-line text-xl"></i>
+                    </button>
                 </div>
             </section>
 
             <section id="transports" class="py-20 border-t border-white/5 bg-brand-surface/30 relative z-20">
-                <div class="container mx-auto px-6">
+                <div class="container mx-auto px-6 relative group/swiper">
                     <div class="flex justify-between items-center mb-10">
                         <h2 class="text-3xl font-bold text-white">Hyper-Speed <span class="text-purple-400 font-serif italic">Fleet</span></h2>
-                        <div class="flex gap-2">
-                            <button class="swiper-prev-trans w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-purple-500 hover:text-brand-dark transition"><i class="ri-arrow-left-line"></i></button>
-                            <button class="swiper-next-trans w-10 h-10 rounded-full glass-panel flex items-center justify-center hover:bg-purple-500 hover:text-brand-dark transition"><i class="ri-arrow-right-line"></i></button>
-                        </div>
                     </div>
 
                     <div class="swiper transportSwiper overflow-visible">
@@ -306,68 +321,34 @@
                             </div>
                         </div>
                     </div>
+
+                    <button class="swiper-prev-trans nav-btn-custom absolute top-1/2 -translate-y-1/2 left-0 z-30 w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:bg-purple-500 hover:text-brand-dark text-white border border-white/10 shadow-lg md:-left-4">
+                        <i class="ri-arrow-left-line text-xl"></i>
+                    </button>
+                    <button class="swiper-next-trans nav-btn-custom absolute top-1/2 -translate-y-1/2 right-0 z-30 w-12 h-12 rounded-full glass-panel flex items-center justify-center hover:bg-purple-500 hover:text-brand-dark text-white border border-white/10 shadow-lg md:-right-4">
+                        <i class="ri-arrow-right-line text-xl"></i>
+                    </button>
                 </div>
             </section>
 
             <script>
                 document.addEventListener("DOMContentLoaded", (event) => {
-                    // GSAP TIMELINE (HERO)
+                    // GSAP TIMELINE (HERO) - TIdak Berubah
                     const tl = gsap.timeline({ delay: 0.2 });
+                    tl.to(".hero-layered-img", { y: 0, opacity: 1, duration: 1.4, stagger: 0.2, ease: "power4.out" }, "start")
+                      .to(".hero-content", { y: 0, opacity: 1, duration: 1, ease: "power3.out" }, "-=0.8")
+                      .to(".hero-side-widget", { x: 0, opacity: 1, duration: 1, stagger: { amount: 0.5, from: "random" }, ease: "back.out(1.5)" }, "-=1")
+                      .to(".hero-search", { y: 0, opacity: 1, duration: 1, ease: "back.out(1.7)" }, "-=0.6");
 
-                    tl.to(".hero-layered-img", {
-                        y: 0,
-                        opacity: 1,
-                        duration: 1.4,
-                        stagger: 0.2,
-                        ease: "power4.out"
-                    }, "start")
-                    .to(".hero-content", {
-                        y: 0,
-                        opacity: 1,
-                        duration: 1,
-                        ease: "power3.out"
-                    }, "-=0.8")
-                    .to(".hero-side-widget", {
-                        x: 0,
-                        opacity: 1,
-                        duration: 1,
-                        stagger: { amount: 0.5, from: "random" },
-                        ease: "back.out(1.5)"
-                    }, "-=1")
-                    .to(".hero-search", {
-                        y: 0,
-                        opacity: 1,
-                        duration: 1,
-                        ease: "back.out(1.7)"
-                    }, "-=0.6");
-
-                    // Continuous Floating Animation for Side Widgets
+                    // Continuous Floating Animation
                     gsap.utils.toArray(".hero-side-widget").forEach((widget, i) => {
-                        gsap.to(widget, {
-                            y: -15,
-                            duration: 2 + (i * 0.5),
-                            repeat: -1,
-                            yoyo: true,
-                            ease: "sine.inOut",
-                            delay: i * 0.2
-                        });
+                        gsap.to(widget, { y: -15, duration: 2 + (i * 0.5), repeat: -1, yoyo: true, ease: "sine.inOut", delay: i * 0.2 });
                     });
 
                     // BENTO GRID ANIMATION
-                    gsap.from(".bento-item", {
-                        scrollTrigger: {
-                            trigger: ".bento-item",
-                            start: "top 85%",
-                        },
-                        y: 50,
-                        opacity: 0,
-                        duration: 0.8,
-                        stagger: 0.1,
-                        ease: "power2.out"
-                    });
+                    gsap.from(".bento-item", { scrollTrigger: { trigger: ".bento-item", start: "top 85%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power2.out" });
 
                     // --- SWIPER CONFIGURATIONS ---
-                    
                     const swiperConfig = {
                         slidesPerView: 1.2,
                         spaceBetween: 20,

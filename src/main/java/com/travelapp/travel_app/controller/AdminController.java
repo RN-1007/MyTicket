@@ -26,9 +26,9 @@ import com.travelapp.travel_app.model.Order;
 import com.travelapp.travel_app.model.OrderDetail;
 import com.travelapp.travel_app.model.Role;
 import com.travelapp.travel_app.model.Transport;
-import com.travelapp.travel_app.model.TransportProvider; // Import Baru
+import com.travelapp.travel_app.model.TransportProvider;
 import com.travelapp.travel_app.model.TransportTicket; 
-import com.travelapp.travel_app.model.TransportType; // Import Baru
+import com.travelapp.travel_app.model.TransportType;
 import com.travelapp.travel_app.model.User;
 import com.travelapp.travel_app.repository.UserRepository;
 import com.travelapp.travel_app.repository.order.OrderRepository;
@@ -168,12 +168,11 @@ public class AdminController {
         // Tambahan untuk Form Provider
         model.addAttribute("provider", new TransportProvider()); 
         model.addAttribute("allProviders", transportProviderRepository.findAll()); 
-        model.addAttribute("allTransportTypes", TransportType.values()); // Enum untuk dropdown
+        model.addAttribute("allTransportTypes", TransportType.values()); 
         
         return "admin/transport/transport"; 
     }
     
-    // --- FITUR BARU: SAVE PROVIDER ---
     @PostMapping("/transport-providers/save")
     public String saveTransportProvider(@ModelAttribute("provider") TransportProvider provider, RedirectAttributes redirectAttributes) {
         try {
@@ -393,9 +392,10 @@ public class AdminController {
         return "admin/order/order-list"; 
     }
 
+    // --- UPDATED: Hanya Tampilkan Customer (Non-Admin) ---
     @GetMapping("/orders")
     public String showUsersForOrders(Model model) {
-        model.addAttribute("users", userService.findAll());
+        model.addAttribute("users", userService.findAllCustomers()); // Panggil method baru
         return "admin/order/order-users"; 
     }
 

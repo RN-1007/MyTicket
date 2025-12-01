@@ -6,9 +6,7 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        .sidebar {
-            font-family: 'Poppins', sans-serif;
-        }
+        .sidebar { font-family: 'Poppins', sans-serif; }
         .dropdown-menu {
             overflow: hidden;
             max-height: 0;
@@ -59,10 +57,9 @@
                         <thead class="bg-gray-700">
                             <tr>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Order ID</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Tanggal</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Nama Hotel</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Tgl Transaksi</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Detail Inap</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Kamar</th>
-                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Qty</th>
                                 <th class="px-6 py-4 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">Total Harga</th>
                                 <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Status</th>
                             </tr>
@@ -71,9 +68,23 @@
                             <tr th:each="item : ${hotelDetails}" class="hover:bg-gray-700/50 transition">
                                 <td class="px-6 py-4 text-sm text-gray-400 font-mono" th:text="${item.order.orderId}">#123</td>
                                 <td class="px-6 py-4 text-sm text-gray-300" th:text="${#dates.format(item.order.orderDate, 'dd MMM yyyy')}">Date</td>
-                                <td class="px-6 py-4 text-sm text-white font-medium" th:text="${item.hotelRoom.hotel.name}">Hotel Name</td>
-                                <td class="px-6 py-4 text-sm text-gray-300" th:text="${item.hotelRoom.roomType}">Deluxe</td>
-                                <td class="px-6 py-4 text-sm text-gray-300 text-center" th:text="${item.quantity}">1</td>
+                                
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col">
+                                        <span class="text-white font-medium" th:text="${item.hotelRoom.hotel.name}">Hotel Name</span>
+                                        <span class="text-xs text-yellow-400 mt-1 font-mono bg-yellow-900/30 px-2 py-0.5 rounded inline-block w-fit border border-yellow-700/50">
+                                            <i class="ri-calendar-check-line mr-1"></i>
+                                            <span th:text="${#dates.format(item.checkInDate, 'dd MMM')}"></span> 
+                                            - 
+                                            <span th:text="${#dates.format(item.checkOutDate, 'dd MMM yyyy')}"></span>
+                                        </span>
+                                    </div>
+                                </td>
+
+                                <td class="px-6 py-4 text-sm text-gray-300">
+                                    <span th:text="${item.hotelRoom.roomType}">Deluxe</span>
+                                    <span class="text-xs text-gray-500 block" th:text="'Qty: ' + ${item.quantity}"></span>
+                                </td>
                                 <td class="px-6 py-4 text-sm text-right text-blue-300 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(item.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
                                 <td class="px-6 py-4 text-center">
                                     <span th:text="${item.order.status}" 
@@ -82,7 +93,7 @@
                                 </td>
                             </tr>
                             <tr th:if="${#lists.isEmpty(hotelDetails)}">
-                                <td colspan="7" class="px-6 py-8 text-center text-gray-500 italic bg-gray-800/50">Tidak ada booking hotel untuk user ini.</td>
+                                <td colspan="6" class="px-6 py-8 text-center text-gray-500 italic bg-gray-800/50">Tidak ada booking hotel untuk user ini.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -100,9 +111,8 @@
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Order ID</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Tgl Pesan</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Transport</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Berangkat</th>
-                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Qty</th>
-                                <th class="px-6 py-4 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">Total Harga</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Tgl Berangkat (User)</th> <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Qty</th>
+                                <th class="px-6 py-4 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">Total</th>
                                 <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
@@ -110,10 +120,17 @@
                             <tr th:each="item : ${transportDetails}" class="hover:bg-gray-700/50 transition">
                                 <td class="px-6 py-4 text-sm text-gray-400 font-mono" th:text="${item.order.orderId}">#123</td>
                                 <td class="px-6 py-4 text-sm text-gray-300" th:text="${#dates.format(item.order.orderDate, 'dd MMM yyyy')}">Date</td>
-                                <td class="px-6 py-4 text-sm text-white font-medium" th:text="${item.transportTicket.transport.name}">Garuda</td>
-                                <td class="px-6 py-4 text-sm text-yellow-300" th:text="${#dates.format(item.transportTicket.departureDate, 'dd MMM HH:mm')}">Tgl Berangkat</td>
-                                <td class="px-6 py-4 text-sm text-gray-300 text-center" th:text="${item.quantity}">1</td>
-                                <td class="px-6 py-4 text-sm text-right text-purple-300 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(item.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
+                                <td class="px-6 py-4 text-sm text-white" th:text="${item.transportTicket.transport.name}">Garuda</td>
+                                
+                                <td class="px-6 py-4">
+                                    <span class="bg-purple-900/30 text-purple-300 px-2 py-1 rounded text-xs border border-purple-700 font-mono">
+                                        <i class="ri-calendar-event-line mr-1"></i> 
+                                        <span th:text="${#dates.format(item.checkInDate, 'dd MMM yyyy')}"></span>
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-4 text-center text-gray-300" th:text="${item.quantity}">1</td>
+                                <td class="px-6 py-4 text-right text-purple-300 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(item.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
                                 <td class="px-6 py-4 text-center">
                                     <span th:text="${item.order.status}" 
                                           th:classappend="${item.order.status.name() == 'PAID'} ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'"
@@ -138,10 +155,9 @@
                             <tr>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Order ID</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Tgl Pesan</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Nama Atraksi</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Berlaku</th>
-                                <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Qty</th>
-                                <th class="px-6 py-4 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">Total Harga</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Atraksi</th>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-300 uppercase tracking-wider">Tgl Kunjungan (User)</th> <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Qty</th>
+                                <th class="px-6 py-4 text-right text-xs font-bold text-gray-300 uppercase tracking-wider">Total</th>
                                 <th class="px-6 py-4 text-center text-xs font-bold text-gray-300 uppercase tracking-wider">Status</th>
                             </tr>
                         </thead>
@@ -149,10 +165,17 @@
                             <tr th:each="item : ${attractionDetails}" class="hover:bg-gray-700/50 transition">
                                 <td class="px-6 py-4 text-sm text-gray-400 font-mono" th:text="${item.order.orderId}">#123</td>
                                 <td class="px-6 py-4 text-sm text-gray-300" th:text="${#dates.format(item.order.orderDate, 'dd MMM yyyy')}">Date</td>
-                                <td class="px-6 py-4 text-sm text-white font-medium" th:text="${item.attractionTicket.attraction.name}">Dufan</td>
-                                <td class="px-6 py-4 text-sm text-yellow-300" th:text="${#dates.format(item.attractionTicket.validDate, 'dd MMM yyyy')}">Valid</td>
-                                <td class="px-6 py-4 text-sm text-gray-300 text-center" th:text="${item.quantity}">1</td>
-                                <td class="px-6 py-4 text-sm text-right text-green-300 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(item.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
+                                <td class="px-6 py-4 text-sm text-white" th:text="${item.attractionTicket.attraction.name}">Dufan</td>
+                                
+                                <td class="px-6 py-4">
+                                    <span class="bg-green-900/30 text-green-300 px-2 py-1 rounded text-xs border border-green-700 font-mono">
+                                        <i class="ri-calendar-check-line mr-1"></i> 
+                                        <span th:text="${#dates.format(item.checkInDate, 'dd MMM yyyy')}"></span>
+                                    </span>
+                                </td>
+
+                                <td class="px-6 py-4 text-center text-gray-300" th:text="${item.quantity}">1</td>
+                                <td class="px-6 py-4 text-right text-green-300 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(item.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
                                 <td class="px-6 py-4 text-center">
                                     <span th:text="${item.order.status}" 
                                           th:classappend="${item.order.status.name() == 'PAID'} ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'"

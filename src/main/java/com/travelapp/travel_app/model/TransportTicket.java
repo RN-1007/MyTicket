@@ -12,7 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-// Jika Anda pakai Lombok, tambahkan @Data, @NoArgsConstructor, @AllArgsConstructor
+
 @Entity
 @Table(name = "transport_tickets")
 public class TransportTicket {
@@ -20,8 +20,12 @@ public class TransportTicket {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ticketId;
     
+    // Field baru untuk nama kelas (Ex: "Economy", "Business Class")
+    private String ticketClass; 
+    
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date departureDate;
+    private Date departureDate; // (Opsional: bisa diabaikan jika logic full di user)
+    
     private BigDecimal price;
 
     @ManyToOne
@@ -36,6 +40,14 @@ public class TransportTicket {
 
     public void setTicketId(Integer ticketId) {
         this.ticketId = ticketId;
+    }
+
+    public String getTicketClass() {
+        return ticketClass;
+    }
+
+    public void setTicketClass(String ticketClass) {
+        this.ticketClass = ticketClass;
     }
 
     public Date getDepartureDate() {

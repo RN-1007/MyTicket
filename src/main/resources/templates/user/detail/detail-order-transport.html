@@ -17,6 +17,7 @@
                    title="Kembali ke Beranda">
                     <i class="ri-arrow-left-line text-xl font-bold"></i>
                 </a>
+
                 <img th:if="${transport.image != null}" th:src="@{${transport.imagePath}}" class="w-full h-full object-cover" data-speed="0.5">
                 <img th:unless="${transport.image != null}" src="https://source.unsplash.com/random/1600x900/?airplane,train,bus" class="w-full h-full object-cover" data-speed="0.5">
                 <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-dark/50 to-brand-dark"></div>
@@ -84,18 +85,27 @@
                                 <input type="hidden" id="selectedItemId" name="itemId" th:value="${tickets != null and !tickets.isEmpty() ? tickets[0].ticketId : ''}" />
 
                                 <div th:if="${tickets != null && !tickets.isEmpty()}">
+                                    
                                     <div class="space-y-2">
-                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Schedule</label>
+                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Ticket Class</label>
                                         <div class="relative">
-                                            <select id="ticketSelect" onchange="updatePrice()" class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-4 appearance-none focus:border-purple-500 focus:ring-0 outline-none cursor-pointer transition-colors hover:bg-brand-dark/70">
+                                            <select id="ticketSelect" name="itemId" onchange="updatePrice()" class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-4 appearance-none focus:border-purple-500 focus:ring-0 outline-none cursor-pointer transition-colors hover:bg-brand-dark/70">
                                                 <option th:each="t : ${tickets}" 
                                                         th:value="${t.ticketId}" 
                                                         th:data-price="${t.price}"
-                                                        th:text="${#dates.format(t.departureDate, 'dd MMM yyyy')} + ' - Seat Available'">
-                                                    Date
+                                                        th:text="${t.ticketClass} + ' (Rp ' + ${#numbers.formatDecimal(t.price, 0, 'POINT', 0, 'COMMA')} + ')'">
+                                                    Ticket Name
                                                 </option>
                                             </select>
-                                            <i class="ri-time-line absolute right-4 top-4 text-purple-500 pointer-events-none"></i>
+                                            <i class="ri-ticket-line absolute right-4 top-4 text-purple-500 pointer-events-none"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-2">
+                                        <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Departure Date</label>
+                                        <div class="relative">
+                                            <input type="date" id="checkIn" name="checkIn" required 
+                                                   class="w-full bg-brand-dark/50 border border-white/10 text-white rounded-xl p-4 focus:border-purple-500 focus:ring-0 outline-none transition-colors [color-scheme:dark]">
                                         </div>
                                     </div>
 
@@ -103,7 +113,7 @@
                                         <label class="text-xs uppercase tracking-wider text-gray-500 font-bold">Passengers</label>
                                         <div class="flex items-center bg-brand-dark/50 border border-white/10 rounded-xl p-2">
                                             <button type="button" onclick="adjustQty(-1)" class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"><i class="ri-subtract-line"></i></button>
-                                            <input type="number" id="qtyInput" name="quantity" value="1" min="1" class="bg-transparent border-none text-center text-white font-bold w-full focus:ring-0 appearance-none">
+                                            <input type="number" id="qtyInput" name="quantity" value="1" min="1" onchange="updatePrice()" class="bg-transparent border-none text-center text-white font-bold w-full focus:ring-0 appearance-none">
                                             <button type="button" onclick="adjustQty(1)" class="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 text-white transition-colors"><i class="ri-add-line"></i></button>
                                         </div>
                                     </div>
@@ -123,7 +133,7 @@
                                     <div class="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-500">
                                         <i class="ri-calendar-close-line text-2xl"></i>
                                     </div>
-                                    <p class="text-gray-500">Jadwal belum tersedia.</p>
+                                    <p class="text-gray-500">Tiket belum tersedia.</p>
                                 </div>
                             </form>
                         </div>
@@ -133,14 +143,23 @@
             </div>
 
             <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    document.getElementById('checkIn').valueAsDate = new Date(); 
+                    updatePrice();
+                });
+
                 function updatePrice() {
                     const select = document.getElementById('ticketSelect');
                     const selectedOption = select.options[select.selectedIndex];
-                    const price = selectedOption.getAttribute('data-price');
-                    document.getElementById('selectedItemId').value = selectedOption.value;
+                    const price = parseFloat(selectedOption.getAttribute('data-price'));
+                    const qty = parseInt(document.getElementById('qtyInput').value);
                     
+                    // Update Hidden Input dengan ID tiket yang dipilih saat ini
+                    document.getElementById('selectedItemId').value = selectedOption.value;
+
+                    const total = price * qty;
                     const formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 });
-                    document.getElementById('displayPrice').innerText = formatter.format(price);
+                    document.getElementById('displayPrice').innerText = formatter.format(total);
                 }
 
                 function adjustQty(amount) {
@@ -148,6 +167,7 @@
                     let val = parseInt(input.value) + amount;
                     if(val < 1) val = 1;
                     input.value = val;
+                    updatePrice();
                 }
             </script>
         </div>

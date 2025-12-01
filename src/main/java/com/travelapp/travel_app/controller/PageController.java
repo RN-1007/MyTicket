@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.travelapp.travel_app.model.Attraction;        // Import Baru
-import com.travelapp.travel_app.model.AttractionTicket;  // Import Baru
+import com.travelapp.travel_app.model.Attraction;
+import com.travelapp.travel_app.model.AttractionTicket;
 import com.travelapp.travel_app.model.Hotel;
 import com.travelapp.travel_app.model.HotelRoom;
-import com.travelapp.travel_app.model.Transport;         // Import Baru
-import com.travelapp.travel_app.model.TransportTicket;   // Import Baru
+import com.travelapp.travel_app.model.Transport;
+import com.travelapp.travel_app.model.TransportTicket;
 import com.travelapp.travel_app.model.User;
 import com.travelapp.travel_app.service.attraction.AttractionService;
 import com.travelapp.travel_app.service.hotel.HotelService;
@@ -66,10 +66,13 @@ public class PageController {
         return "user/index"; 
     }
 
+    // --- UPDATE: SPLIT ORDER LIST ---
     @GetMapping("/my-orders")
     public String myOrdersPage(Model model, Authentication authentication) {
         String email = authentication.getName();
-        model.addAttribute("orders", orderService.findOrdersByUser(email));
+        // Pisahkan order yang belum dibayar (Keranjang) dan histori
+        model.addAttribute("pendingOrders", orderService.findPendingOrders(email));
+        model.addAttribute("historyOrders", orderService.findHistoryOrders(email));
         return "user/my-orders";
     }
 
@@ -78,56 +81,33 @@ public class PageController {
         return "user/about-us";
     }
 
-    // --- DETAIL HOTEL ---
     @GetMapping("/hotel/detail/{id}")
     public String hotelDetailPage(@PathVariable("id") Integer id, Model model) {
-        Hotel hotel = hotelService.getHotelById(id)
-                                  .orElseThrow(() -> new IllegalArgumentException("Invalid hotel Id:" + id));
-        
+        Hotel hotel = hotelService.getHotelById(id).orElseThrow(() -> new IllegalArgumentException("Invalid hotel Id:" + id));
         model.addAttribute("hotel", hotel);
-
         List<HotelRoom> roomList = new ArrayList<>();
-        if (hotel.getRooms() != null) {
-            roomList.addAll(hotel.getRooms());
-        }
+        if (hotel.getRooms() != null) roomList.addAll(hotel.getRooms());
         model.addAttribute("rooms", roomList);
-
         return "user/detail/detail-order-hotel";
     }
 
-    // --- DETAIL ATTRACTION (BARU) ---
     @GetMapping("/attraction/detail/{id}")
     public String attractionDetailPage(@PathVariable("id") Integer id, Model model) {
-        Attraction attraction = attractionService.getAttractionById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid attraction Id:" + id));
-        
+        Attraction attraction = attractionService.getAttractionById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Id:" + id));
         model.addAttribute("attraction", attraction);
-
-        // Konversi Set ke List agar mudah diakses index-nya di frontend
         List<AttractionTicket> ticketList = new ArrayList<>();
-        if (attraction.getTickets() != null) {
-            ticketList.addAll(attraction.getTickets());
-        }
+        if (attraction.getTickets() != null) ticketList.addAll(attraction.getTickets());
         model.addAttribute("tickets", ticketList);
-
-        return "user/detail/detail-order-attraction"; // Path file template baru
+        return "user/detail/detail-order-attraction";
     }
 
-    // --- DETAIL TRANSPORT (BARU) ---
     @GetMapping("/transport/detail/{id}")
     public String transportDetailPage(@PathVariable("id") Integer id, Model model) {
-        Transport transport = transportService.getTransportById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid transport Id:" + id));
-        
+        Transport transport = transportService.getTransportById(id).orElseThrow(() -> new IllegalArgumentException("Invalid Id:" + id));
         model.addAttribute("transport", transport);
-
-        // Konversi Set ke List
         List<TransportTicket> ticketList = new ArrayList<>();
-        if (transport.getTickets() != null) {
-            ticketList.addAll(transport.getTickets());
-        }
+        if (transport.getTickets() != null) ticketList.addAll(transport.getTickets());
         model.addAttribute("tickets", ticketList);
-
-        return "user/detail/detail-order-transport"; // Path file template baru
+        return "user/detail/detail-order-transport";
     }
 }
