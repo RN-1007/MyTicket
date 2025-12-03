@@ -39,7 +39,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         );
     }
 
-    // --- METHOD REGISTRASI (UPDATED) ---
+    // --- METHOD REGISTRASI (UPDATED: Validasi Password) ---
     public void registerUser(User user) throws Exception {
         
         // 1. VALIDASI WAJIB GMAIL
@@ -47,21 +47,26 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new Exception("Registrasi gagal! Harap gunakan alamat email Google (@gmail.com).");
         }
 
-        // 2. Cek apakah email sudah terdaftar
+        // 2. VALIDASI PASSWORD MINIMAL 8 KARAKTER (BARU)
+        if (user.getPassword() == null || user.getPassword().length() < 8) {
+            throw new Exception("Password harus memiliki minimal 8 karakter.");
+        }
+
+        // 3. Cek apakah email sudah terdaftar
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new Exception("Email " + user.getEmail() + " sudah terdaftar.");
         }
 
-        // 3. Enkripsi password
+        // 4. Enkripsi password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        // 4. Set role default sebagai USER
+        // 5. Set role default sebagai USER
         user.setRole(Role.ROLE_USER);
         
-        // 5. Set Active
+        // 6. Set Active
         user.setIsActive(true);
 
-        // 6. Simpan user baru
+        // 7. Simpan user baru
         userRepository.save(user);
     }
 
