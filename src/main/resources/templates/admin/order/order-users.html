@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
  <head>
-    <title>Manage Hotels</title>
+    <title>Pilih User - Order History</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
@@ -11,46 +11,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
-        .sidebar {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        /* Sembunyikan menu dropdown (transisi) */
-        .dropdown-menu {
-            overflow: hidden;
-            max-height: 0;
-            opacity: 0;
-            visibility: hidden;
-            transition: max-height 0.4s ease-out, opacity 0.3s ease-out, visibility 0s linear 0.4s;
-        }
-        
-        /* Tampilkan menu saat parent-nya punya class .open */
-        .dropdown-parent.open .dropdown-menu {
-            max-height: 200px; /* Cukup tinggi untuk 2 item */
-            opacity: 1;
-            visibility: visible;
-            transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
-        }
-        
-        /* Transisi untuk panah */
-        .arrow-icon {
-            transition: transform 0.3s ease;
-        }
-         .custom-scrollbar::-webkit-scrollbar {
-        height: 8px;
-        width: 8px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-track {
-        background: #1f2937;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #4b5563;
-        border-radius: 4px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #6b7280;
-      }
-        /* Class .rotate-180 akan ditambahkan oleh JS */
+        .sidebar { font-family: 'Poppins', sans-serif; }
+        .dropdown-menu { overflow: hidden; max-height: 0; opacity: 0; visibility: hidden; transition: all 0.4s ease; background-color: transparent !important; }
+        .dropdown-parent.open .dropdown-menu { max-height: 200px; opacity: 1; visibility: visible; }
+        .arrow-icon { transition: transform 0.3s ease; }
+        .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -64,16 +31,20 @@
                 </div>
             </div>
 
-            <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+            <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden table-container">
                 
-                <div class="p-5 border-b border-gray-700 flex items-center gap-4 bg-gray-800/50">
-                    <div class="relative w-full sm:w-72">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="ri-search-line text-gray-400"></i>
+                <div class="p-5 border-b border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-800/50">
+                    <div class="flex items-center gap-4 w-full sm:w-auto">
+                        <div class="relative w-full sm:w-72">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="ri-search-line text-gray-400"></i></div>
+                            <input type="text" id="tableSearch" class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500 transition-colors" placeholder="Cari nama atau email...">
                         </div>
-                        <input type="text" id="tableSearch" 
-                               class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500 transition-colors" 
-                               placeholder="Cari nama atau email...">
+                        <select id="rowsPerPage" class="bg-gray-900 border border-gray-600 text-gray-300 text-sm rounded-lg focus:ring-blue-500 block p-2.5 cursor-pointer rows-per-page">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
                     </div>
                 </div>
 
@@ -87,7 +58,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-700">
-                            <tr th:each="user : ${users}" class="hover:bg-gray-700/30 transition-colors duration-150 group">
+                            <tr th:each="user : ${users}" class="hover:bg-gray-700/30 transition-colors duration-150 group table-row-item">
                                 
                                 <td class="px-6 py-4 whitespace-nowrap">
                                     <div class="flex items-center gap-4">
@@ -136,48 +107,85 @@
                 </div>
                 
                 <div class="p-4 border-t border-gray-700 bg-gray-900/30 flex justify-between items-center">
-                    <span class="text-xs text-gray-500">Total User: <span class="font-semibold text-white" th:text="${#lists.size(users)}">0</span></span>
+                    <span class="text-xs text-gray-500 page-info" id="pageInfo">Menampilkan 0 data</span>
+                    <div class="flex gap-2">
+                        <button id="btnPrev" class="px-3 py-1 text-xs font-medium text-gray-400 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700 hover:text-white btn-prev">Prev</button>
+                        <button id="btnNext" class="px-3 py-1 text-xs font-medium text-gray-400 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700 hover:text-white btn-next">Next</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-                document.addEventListener("DOMContentLoaded", function() {
-                    const statusFilter = document.getElementById('statusFilter');
-                    const searchInput = document.getElementById('tableSearch');
-                    const tableRows = document.querySelectorAll('.datatable tbody tr');
+        document.addEventListener("DOMContentLoaded", function() {
+            // --- SCRIPT PAGINATION & SEARCH ---
+            const searchInput = document.getElementById('tableSearch');
+            const rowsPerPageSelect = document.getElementById('rowsPerPage');
+            const btnPrev = document.getElementById('btnPrev');
+            const btnNext = document.getElementById('btnNext');
+            const pageInfo = document.getElementById('pageInfo');
+            
+            const allRows = Array.from(document.querySelectorAll('.table-row-item'));
+            let currentPage = 1;
+            let rowsPerPage = parseInt(rowsPerPageSelect.value);
 
-                    function filterTable() {
-                        const statusValue = statusFilter.value.toUpperCase();
-                        const searchValue = searchInput.value.toLowerCase();
-
-                        tableRows.forEach(row => {
-                            // Ambil text dari seluruh baris untuk search
-                            const rowText = row.textContent.toLowerCase();
-                            
-                            // Ambil status spesifik dari badge (kita pakai atribut data-status biar akurat)
-                            const statusBadge = row.querySelector('.status-badge');
-                            const rowStatus = statusBadge ? statusBadge.getAttribute('data-status').toUpperCase() : '';
-
-                            // Cek kondisi Search AND Filter
-                            const matchesSearch = rowText.includes(searchValue);
-                            const matchesStatus = statusValue === "" || rowStatus === statusValue;
-
-                            if (matchesSearch && matchesStatus) {
-                                row.style.display = "";
-                            } else {
-                                row.style.display = "none";
-                            }
-                        });
-                    }
-
-                    // Event Listeners
-                    statusFilter.addEventListener('change', filterTable);
-                    
-                    // Kita juga pasang listener di search input (menimpa/melengkapi script global jika ada)
-                    searchInput.addEventListener('keyup', filterTable);
+            function renderTable() {
+                const searchVal = searchInput.value.toLowerCase();
+                
+                const filteredRows = allRows.filter(row => {
+                    const text = row.textContent.toLowerCase();
+                    return text.includes(searchVal);
                 });
-            </script>
+
+                const totalItems = filteredRows.length;
+                const totalPages = Math.ceil(totalItems / rowsPerPage);
+
+                if (currentPage > totalPages) currentPage = totalPages > 0 ? totalPages : 1;
+                if (currentPage < 1) currentPage = 1;
+
+                const start = (currentPage - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+
+                allRows.forEach(row => row.style.display = 'none');
+                
+                if (totalItems > 0) {
+                    filteredRows.slice(start, end).forEach(row => row.style.display = '');
+                }
+
+                const displayStart = totalItems === 0 ? 0 : start + 1;
+                const displayEnd = Math.min(end, totalItems);
+                pageInfo.textContent = `Menampilkan ${displayStart}-${displayEnd} dari ${totalItems} data`;
+
+                btnPrev.disabled = currentPage === 1;
+                btnPrev.classList.toggle('opacity-50', currentPage === 1);
+                btnPrev.classList.toggle('cursor-not-allowed', currentPage === 1);
+                
+                btnNext.disabled = currentPage >= totalPages;
+                btnNext.classList.toggle('opacity-50', currentPage >= totalPages);
+                btnNext.classList.toggle('cursor-not-allowed', currentPage >= totalPages);
+            }
+
+            searchInput.addEventListener('keyup', () => { currentPage = 1; renderTable(); });
+            rowsPerPageSelect.addEventListener('change', (e) => {
+                rowsPerPage = parseInt(e.target.value);
+                currentPage = 1;
+                renderTable();
+            });
+            btnPrev.addEventListener('click', () => {
+                if (currentPage > 1) { currentPage--; renderTable(); }
+            });
+            btnNext.addEventListener('click', () => {
+                 const searchVal = searchInput.value.toLowerCase();
+                 const filteredCount = allRows.filter(row => row.textContent.toLowerCase().includes(searchVal)).length;
+                 if (currentPage < Math.ceil(filteredCount / rowsPerPage)) {
+                    currentPage++;
+                    renderTable();
+                }
+            });
+
+            renderTable();
+        });
+    </script>
 </body>
 </html>

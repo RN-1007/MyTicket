@@ -34,11 +34,20 @@
                 </div>
             </div>
 
-            <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden">
+            <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-xl overflow-hidden table-container">
+                
                 <div class="p-5 border-b border-gray-700 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-800/50">
-                    <div class="relative w-full sm:w-72">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="ri-search-line text-gray-400"></i></div>
-                        <input type="text" id="tableSearch" class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500" placeholder="Cari nama, email...">
+                    <div class="flex items-center gap-4 w-full sm:w-auto">
+                        <div class="relative w-full sm:w-72">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="ri-search-line text-gray-400"></i></div>
+                            <input type="text" id="tableSearch" class="bg-gray-900 border border-gray-600 text-gray-200 text-sm rounded-lg focus:ring-blue-500 block w-full pl-10 p-2.5 placeholder-gray-500" placeholder="Cari nama, email...">
+                        </div>
+                        <select id="rowsPerPage" class="bg-gray-900 border border-gray-600 text-gray-300 text-sm rounded-lg focus:ring-blue-500 block p-2.5 cursor-pointer rows-per-page">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
                     </div>
                     <div class="flex gap-2">
                          <select id="roleFilter" class="bg-gray-900 border border-gray-600 text-gray-300 text-sm rounded-lg focus:ring-blue-500 block p-2.5 cursor-pointer">
@@ -61,7 +70,7 @@
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-700">
-                            <tr th:each="user : ${allUsers}" th:data-role="${user.role}" class="hover:bg-gray-700/30 transition-colors">
+                            <tr th:each="user : ${allUsers}" th:data-role="${user.role}" class="hover:bg-gray-700/30 transition-colors table-row-item">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-4">
                                         <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition"
@@ -92,7 +101,15 @@
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <div class="flex items-center justify-center gap-2">
-                                        <a th:href="@{/admin/users/status/{id}(id=${user.userId})}"
+                                        
+                                        <button th:if="${user.email == #authentication.name}" 
+                                                class="p-2 bg-gray-800 text-gray-600 rounded-lg cursor-not-allowed border border-gray-700" 
+                                                title="Akun Anda Sendiri (Tidak bisa dinonaktifkan)">
+                                            <i class="ri-lock-fill"></i>
+                                        </button>
+
+                                        <a th:unless="${user.email == #authentication.name}"
+                                           th:href="@{/admin/users/status/{id}(id=${user.userId})}"
                                            th:classappend="${user.isActive} ? 'hover:bg-red-600' : 'hover:bg-green-600'"
                                            class="p-2 bg-gray-700 text-white rounded-lg transition-colors group"
                                            th:title="${user.isActive} ? 'Nonaktifkan User' : 'Aktifkan User'">
@@ -113,6 +130,14 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+                
+                <div class="p-4 border-t border-gray-700 bg-gray-900/30 flex justify-between items-center">
+                    <span class="text-xs text-gray-500 page-info" id="pageInfo">Menampilkan 0 data</span>
+                    <div class="flex gap-2">
+                        <button id="btnPrev" class="px-3 py-1 text-xs font-medium text-gray-400 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700 hover:text-white btn-prev">Prev</button>
+                        <button id="btnNext" class="px-3 py-1 text-xs font-medium text-gray-400 bg-gray-800 rounded border border-gray-600 hover:bg-gray-700 hover:text-white btn-next">Next</button>
+                    </div>
                 </div>
             </div>
 
@@ -164,69 +189,119 @@
 
             <script th:inline="javascript">
                 document.addEventListener("DOMContentLoaded", function() {
-                    // Toast Logic
+                    // --- PAGINATION & FILTER ---
+                    const searchInput = document.getElementById('tableSearch');
+                    const roleFilter = document.getElementById('roleFilter');
+                    const rowsPerPageSelect = document.getElementById('rowsPerPage');
+                    const btnPrev = document.getElementById('btnPrev');
+                    const btnNext = document.getElementById('btnNext');
+                    const pageInfo = document.getElementById('pageInfo');
+                    
+                    const allRows = Array.from(document.querySelectorAll('.table-row-item'));
+                    let currentPage = 1;
+                    let rowsPerPage = parseInt(rowsPerPageSelect.value);
+
+                    function renderTable() {
+                        const searchVal = searchInput.value.toLowerCase();
+                        const roleVal = roleFilter.value.toUpperCase();
+                        
+                        const filteredRows = allRows.filter(row => {
+                            const text = row.textContent.toLowerCase();
+                            const rowRole = row.getAttribute('data-role') || '';
+                            
+                            const matchSearch = text.includes(searchVal);
+                            const matchRole = roleVal === "" || rowRole.includes(roleVal);
+                            
+                            return matchSearch && matchRole;
+                        });
+
+                        const totalItems = filteredRows.length;
+                        const totalPages = Math.ceil(totalItems / rowsPerPage);
+
+                        if (currentPage > totalPages) currentPage = totalPages > 0 ? totalPages : 1;
+                        if (currentPage < 1) currentPage = 1;
+
+                        const start = (currentPage - 1) * rowsPerPage;
+                        const end = start + rowsPerPage;
+
+                        allRows.forEach(row => row.style.display = 'none');
+                        if (totalItems > 0) {
+                            filteredRows.slice(start, end).forEach(row => row.style.display = '');
+                        }
+
+                        const displayStart = totalItems === 0 ? 0 : start + 1;
+                        const displayEnd = Math.min(end, totalItems);
+                        pageInfo.textContent = `Menampilkan ${displayStart}-${displayEnd} dari ${totalItems} data`;
+
+                        btnPrev.disabled = currentPage === 1;
+                        btnPrev.classList.toggle('opacity-50', currentPage === 1);
+                        btnPrev.classList.toggle('cursor-not-allowed', currentPage === 1);
+                        
+                        btnNext.disabled = currentPage >= totalPages;
+                        btnNext.classList.toggle('opacity-50', currentPage >= totalPages);
+                        btnNext.classList.toggle('cursor-not-allowed', currentPage >= totalPages);
+                    }
+
+                    searchInput.addEventListener('keyup', () => { currentPage = 1; renderTable(); });
+                    roleFilter.addEventListener('change', () => { currentPage = 1; renderTable(); });
+                    rowsPerPageSelect.addEventListener('change', (e) => {
+                        rowsPerPage = parseInt(e.target.value);
+                        currentPage = 1;
+                        renderTable();
+                    });
+                    btnPrev.addEventListener('click', () => {
+                        if (currentPage > 1) { currentPage--; renderTable(); }
+                    });
+                    btnNext.addEventListener('click', () => {
+                        // Recalculate filter count
+                        const searchVal = searchInput.value.toLowerCase();
+                        const roleVal = roleFilter.value.toUpperCase();
+                        const filteredCount = allRows.filter(row => {
+                             const text = row.textContent.toLowerCase();
+                             const rowRole = row.getAttribute('data-role') || '';
+                             return text.includes(searchVal) && (roleVal === "" || rowRole.includes(roleVal));
+                        }).length;
+
+                        if (currentPage < Math.ceil(filteredCount / rowsPerPage)) {
+                            currentPage++;
+                            renderTable();
+                        }
+                    });
+
+                    renderTable(); // Init
+
+                    // --- TOAST ---
                     const successMsg = /*[[${successMessage}]]*/ null; 
                     const errorMsg = /*[[${errorMessage}]]*/ null;
 
                     if (successMsg) {
-                        if (successMsg.toLowerCase().includes('dihapus')) {
-                            showToast(successMsg, 'delete');
-                        } else {
-                            showToast(successMsg, 'success');
-                        }
+                        if (successMsg.toLowerCase().includes('dihapus')) showToast(successMsg, 'delete');
+                        else showToast(successMsg, 'success');
                     }
                     if (errorMsg) showToast(errorMsg, 'error');
 
                     function showToast(message, type) {
                         const container = document.getElementById('toast-container');
                         const toast = document.createElement('div');
-                        
                         let borderClass, iconClass, title;
 
                         if (type === 'success') {
-                            borderClass = 'border-green-500';
-                            iconClass = 'ri-checkbox-circle-fill text-green-500';
-                            title = 'Berhasil';
+                            borderClass = 'border-green-500'; iconClass = 'ri-checkbox-circle-fill text-green-500'; title = 'Berhasil';
                         } else if (type === 'delete') {
-                            borderClass = 'border-red-500';
-                            iconClass = 'ri-delete-bin-5-fill text-red-500';
-                            title = 'Terhapus';
+                            borderClass = 'border-red-500'; iconClass = 'ri-delete-bin-5-fill text-red-500'; title = 'Terhapus';
                         } else {
-                            borderClass = 'border-red-500';
-                            iconClass = 'ri-error-warning-fill text-red-500';
-                            title = 'Gagal';
+                            borderClass = 'border-red-500'; iconClass = 'ri-error-warning-fill text-red-500'; title = 'Gagal';
                         }
 
                         toast.className = `pointer-events-auto flex items-center w-full max-w-sm p-4 rounded-lg shadow-2xl border-l-4 bg-gray-800 text-white transform transition-all duration-500 translate-x-full opacity-0 ${borderClass}`;
-                        toast.innerHTML = `
-                            <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8"><i class="${iconClass} text-2xl"></i></div>
-                            <div class="ml-3 text-sm font-normal"><span class="block font-semibold text-base mb-0.5">${title}</span><span class="text-gray-300">${message}</span></div>
-                            <button onclick="this.parentElement.remove()" class="ml-auto -mx-1.5 -my-1.5 text-gray-400 hover:text-white rounded-lg p-1.5 hover:bg-gray-700 inline-flex h-8 w-8"><i class="ri-close-line text-xl"></i></button>
-                        `;
+                        toast.innerHTML = `<div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8"><i class="${iconClass} text-2xl"></i></div><div class="ml-3 text-sm font-normal"><span class="block font-semibold text-base mb-0.5">${title}</span><span class="text-gray-300">${message}</span></div><button onclick="this.parentElement.remove()" class="ml-auto -mx-1.5 -my-1.5 text-gray-400 hover:text-white rounded-lg p-1.5 hover:bg-gray-700 inline-flex h-8 w-8"><i class="ri-close-line text-xl"></i></button>`;
                         container.appendChild(toast);
                         setTimeout(() => { toast.classList.remove('translate-x-full', 'opacity-0'); }, 10);
                         setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); setTimeout(() => toast.remove(), 500); }, 5000);
                     }
-
-                    // Table Filter
-                    const searchInput = document.getElementById('tableSearch');
-                    const roleFilter = document.getElementById('roleFilter');
-                    const rows = document.querySelectorAll('.datatable tbody tr');
-
-                    function filterTable() {
-                        const searchVal = searchInput.value.toLowerCase();
-                        const roleVal = roleFilter.value.toUpperCase();
-                        rows.forEach(row => {
-                            const text = row.textContent.toLowerCase();
-                            const rowRole = row.getAttribute('data-role') || '';
-                            row.style.display = (text.includes(searchVal) && (roleVal === "" || rowRole.includes(roleVal))) ? '' : 'none';
-                        });
-                    }
-                    if(searchInput) searchInput.addEventListener('keyup', filterTable);
-                    if(roleFilter) roleFilter.addEventListener('change', filterTable);
                 });
 
-                // User Modal Logic
+                // MODAL LOGIC
                 const modal = document.getElementById('userModal');
                 const modalTitle = document.getElementById('modalTitle');
                 const form = document.getElementById('userForm');
@@ -256,7 +331,7 @@
                     document.body.classList.remove('modal-active');
                 }
 
-                // 🔥 DELETE MODAL LOGIC
+                // DELETE MODAL LOGIC
                 const deleteModal = document.getElementById('deleteModal');
                 const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
 
@@ -273,7 +348,7 @@
                     document.body.classList.remove('modal-active');
                 }
             </script>
-            <script>if(!window.adminScriptLoaded){document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll('.dropdown-toggle').forEach(t=>{t.addEventListener('click',e=>{e.currentTarget.closest('.dropdown-parent').classList.toggle('open');const i=e.currentTarget.querySelector('.arrow-icon');if(i)i.classList.toggle('rotate-180')})})});window.adminScriptLoaded=true}</script>
+             <script>if(!window.adminScriptLoaded){document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll('.dropdown-toggle').forEach(t=>{t.addEventListener('click',e=>{e.currentTarget.closest('.dropdown-parent').classList.toggle('open');const i=e.currentTarget.querySelector('.arrow-icon');if(i)i.classList.toggle('rotate-180')})})});window.adminScriptLoaded=true}</script>
         </div>
     </div>
 </body>

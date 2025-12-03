@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Travel App Register</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -35,36 +39,69 @@
                 
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-300">Nama Lengkap</label>
-                    <input type="text" id="name" th:field="*{name}" class="w-full px-4 py-2 mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    <input type="text" id="name" th:field="*{name}" class="w-full px-4 py-2 mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none" required>
                 </div>
 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-300">Email</label>
-                    <input type="email" id="email" th:field="*{email}" class="w-full px-4 py-2 mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    <label for="email" class="block text-sm font-medium text-gray-300">Email (Wajib @gmail.com)</label>
+                    <input type="email" id="email" th:field="*{email}" 
+                           class="w-full px-4 py-2 mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none" 
+                           placeholder="nama@gmail.com"
+                           pattern=".+@gmail\.com"
+                           title="Harap gunakan alamat email dengan domain @gmail.com"
+                           required>
                 </div>
 
                 <div>
                     <label for="phone" class="block text-sm font-medium text-gray-300">Nomor Telepon</label>
-                    <input type="text" id="phone" th:field="*{phone}" class="w-full px-4 py-2 mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <input type="text" id="phone" th:field="*{phone}" 
+                          
+                           class="w-full px-4 py-2 mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none"
+                           placeholder="Contoh: 08123456789" required>
                 </div>
 
                 <div>
                     <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
-                    <input type="password" id="password" th:field="*{password}" class="w-full px-4 py-2 mt-1 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500" required>
+                    <div class="relative mt-1">
+                        <input type="password" id="password" th:field="*{password}" class="w-full px-4 py-2 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-blue-500 focus:border-blue-500 outline-none pr-10" required>
+                        
+                        <button type="button" onclick="toggleRegPassword()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white focus:outline-none">
+                            <i id="eye-icon-reg" class="ri-eye-off-line text-xl"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" class="w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg font-semibold shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-200">
                     Register
                 </button>
             </form>
-
+            
             <p class="text-center text-sm mt-4 text-gray-400">
                 Sudah punya akun? 
                 <a th:href="@{/login}" class="text-blue-400 hover:underline">Login di sini</a>
             </p>
         </div>
-
+        <!-- oninput="this.value = this.value.replace(/[^0-9]/g, '')" -->
+        
     </div> 
 </div> 
+
+<script>
+    function toggleRegPassword() {
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eye-icon-reg');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.classList.remove('ri-eye-off-line');
+            eyeIcon.classList.add('ri-eye-line');
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.classList.remove('ri-eye-line');
+            eyeIcon.classList.add('ri-eye-off-line');
+        }
+    }
+</script>
+
 </body>
 </html>

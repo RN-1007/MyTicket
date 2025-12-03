@@ -40,13 +40,15 @@
 
                 <div sec:authorize="isAuthenticated()" class="relative z-50">
                     
-                    <button id="profileBtn" type="button" onclick="toggleDropdown(event)" class="flex items-center gap-3 focus:outline-none group cursor-pointer">
+                    <button id="profileBtn" type="button" onclick="toggleProfileMenu(event)" class="flex items-center gap-3 focus:outline-none group cursor-pointer">
                         
                         <div class="text-right hidden md:block">
                             <span class="block text-sm font-bold text-white leading-none" 
-                                  sec:authentication="principal.fullName">User Name</span>
-                            <span class="text-[10px] text-brand-accent font-bold tracking-wider lowercase" 
-                                  sec:authentication="name">user@email.com</span>
+                                  th:with="names=${#strings.arraySplit(#authentication.principal.fullName, ' ')}"
+                                  th:text="${names.length > 1 ? names[0] + ' ' + names[1] : names[0]}">
+                                User Name
+                            </span>
+                            <span class="text-[10px] text-brand-accent font-bold tracking-wider uppercase mt-0.5 block">EXPLORER</span>
                         </div>
                         
                         <div class="w-10 h-10 rounded-full p-[2px] bg-gradient-to-br from-brand-accent to-purple-600 shadow-lg shadow-brand-accent/20 transition-transform group-hover:scale-105 pointer-events-none">
@@ -60,7 +62,7 @@
                         
                         <div class="p-4 border-b border-white/10 bg-white/5">
                             <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Signed in as</p>
-                            <p class="text-sm font-bold text-white truncate" sec:authentication="name">email@domain.com</p>
+                            <p class="text-sm font-bold text-white truncate" sec:authentication="name">user@email.com</p>
                         </div>
 
                         <div class="p-2">
@@ -80,8 +82,8 @@
         </div>
 
         <script>
-            // Fungsi Global agar bisa dipanggil onclick
-            function toggleDropdown(event) {
+            function toggleProfileMenu(event) {
+                // Mencegah klik menyebar ke document (yang akan menutup menu)
                 if (event) {
                     event.stopPropagation();
                     event.preventDefault();
@@ -92,7 +94,7 @@
                 if (menu) {
                     if (menu.classList.contains('hidden')) {
                         menu.classList.remove('hidden');
-                        // Animasi Sederhana
+                        // Animasi Masuk
                         menu.animate([
                             { opacity: 0, transform: 'translateY(-10px) scale(0.95)' },
                             { opacity: 1, transform: 'translateY(0) scale(1)' }
@@ -103,13 +105,14 @@
                 }
             }
 
-            // Event Listener untuk klik di luar
+            // Event Listener Global: Tutup jika klik di luar
             document.addEventListener('click', function(e) {
                 const menu = document.getElementById('profileDropdown');
                 const btn = document.getElementById('profileBtn');
 
+                // Jika menu terbuka
                 if (menu && !menu.classList.contains('hidden')) {
-                    // Jika klik bukan di menu dan bukan di tombol trigger
+                    // Jika yang diklik BUKAN menu DAN BUKAN tombol trigger
                     if (!menu.contains(e.target) && !btn.contains(e.target)) {
                         menu.classList.add('hidden');
                     }

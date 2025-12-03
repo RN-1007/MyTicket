@@ -1,7 +1,9 @@
 package com.travelapp.travel_app.controller;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors; 
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort; 
@@ -64,14 +66,25 @@ public class AdminController {
         return request.getRequestURI();
     }
 
+    // --- UPDATE DASHBOARD: Tambahkan Data Pesanan Terbaru ---
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
+        // 1. Data Counter
         model.addAttribute("hotelCount", hotelService.getHotelCount());
         model.addAttribute("transportCount", transportService.getTransportCount());
         model.addAttribute("attractionCount", attractionService.getAttractionCount());
         model.addAttribute("userCount", userService.getUserCount());
+
+        // 2. Data Transaksi Terbaru (Limit 5)
+        List<Order> recentOrders = orderRepository.findAll(Sort.by(Sort.Direction.DESC, "orderDate"))
+                                                  .stream()
+                                                  .limit(5)
+                                                  .collect(Collectors.toList());
+        model.addAttribute("recentOrders", recentOrders);
+
         return "admin/dashboard"; 
     }
+    // --------------------------------------------------------
 
     // ============================================================
     // 1. MANAGE HOTELS
@@ -164,12 +177,9 @@ public class AdminController {
     public String showTransportList(Model model) {
         model.addAttribute("transports", transportService.getAllTransports());
         model.addAttribute("transport", new Transport());
-        
-        // Tambahan untuk Form Provider
         model.addAttribute("provider", new TransportProvider()); 
         model.addAttribute("allProviders", transportProviderRepository.findAll()); 
         model.addAttribute("allTransportTypes", TransportType.values()); 
-        
         return "admin/transport/transport"; 
     }
     
@@ -371,12 +381,17 @@ public class AdminController {
     }
 
     @GetMapping("/users/status/{id}")
-    public String toggleUserStatus(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
+    public String toggleUserStatus(@PathVariable("id") Integer id, Principal principal, RedirectAttributes redirectAttributes) {
         try {
+            User targetUser = userService.findById(id).orElseThrow(() -> new RuntimeException("User tidak ditemukan"));
+            if (targetUser.getEmail().equals(principal.getName())) {
+                redirectAttributes.addFlashAttribute("errorMessage", "Tindakan Ditolak: Anda tidak bisa menonaktifkan akun sendiri!");
+                return "redirect:/admin/users";
+            }
             userService.toggleUserStatus(id);
             redirectAttributes.addFlashAttribute("successMessage", "Status User berhasil diperbarui!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Gagal memperbarui status user.");
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal memperbarui status user: " + e.getMessage());
         }
         return "redirect:/admin/users";
     }
@@ -392,10 +407,9 @@ public class AdminController {
         return "admin/order/order-list"; 
     }
 
-    // --- UPDATED: Hanya Tampilkan Customer (Non-Admin) ---
     @GetMapping("/orders")
     public String showUsersForOrders(Model model) {
-        model.addAttribute("users", userService.findAllCustomers()); // Panggil method baru
+        model.addAttribute("users", userService.findAllCustomers());
         return "admin/order/order-users"; 
     }
 
@@ -408,16 +422,11 @@ public class AdminController {
         List<OrderDetail> attractionDetails = new ArrayList<>();
         for (Order order : userOrders) {
             for (OrderDetail detail : order.getOrderDetails()) {
-                if (detail.getHotelRoom() != null) {
-                    hotelDetails.add(detail);
-                } else if (detail.getTransportTicket() != null) {
-                    transportDetails.add(detail);
-                } else if (detail.getAttractionTicket() != null) {
-                    attractionDetails.add(detail);
-                }
+                if (detail.getHotelRoom() != null) hotelDetails.add(detail);
+                else if (detail.getTransportTicket() != null) transportDetails.add(detail);
+                else if (detail.getAttractionTicket() != null) attractionDetails.add(detail);
             }
         }
-    
         model.addAttribute("user", user);
         model.addAttribute("hotelDetails", hotelDetails);
         model.addAttribute("transportDetails", transportDetails);

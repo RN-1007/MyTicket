@@ -31,32 +31,46 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
 
-        // Kita gunakan CustomUserDetails (Inner Class di bawah) agar bisa bawa Nama Lengkap
         return new CustomUserDetails(
                 user.getEmail(),
                 user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRole().name())),
-                user.getName() // <-- Masukkan Nama Asli di sini
+                user.getName()
         );
     }
 
+    // --- METHOD REGISTRASI (UPDATED) ---
     public void registerUser(User user) throws Exception {
+        
+        // 1. VALIDASI WAJIB GMAIL
+        if (user.getEmail() == null || !user.getEmail().toLowerCase().endsWith("@gmail.com")) {
+            throw new Exception("Registrasi gagal! Harap gunakan alamat email Google (@gmail.com).");
+        }
+
+        // 2. Cek apakah email sudah terdaftar
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new Exception("Email " + user.getEmail() + " sudah terdaftar.");
         }
+
+        // 3. Enkripsi password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        // 4. Set role default sebagai USER
         user.setRole(Role.ROLE_USER);
+        
+        // 5. Set Active
         user.setIsActive(true);
+
+        // 6. Simpan user baru
         userRepository.save(user);
     }
 
-    // --- CLASS TAMBAHAN (CUSTOM USER DETAILS) ---
-    // Ini memungkan kita mengakses 'principal.fullName' di HTML
+    // --- INNER CLASS (CUSTOM DETAILS) ---
     public static class CustomUserDetails implements UserDetails {
-        private String username; // Email
+        private String username;
         private String password;
         private Collection<? extends GrantedAuthority> authorities;
-        private String fullName; // Field Baru
+        private String fullName;
 
         public CustomUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities, String fullName) {
             this.username = username;
@@ -65,7 +79,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             this.fullName = fullName;
         }
 
-        public String getFullName() { return fullName; } // Getter ini dipanggil di HTML
+        public String getFullName() { return fullName; }
 
         @Override public Collection<? extends GrantedAuthority> getAuthorities() { return authorities; }
         @Override public String getPassword() { return password; }

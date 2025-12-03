@@ -180,14 +180,15 @@
             </section>
             
             <section id="hotels" class="py-20 border-t border-white/5 bg-brand-surface/30 relative z-20">
-                <div class="container mx-auto px-6 relative group/swiper"> <div class="flex justify-between items-center mb-10">
+                <div class="container mx-auto px-6 relative group/swiper">
+                    <div class="flex justify-between items-center mb-10">
                         <h2 class="text-3xl font-bold text-white">Curated <span class="text-brand-accent font-serif italic">Stays</span></h2>
                     </div>
 
                     <div class="swiper hotelSwiper overflow-visible">
                         <div class="swiper-wrapper">
                             <div th:each="hotel : ${hotels}" class="swiper-slide w-[300px] md:w-[400px]">
-                                <div class="group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-brand-accent/50 transition-colors">
+                                <a th:href="@{/hotel/detail/{id}(id=${hotel.hotelId})}" class="block group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-brand-accent/50 transition-colors cursor-pointer">
                                     <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
                                     <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/400x500/?luxury-hotel" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
                                     
@@ -207,12 +208,12 @@
                                                 <p class="text-xs text-gray-500 uppercase">Starts from</p>
                                                 <p class="text-lg font-bold text-white" th:text="'Rp ' + ${#numbers.formatDecimal(hotel.startingPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</p>
                                             </div>
-                                            <a th:href="@{/hotel/detail/{id}(id=${hotel.hotelId})}" class="w-10 h-10 rounded-full bg-white text-brand-dark flex items-center justify-center hover:bg-brand-accent transition-colors">
+                                            <div class="w-10 h-10 rounded-full bg-white text-brand-dark flex items-center justify-center group-hover:bg-brand-accent transition-colors">
                                                 <i class="ri-arrow-right-up-line"></i>
-                                            </a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -236,7 +237,7 @@
                     <div class="swiper attractionSwiper overflow-visible">
                         <div class="swiper-wrapper">
                             <div th:each="attraction : ${attractions}" class="swiper-slide w-[300px] md:w-[400px]">
-                                <div class="group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-green-500/50 transition-colors">
+                                <a th:href="@{/attraction/detail/{id}(id=${attraction.attractionId})}" class="block group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-green-500/50 transition-colors cursor-pointer">
                                     <img th:if="${attraction.image != null}" th:src="@{${attraction.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
                                     <img th:unless="${attraction.image != null}" src="https://source.unsplash.com/random/400x500/?nature,museum,park" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
                                     
@@ -261,12 +262,12 @@
                                                    th:text="'Rp ' + ${#numbers.formatDecimal(attraction.tickets[0].price, 0, 'POINT', 0, 'COMMA')}">Rp 0</p>
                                                 <p class="text-lg font-bold text-gray-500" th:if="${#lists.isEmpty(attraction.tickets)}">Check Details</p>
                                             </div>
-                                            <a th:href="@{/attraction/detail/{id}(id=${attraction.attractionId})}" class="w-10 h-10 rounded-full bg-white text-brand-dark flex items-center justify-center hover:bg-green-500 transition-colors">
+                                            <div class="w-10 h-10 rounded-full bg-white text-brand-dark flex items-center justify-center group-hover:bg-green-500 transition-colors">
                                                 <i class="ri-arrow-right-up-line"></i>
-                                            </a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -289,7 +290,7 @@
                     <div class="swiper transportSwiper overflow-visible">
                         <div class="swiper-wrapper">
                             <div th:each="transport : ${transports}" class="swiper-slide w-[300px] md:w-[400px]">
-                                <div class="group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-purple-500/50 transition-colors">
+                                <a th:href="@{/transport/detail/{id}(id=${transport.transportId})}" class="block group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-purple-500/50 transition-colors cursor-pointer">
                                     <img th:if="${transport.image != null}" th:src="@{${transport.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
                                     <img th:unless="${transport.image != null}" src="https://source.unsplash.com/random/400x500/?airplane,train,bus" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
                                     
@@ -312,12 +313,12 @@
                                                 <p class="text-xs text-gray-500 uppercase">Capacity</p>
                                                 <p class="text-lg font-bold text-white"><span th:text="${transport.capacity}">0</span> Seats</p>
                                             </div>
-                                            <a th:href="@{/transport/detail/{id}(id=${transport.transportId})}" class="w-10 h-10 rounded-full bg-white text-brand-dark flex items-center justify-center hover:bg-purple-500 transition-colors">
+                                            <div class="w-10 h-10 rounded-full bg-white text-brand-dark flex items-center justify-center group-hover:bg-purple-500 transition-colors">
                                                 <i class="ri-arrow-right-up-line"></i>
-                                            </a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </a>
                             </div>
                         </div>
                     </div>
