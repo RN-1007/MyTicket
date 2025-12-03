@@ -83,6 +83,14 @@ public class PaymentService {
         String orderIdsString = orderIds.stream().map(String::valueOf).collect(Collectors.joining(","));
         params.put("custom_field1", orderIdsString);
 
+        Map<String, String> callbacks = new HashMap<>();
+        callbacks.put("finish", "https://myticket.biz.id/my-orders"); 
+        callbacks.put("error", "https://myticket.biz.id/my-orders?error=payment_failed");
+        callbacks.put("unfinish", "https://myticket.biz.id/my-orders?warning=payment_pending");
+        params.put("callbacks", callbacks);
+
+        // https://kiara-nonzealous-evolutionarily.ngrok-free.dev
+
         // --- PERUBAHAN PENTING DISINI ---
         // Gunakan createTransactionToken, BUKAN createTransactionRedirectUrl
         return SnapApi.createTransactionToken(params);
