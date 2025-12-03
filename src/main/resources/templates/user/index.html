@@ -114,8 +114,10 @@
                 <div class="mt-12 w-full max-w-2xl z-30 hero-search opacity-0 translate-y-10">
                     <div class="glass-panel p-2 rounded-full flex items-center shadow-2xl shadow-brand-accent/10 bg-brand-dark/60 backdrop-blur-xl border-brand-accent/20">
                         <div class="pl-6 text-gray-400"><i class="ri-search-2-line text-xl"></i></div>
-                        <input type="text" placeholder="Cari destinasi impianmu..." class="w-full bg-transparent border-none text-white px-4 py-3 focus:ring-0 focus:outline-none placeholder-gray-400 text-lg">
-                        <button class="bg-brand-accent hover:bg-orange-600 text-brand-dark font-bold px-8 py-3 rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-brand-accent/20">
+                        
+                        <input type="text" id="heroSearchInput" placeholder="Cari destinasi impianmu..." class="w-full bg-transparent border-none text-white px-4 py-3 focus:ring-0 focus:outline-none placeholder-gray-400 text-lg">
+                        
+                        <button id="heroSearchBtn" onclick="scrollToResults()" class="bg-brand-accent hover:bg-orange-600 text-brand-dark font-bold px-8 py-3 rounded-full transition-transform hover:scale-105 active:scale-95 shadow-lg shadow-brand-accent/20">
                             Explore
                         </button>
                     </div>
@@ -349,11 +351,14 @@
                     // BENTO GRID ANIMATION
                     gsap.from(".bento-item", { scrollTrigger: { trigger: ".bento-item", start: "top 85%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power2.out" });
 
-                    // --- SWIPER CONFIGURATIONS ---
+                    // --- SWIPER CONFIGURATIONS (UPDATED for Filter) ---
                     const swiperConfig = {
                         slidesPerView: 1.2,
                         spaceBetween: 20,
                         centeredSlides: false,
+                        // TAMBAHAN PENTING UNTUK FILTER:
+                        observer: true,
+                        observeParents: true,
                         breakpoints: {
                             640: { slidesPerView: 2.2, spaceBetween: 20 },
                             1024: { slidesPerView: 3.2, spaceBetween: 30 },
@@ -386,7 +391,34 @@
                             prevEl: ".swiper-prev-trans",
                         },
                     });
+
+                    // --- SEARCH FILTER LOGIC (ADDED) ---
+                    const searchInput = document.getElementById('heroSearchInput');
+                    if (searchInput) {
+                        searchInput.addEventListener('keyup', function() {
+                            const query = this.value.toLowerCase();
+                            // Select all slides across all swipers
+                            const allSlides = document.querySelectorAll('.swiper-slide');
+
+                            allSlides.forEach(slide => {
+                                const text = slide.textContent.toLowerCase();
+                                if (text.includes(query)) {
+                                    slide.style.display = '';
+                                } else {
+                                    slide.style.display = 'none';
+                                }
+                            });
+                        });
+                    }
                 });
+
+                // FUNCTION TO SCROLL TO RESULTS
+                function scrollToResults() {
+                    const target = document.getElementById('hotels');
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
             </script>
         </div>
     </div>
