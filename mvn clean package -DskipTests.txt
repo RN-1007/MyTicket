@@ -1,0 +1,6 @@
+mvn clean package -DskipTests
+
+# Ganti IP dengan IP VPS Anda (116.193.190.195)
+scp target/travel-app-0.0.1-SNAPSHOT.jar root@116.193.190.195:/var/www/travelapp.jar
+
+systemctl restart travelapp
