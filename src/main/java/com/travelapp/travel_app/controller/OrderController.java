@@ -14,13 +14,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.travelapp.travel_app.model.ItemType;
 import com.travelapp.travel_app.service.user.OrderService;
+import com.travelapp.travel_app.service.user.PaymentService;
 
 @Controller
 public class OrderController {
 
-    @Autowired
-    private OrderService orderService;
+    @Autowired private OrderService orderService;
+    @Autowired private PaymentService paymentService;
 
+    // Create Order (Tidak berubah)
     @PostMapping("/order/create")
     public String createOrder(
             @RequestParam("itemType") ItemType itemType,
@@ -30,17 +32,16 @@ public class OrderController {
             @RequestParam(value = "checkOut", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date checkOut,
             Authentication authentication,
             RedirectAttributes redirectAttributes) {
-
         try {
             orderService.createNewOrder(itemType, itemId, quantity, authentication.getName(), checkIn, checkOut);
             redirectAttributes.addFlashAttribute("successMessage", "Item berhasil ditambahkan ke keranjang!");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Gagal menambahkan ke keranjang: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Gagal: " + e.getMessage());
         }
-
         return "redirect:/my-orders"; 
     }
 
+    // --- UPDATE: CHECKOUT MENGGUNAKAN POPUP ---
     @PostMapping("/order/checkout")
     public String processCheckout(@RequestParam(value = "orderIds", required = false) List<Integer> orderIds, 
                                   RedirectAttributes redirectAttributes) {
@@ -50,19 +51,28 @@ public class OrderController {
         }
 
         try {
-            orderService.payMultipleOrders(orderIds);
-            redirectAttributes.addFlashAttribute("successMessage", "Pembayaran Berhasil! Tiket Anda telah diterbitkan.");
+            // 1. Minta TOKEN ke Midtrans (bukan URL lagi)
+            String snapToken = paymentService.getSnapToken(orderIds);
+            
+            // 2. Kirim Token ke Frontend via FlashAttribute
+            // Token ini akan ditangkap oleh JavaScript di halaman my-orders
+            redirectAttributes.addFlashAttribute("snapToken", snapToken);
+            
         } catch (Exception e) {
+            e.printStackTrace();
             redirectAttributes.addFlashAttribute("errorMessage", "Gagal memproses pembayaran: " + e.getMessage());
         }
+        
+        // Tetap di halaman yang sama, nanti JS yang akan buka popup
         return "redirect:/my-orders";
     }
 
+    // Cancel Order (Tidak berubah)
     @PostMapping("/order/cancel/{id}")
     public String cancelOrder(@PathVariable("id") Integer id, RedirectAttributes redirectAttributes) {
         try {
             orderService.cancelOrder(id);
-            redirectAttributes.addFlashAttribute("successMessage", "Item berhasil dihapus dari pesanan.");
+            redirectAttributes.addFlashAttribute("successMessage", "Item berhasil dihapus.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Gagal menghapus item: " + e.getMessage());
         }
