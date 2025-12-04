@@ -26,8 +26,8 @@
                 <h2 class="text-sm font-medium text-gray-400 mb-1">Total Hotels</h2>
                 <p class="text-3xl font-bold text-white" th:text="${hotelCount}">0</p>
             </div>
-            <div class="p-3 bg-blue-500/10 rounded-xl text-blue-500">
-                <i class="ri-building-2-line text-3xl"></i>
+            <div class="p-3 bg-blue-500/10 rounded-xl text-blue-500 border border-blue-500/20">
+                <i class="ri-building-2-line text-2xl"></i>
             </div>
           </div>
 
@@ -36,8 +36,8 @@
                 <h2 class="text-sm font-medium text-gray-400 mb-1">Total Transports</h2>
                 <p class="text-3xl font-bold text-white" th:text="${transportCount}">0</p>
             </div>
-            <div class="p-3 bg-purple-500/10 rounded-xl text-purple-500">
-                <i class="ri-bus-2-line text-3xl"></i>
+            <div class="p-3 bg-purple-500/10 rounded-xl text-purple-500 border border-purple-500/20">
+                <i class="ri-bus-2-line text-2xl"></i>
             </div>
           </div>
 
@@ -46,8 +46,8 @@
                 <h2 class="text-sm font-medium text-gray-400 mb-1">Total Attractions</h2>
                 <p class="text-3xl font-bold text-white" th:text="${attractionCount}">0</p>
             </div>
-            <div class="p-3 bg-green-500/10 rounded-xl text-green-500">
-                <i class="ri-camera-lens-line text-3xl"></i>
+            <div class="p-3 bg-green-500/10 rounded-xl text-green-500 border border-green-500/20">
+                <i class="ri-camera-lens-line text-2xl"></i>
             </div>
           </div>
 
@@ -56,8 +56,8 @@
                 <h2 class="text-sm font-medium text-gray-400 mb-1">Total Users</h2>
                 <p class="text-3xl font-bold text-white" th:text="${userCount}">0</p>
             </div>
-            <div class="p-3 bg-yellow-500/10 rounded-xl text-yellow-500">
-                <i class="ri-group-line text-3xl"></i>
+            <div class="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 border border-yellow-500/20">
+                <i class="ri-group-line text-2xl"></i>
             </div>
           </div>
 
@@ -65,8 +65,8 @@
 
         <div class="mt-8 bg-gray-800 border border-gray-700 rounded-lg shadow-lg overflow-hidden">
           <div class="p-5 border-b border-gray-700 flex justify-between items-center bg-gray-800/50">
-             <h2 class="text-xl font-semibold text-white">
-                <i class="ri-time-line mr-2 text-blue-500"></i> Transaksi Terbaru
+             <h2 class="text-xl font-semibold text-white flex items-center gap-2">
+                <i class="ri-time-line text-blue-500"></i> Transaksi Terbaru
              </h2>
              <a th:href="@{/admin/transactions}" class="text-sm text-blue-400 hover:text-blue-300 hover:underline">Lihat Semua</a>
           </div>
@@ -84,25 +84,32 @@
                   </thead>
                   <tbody class="divide-y divide-gray-700">
                       <tr th:each="order : ${recentOrders}" class="hover:bg-gray-700/30 transition-colors">
-                          <td class="px-6 py-4 text-blue-400 font-mono" th:text="'#' + ${order.orderId}">#1</td>
+                          <td class="px-6 py-4 text-blue-400 font-mono font-semibold" th:text="'#' + ${order.orderId}">#1</td>
                           <td class="px-6 py-4 text-white font-medium">
-                              <div class="flex items-center gap-2">
-                                  <div class="w-6 h-6 rounded-full bg-gray-600 flex items-center justify-center text-[10px] text-white" th:text="${#strings.substring(order.user.name, 0, 1)}">U</div>
-                                  <span th:text="${order.user.name}">Name</span>
+                              <div class="flex items-center gap-3">
+                                  <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-white font-bold border border-gray-600" 
+                                       th:text="${order.user != null ? #strings.substring(order.user.name, 0, 1) : '?'}">U</div>
+                                  <div class="flex flex-col">
+                                      <span th:text="${order.user != null ? order.user.name : 'Unknown'}">Name</span>
+                                      <span class="text-xs text-gray-500" th:text="${order.user != null ? order.user.email : '-'}">Email</span>
+                                  </div>
                               </div>
                           </td>
-                          <td class="px-6 py-4 text-gray-400" th:text="${#dates.format(order.orderDate, 'dd MMM HH:mm')}">Date</td>
+                          <td class="px-6 py-4 text-gray-400" th:text="${#dates.format(order.orderDate, 'dd MMM yyyy, HH:mm')}">Date</td>
                           <td class="px-6 py-4 text-right text-emerald-400 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(#aggregates.sum(order.orderDetails.![totalPrice]), 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
                           <td class="px-6 py-4 text-center">
                               <span th:text="${order.status}" 
                                     th:classappend="${order.status.name() == 'PAID'} ? 'bg-green-900/30 text-green-400 border-green-800' : 'bg-red-900/30 text-red-400 border-red-800'"
-                                    class="px-2 py-1 rounded text-[10px] font-bold uppercase border inline-block min-w-[60px]">
+                                    class="px-3 py-1 rounded-full text-xs font-bold uppercase border inline-block min-w-[80px]">
                                   Status
                               </span>
                           </td>
                       </tr>
                       <tr th:if="${#lists.isEmpty(recentOrders)}">
-                          <td colspan="5" class="px-6 py-8 text-center text-gray-500 italic">Belum ada transaksi terbaru.</td>
+                          <td colspan="5" class="px-6 py-12 text-center text-gray-500 italic">
+                              <i class="ri-inbox-line text-4xl mb-2 block opacity-50"></i>
+                              Belum ada transaksi terbaru.
+                          </td>
                       </tr>
                   </tbody>
               </table>

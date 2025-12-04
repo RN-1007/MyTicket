@@ -3,15 +3,15 @@ package com.travelapp.travel_app.controller;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors; 
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort; 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute; 
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,23 +20,23 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.travelapp.travel_app.model.Attraction;
-import com.travelapp.travel_app.model.AttractionTicket; 
+import com.travelapp.travel_app.model.AttractionTicket;
 import com.travelapp.travel_app.model.Category;
 import com.travelapp.travel_app.model.Hotel;
-import com.travelapp.travel_app.model.HotelRoom; 
+import com.travelapp.travel_app.model.HotelRoom;
 import com.travelapp.travel_app.model.Order;
 import com.travelapp.travel_app.model.OrderDetail;
 import com.travelapp.travel_app.model.Role;
 import com.travelapp.travel_app.model.Transport;
 import com.travelapp.travel_app.model.TransportProvider;
-import com.travelapp.travel_app.model.TransportTicket; 
+import com.travelapp.travel_app.model.TransportTicket;
 import com.travelapp.travel_app.model.TransportType;
 import com.travelapp.travel_app.model.User;
 import com.travelapp.travel_app.repository.UserRepository;
 import com.travelapp.travel_app.repository.order.OrderRepository;
 import com.travelapp.travel_app.repository.transport.TransportProviderRepository;
 import com.travelapp.travel_app.service.attraction.AttractionService;
-import com.travelapp.travel_app.service.attraction.AttractionTicketService; 
+import com.travelapp.travel_app.service.attraction.AttractionTicketService;
 import com.travelapp.travel_app.service.hotel.HotelRoomService;
 import com.travelapp.travel_app.service.hotel.HotelService;
 import com.travelapp.travel_app.service.transport.TransportService;
@@ -53,8 +53,8 @@ public class AdminController {
     @Autowired private HotelService hotelService;
     @Autowired private TransportService transportService;
     @Autowired private AttractionService attractionService;
-    @Autowired private TransportProviderRepository transportProviderRepository; 
-    @Autowired private UserRepository userRepository; 
+    @Autowired private TransportProviderRepository transportProviderRepository;
+    @Autowired private UserRepository userRepository;
     @Autowired private OrderRepository orderRepository;
     @Autowired private HotelRoomService hotelRoomService;
     @Autowired private TransportTicketService transportTicketService;
@@ -66,7 +66,9 @@ public class AdminController {
         return request.getRequestURI();
     }
 
-    // --- UPDATE DASHBOARD: Tambahkan Data Pesanan Terbaru ---
+    // ============================================================
+    // DASHBOARD (SORTING DIPERBAIKI)
+    // ============================================================
     @GetMapping("/dashboard")
     public String dashboard(Model model) {
         // 1. Data Counter
@@ -75,16 +77,17 @@ public class AdminController {
         model.addAttribute("attractionCount", attractionService.getAttractionCount());
         model.addAttribute("userCount", userService.getUserCount());
 
-        // 2. Data Transaksi Terbaru (Limit 5)
-        List<Order> recentOrders = orderRepository.findAll(Sort.by(Sort.Direction.DESC, "orderDate"))
-                                                  .stream()
-                                                  .limit(5)
-                                                  .collect(Collectors.toList());
+        // 2. Data Transaksi Terbaru (5 Teratas)
+        // Sort: Tanggal Terbaru (DESC), jika tanggal sama lihat ID (DESC)
+        List<Order> recentOrders = orderRepository.findAll(Sort.by(
+                Sort.Order.desc("orderDate"),
+                Sort.Order.desc("orderId")
+        )).stream().limit(5).collect(Collectors.toList());
+        
         model.addAttribute("recentOrders", recentOrders);
 
-        return "admin/dashboard"; 
+        return "admin/dashboard";
     }
-    // --------------------------------------------------------
 
     // ============================================================
     // 1. MANAGE HOTELS
@@ -397,12 +400,16 @@ public class AdminController {
     }
 
     // ============================================================
-    // 8. TRANSACTION & ORDERS
+    // 8. TRANSACTION & ORDERS (SORTING DIPERBAIKI JUGA)
     // ============================================================
 
     @GetMapping("/transactions")
     public String showTransactionList(Model model) {
-        List<Order> allOrders = orderRepository.findAll(Sort.by(Sort.Direction.DESC, "orderDate"));
+        // Sort: Tanggal Terbaru (DESC)
+        List<Order> allOrders = orderRepository.findAll(Sort.by(
+                Sort.Order.desc("orderDate"),
+                Sort.Order.desc("orderId")
+        ));
         model.addAttribute("allOrders", allOrders);
         return "admin/order/order-list"; 
     }
