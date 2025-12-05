@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="'Invoice #' + ${order.orderId} + ' - MyTicket'">MyTicket</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                    colors: {
+                        brand: { dark: '#0B0F19', accent: '#FF8A5B' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0B0F19; color: #E2E8F0; }
+        
+        /* PRINT STYLES: Agar saat dicetak background jadi putih dan hemat tinta */
+        @media print {
+            body { background-color: white; color: black; margin: 0; padding: 0; }
+            .no-print { display: none !important; }
+            .print-container { box-shadow: none !important; border: none !important; max-width: 100% !important; }
+            .print-text-dark { color: #000 !important; }
+            .print-border { border: 1px solid #ddd !important; }
+            .print-bg-white { background-color: white !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6 print:p-0">
+
+    <div class="print-container w-full max-w-3xl bg-[#151C2C] rounded-3xl shadow-2xl overflow-hidden border border-white/5 relative print-bg-white">
+        
+        <div class="absolute top-0 right-0 w-64 h-64 bg-brand-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none no-print"></div>
+
+        <div class="p-8 border-b border-white/10 flex justify-between items-start relative z-10 print-border">
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-br from-[#FF8A5B] to-orange-600 rounded-lg flex items-center justify-center text-white font-bold no-print">
+                        <i class="ri-rocket-2-fill"></i>
+                    </div>
+                    <span class="text-2xl font-bold text-white print-text-dark">MyTicket<span class="text-brand-accent">.</span></span>
+                </div>
+                <p class="text-sm text-gray-400 print-text-dark">Official Payment Receipt</p>
+                <p class="text-xs text-gray-500 mt-1 print-text-dark">PT. Travel App Indonesia</p>
+            </div>
+            <div class="text-right">
+                <h1 class="text-xl font-bold text-white mb-1 print-text-dark">INVOICE</h1>
+                <p class="text-brand-accent font-mono font-medium print-text-dark" th:text="'#' + ${order.orderId}">#12345</p>
+                
+                <div class="mt-2 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-500/10 text-green-400 border border-green-500/20 text-xs font-bold uppercase no-print">
+                    <i class="ri-checkbox-circle-fill"></i> PAID
+                </div>
+                <p class="hidden print:block text-sm font-bold text-green-600 mt-1">STATUS: PAID LUNAS</p>
+            </div>
+        </div>
+
+        <div class="p-8 grid grid-cols-2 gap-8 text-sm">
+            <div>
+                <p class="text-gray-500 mb-1 uppercase tracking-wider text-xs">Billed To</p>
+                <p class="text-white font-bold text-lg print-text-dark" th:text="${order.user.name}">Nama User</p>
+                <p class="text-gray-400 print-text-dark" th:text="${order.user.email}">user@email.com</p>
+                <p class="text-gray-400 print-text-dark" th:text="${order.user.phone}">0812...</p>
+            </div>
+            <div class="text-right">
+                <p class="text-gray-500 mb-1 uppercase tracking-wider text-xs">Payment Date</p>
+                <p class="text-white font-bold text-lg print-text-dark" th:text="${#dates.format(order.orderDate, 'dd MMMM yyyy')}">01 Jan 2025</p>
+                <p class="text-gray-400 print-text-dark" th:text="${#dates.format(order.orderDate, 'HH:mm') + ' WIB'}">12:00 WIB</p>
+            </div>
+        </div>
+
+        <div class="px-8 pb-8">
+            <div class="rounded-xl overflow-hidden border border-white/5 print-border">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-white/5 text-gray-400 border-b border-white/5 print-text-dark print-border print-bg-white">
+                        <tr>
+                            <th class="p-4 font-medium">Item Description</th>
+                            <th class="p-4 font-medium text-center">Type</th>
+                            <th class="p-4 font-medium text-center">Qty</th>
+                            <th class="p-4 font-medium text-right">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5 text-gray-300 print-text-dark">
+                        <tr th:each="detail : ${order.orderDetails}">
+                            <td class="p-4">
+                                <div class="font-bold text-white print-text-dark">
+                                    <span th:if="${detail.hotelRoom != null}" th:text="${detail.hotelRoom.hotel.name}">Hotel Name</span>
+                                    <span th:if="${detail.attractionTicket != null}" th:text="${detail.attractionTicket.attraction.name}">Attraction Name</span>
+                                    <span th:if="${detail.transportTicket != null}" th:text="${detail.transportTicket.transport.name}">Transport Name</span>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-0.5 print-text-dark">
+                                    <span th:if="${detail.hotelRoom != null}" th:text="${detail.hotelRoom.roomType}">Room Type</span>
+                                    <span th:if="${detail.attractionTicket != null}" th:text="${detail.attractionTicket.ticketType}">Ticket Type</span>
+                                    <span th:if="${detail.transportTicket != null}" th:text="${detail.transportTicket.ticketClass}">Class</span>
+                                </div>
+                                <div class="text-xs text-brand-accent mt-1 print-text-dark">
+                                    <span th:text="${#dates.format(detail.checkInDate, 'dd MMM yyyy')}">Date</span>
+                                    <span th:if="${detail.checkOutDate != null}" th:text="' - ' + ${#dates.format(detail.checkOutDate, 'dd MMM yyyy')}"></span>
+                                </div>
+                            </td>
+                            <td class="p-4 text-center">
+                                <span class="px-2 py-1 rounded text-[10px] font-bold uppercase bg-white/5 border border-white/10 print-border"
+                                      th:text="${detail.hotelRoom != null ? 'HOTEL' : (detail.attractionTicket != null ? 'TICKET' : 'TRANSPORT')}">TYPE</span>
+                            </td>
+                            <td class="p-4 text-center font-mono" th:text="${detail.quantity}">1</td>
+                            <td class="p-4 text-right font-mono font-medium" th:text="'Rp ' + ${#numbers.formatDecimal(detail.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="px-8 pb-8 flex flex-col items-end">
+            <div class="w-full md:w-1/2 border-t border-white/10 pt-4 space-y-2">
+                <div class="flex justify-between text-gray-400 text-sm print-text-dark">
+                    <span>Subtotal</span>
+                    <span th:text="'Rp ' + ${#numbers.formatDecimal(grandTotal, 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
+                </div>
+                <div class="flex justify-between text-gray-400 text-sm print-text-dark">
+                    <span>Tax & Service (Included)</span>
+                    <span>Rp 0</span>
+                </div>
+                <div class="flex justify-between items-center pt-4 mt-2 border-t border-white/10 print-border">
+                    <span class="text-white font-bold print-text-dark text-lg">Total Payment</span>
+                    <span class="text-3xl font-bold text-brand-accent print-text-dark" th:text="'Rp ' + ${#numbers.formatDecimal(grandTotal, 0, 'POINT', 0, 'COMMA')}">Rp 0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-[#0B0F19] p-6 text-center border-t border-white/5 no-print">
+            <p class="text-gray-500 text-xs mb-6">Terima kasih telah mempercayai MyTicket.</p>
+            <div class="flex justify-center gap-4">
+                <a th:href="@{/my-orders}" class="px-6 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:bg-white/5 hover:text-white transition-colors text-sm font-medium flex items-center gap-2">
+                    <i class="ri-arrow-left-line"></i> Kembali
+                </a>
+                <button onclick="window.print()" class="px-6 py-2.5 rounded-xl bg-brand-accent hover:bg-orange-600 text-brand-dark font-bold transition-all shadow-lg shadow-orange-500/20 text-sm flex items-center gap-2">
+                    <i class="ri-printer-line"></i> Cetak / Simpan PDF
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

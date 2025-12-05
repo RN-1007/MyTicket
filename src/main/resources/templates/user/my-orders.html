@@ -9,91 +9,28 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
-        /* --- CUSTOM CHECKBOX --- */
-        .cosmic-checkbox {
-            appearance: none; width: 1.5rem; height: 1.5rem;
-            border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.05); cursor: pointer;
-            transition: all 0.3s ease; display: flex; align-items: center; justify-content: center;
-        }
-        .cosmic-checkbox:checked {
-            background-color: #FF8A5B; border-color: #FF8A5B;
-            box-shadow: 0 0 15px rgba(255, 138, 91, 0.5);
-        }
-        .cosmic-checkbox:checked::after {
-            content: '✔'; color: #0B0F19; font-size: 0.8rem; font-weight: 900;
-        }
-
-        /* --- FLOATING CHECKOUT BAR --- */
+        /* CSS TETAP SAMA (Cosmic Theme) */
+        .cosmic-checkbox { appearance: none; width: 1.5rem; height: 1.5rem; border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 50%; background-color: rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; }
+        .cosmic-checkbox:checked { background-color: #FF8A5B; border-color: #FF8A5B; box-shadow: 0 0 15px rgba(255, 138, 91, 0.5); }
+        .cosmic-checkbox:checked::after { content: '✔'; color: #0B0F19; font-size: 0.8rem; font-weight: 900; }
         #checkout-bar { transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 50; }
         #checkout-bar.hidden-bar { transform: translateY(150%) scale(0.95); opacity: 0; pointer-events: none; }
-        
-        /* --- CARD HOVER --- */
         .order-card { transition: all 0.3s ease; border: 1px solid rgba(255, 255, 255, 0.05); }
-        .order-card:hover {
-            background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 138, 91, 0.4);
-            transform: translateY(-2px); box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-        }
-
-        /* --- CUSTOM SCROLLBAR --- */
+        .order-card:hover { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 138, 91, 0.4); transform: translateY(-2px); box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5); }
         #selected-items-container::-webkit-scrollbar { width: 4px; }
         #selected-items-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
         #selected-items-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
-
-        /* --- SEARCH BOX ANIMATION (SQUARE FIXED) --- */
-        .search-container {
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, box-shadow 0.3s;
-            overflow: hidden;
-            width: 4rem; height: 4rem; /* KOTAK */
-            background: linear-gradient(135deg, #FF8A5B 0%, #ea580c 100%);
-            position: relative; cursor: pointer; border-radius: 0.75rem;
-            box-shadow: 0 10px 25px -5px rgba(255, 138, 91, 0.4);
-        }
-        .search-container.expanded {
-            width: 22rem; box-shadow: 0 0 30px rgba(255, 138, 91, 0.3);
-        }
-        
-        .search-input {
-            opacity: 0; width: 100%; height: 100%; position: absolute; left: 0; top: 0;
-            background: transparent; border: none; color: white; font-weight: 500;
-            padding-left: 3.5rem; padding-right: 3.5rem; z-index: 10;
-            transition: opacity 0.3s ease 0.1s; pointer-events: none;
-        }
+        .search-container { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, box-shadow 0.3s; overflow: hidden; width: 4rem; height: 4rem; background: linear-gradient(135deg, #FF8A5B 0%, #ea580c 100%); position: relative; cursor: pointer; border-radius: 0.75rem; box-shadow: 0 10px 25px -5px rgba(255, 138, 91, 0.4); }
+        .search-container.expanded { width: 22rem; box-shadow: 0 0 30px rgba(255, 138, 91, 0.3); }
+        .search-input { opacity: 0; width: 100%; height: 100%; position: absolute; left: 0; top: 0; background: transparent; border: none; color: white; font-weight: 500; padding-left: 3.5rem; padding-right: 3.5rem; z-index: 10; transition: opacity 0.3s ease 0.1s; pointer-events: none; }
         .search-container.expanded .search-input { opacity: 1; pointer-events: auto; }
         .search-input::placeholder { color: rgba(255, 255, 255, 0.8); }
-
-        /* Magnifier: Tengah saat tutup, Kiri saat buka */
-        .search-magnifier {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-            color: #FFFFFF; opacity: 1; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            pointer-events: none; font-size: 1.5rem; z-index: 25;
-        }
+        .search-magnifier { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #FFFFFF; opacity: 1; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); pointer-events: none; font-size: 1.5rem; z-index: 25; }
         .search-container.expanded .search-magnifier { left: 1.5rem; transform: translate(0, -50%); }
-
-        /* Glasses Icon: Kanan */
-        .search-icon-btn {
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: absolute; right: 0; top: 0;
-            height: 100%; width: 4rem; display: flex; align-items: center; justify-content: center;
-            z-index: 20; opacity: 0; transform: scale(0.5) rotate(-90deg);
-        }
+        .search-icon-btn { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); position: absolute; right: 0; top: 0; height: 100%; width: 4rem; display: flex; align-items: center; justify-content: center; z-index: 20; opacity: 0; transform: scale(0.5) rotate(-90deg); }
         .search-container.expanded .search-icon-btn { opacity: 1; transform: scale(1) rotate(0deg); }
-
-        /* --- SWEETALERT THEME --- */
-        div:where(.swal2-container) div:where(.swal2-popup) {
-            background: #151C2C !important; border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1.5rem; color: #E2E8F0;
-        }
+        div:where(.swal2-container) div:where(.swal2-popup) { background: #151C2C !important; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 1.5rem; color: #E2E8F0; }
         div:where(.swal2-container) h2:where(.swal2-title) { color: #fff; }
-        div:where(.swal2-icon).swal2-warning { border-color: #FBBF24; color: #FBBF24; }
-        div:where(.swal2-icon).swal2-error { border-color: #EF4444; color: #EF4444; }
-        div:where(.swal2-icon).swal2-success { border-color: #10B981; color: #10B981; }
-        div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
-            background: linear-gradient(135deg, #FF8A5B 0%, #ea580c 100%) !important;
-            border-radius: 0.75rem; font-weight: bold; box-shadow: 0 4px 15px rgba(255, 138, 91, 0.4);
-        }
-        div:where(.swal2-container) button:where(.swal2-styled).swal2-cancel {
-            background: rgba(255, 255, 255, 0.1) !important; border-radius: 0.75rem; color: #ccc;
-        }
     </style>
 </head>
 <body>
@@ -106,19 +43,16 @@
                 
                 <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
                     <div class="flex items-center gap-5">
-                        
                         <div class="search-container shadow-2xl shadow-brand-accent/20" onclick="toggleSearch(this)">
                             <div class="search-magnifier"><i class="ri-search-2-line"></i></div>
                             <input type="text" id="orderSearchInput" class="search-input" placeholder="Cari pesanan..." onclick="event.stopPropagation()" autocomplete="off">
                             <div class="search-icon-btn text-white text-2xl"><i class="ri-sunglasses-fill"></i></div>
                         </div>
-
                         <div>
                             <h1 class="text-4xl font-bold text-white tracking-tight">My <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-accent to-yellow-200 font-serif italic">Journeys</span></h1>
                             <p class="text-gray-400 mt-1">Kelola dan bayar tiket perjalanan Anda.</p>
                         </div>
                     </div>
-
                     <div class="glass-panel p-1.5 rounded-2xl flex gap-2 bg-white/5 border border-white/10">
                         <button onclick="switchTab('pending')" id="tab-pending" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all bg-brand-accent text-brand-dark shadow-lg shadow-brand-accent/20 flex items-center gap-2">
                             Waiting Payment <span class="bg-brand-dark/20 px-2 py-0.5 rounded-md text-xs" th:text="${#lists.size(pendingOrders)}">0</span>
@@ -145,7 +79,6 @@
                             <p class="text-gray-500 mb-8 mt-2 text-sm">Belum ada item yang menunggu pembayaran.</p>
                             <a th:href="@{/}" class="px-8 py-3 rounded-full border border-white/20 text-white hover:bg-brand-accent hover:text-brand-dark hover:border-brand-accent transition-all font-medium">Mulai Petualangan</a>
                         </div>
-
                         <div th:each="order : ${pendingOrders}" class="order-card glass-panel rounded-3xl flex items-center overflow-hidden bg-brand-dark/30 backdrop-blur-md relative searchable-item">
                             <div class="w-16 self-stretch flex items-center justify-center border-r border-white/5 bg-white/[0.02] cursor-pointer hover:bg-white/[0.05] transition-colors" onclick="if(event.target.tagName !== 'INPUT') this.querySelector('input').click()">
                                 <input type="checkbox" name="orderIds" th:value="${order.orderId}" th:data-price="${#aggregates.sum(order.orderDetails.![totalPrice])}" onchange="calculateTotal(); event.stopPropagation();" class="cosmic-checkbox">
@@ -170,7 +103,6 @@
                                         </div>
                                         <div class="flex items-center gap-6 w-full md:w-auto justify-between md:justify-end">
                                             <div class="text-right"><p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Total</p><p class="text-2xl font-bold text-brand-accent font-sans" th:text="'Rp ' + ${#numbers.formatDecimal(detail.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</p></div>
-                                            
                                             <button type="button" th:onclick="'cancelOrder(' + ${order.orderId} + ')'" class="w-10 h-10 rounded-full border border-white/10 text-gray-400 hover:bg-red-500/10 hover:text-red-500 hover:border-red-500/50 transition-all flex items-center justify-center" title="Hapus Item"><i class="ri-delete-bin-line"></i></button>
                                         </div>
                                     </div>
@@ -185,15 +117,29 @@
 
                     <div id="history-section" class="hidden space-y-4 pb-20">
                          <div th:if="${#lists.isEmpty(historyOrders)}" class="text-center py-20 text-gray-500"><i class="ri-history-line text-4xl mb-4 block opacity-50"></i>Belum ada riwayat transaksi selesai.</div>
-                        <div th:each="order : ${historyOrders}" class="glass-panel p-5 rounded-2xl flex flex-col md:flex-row items-center gap-6 border border-white/5 opacity-60 hover:opacity-100 transition-all">
-                            <div class="flex items-center gap-4 flex-1">
-                                <div class="w-12 h-12 rounded-xl bg-brand-dark flex items-center justify-center text-gray-400 border border-white/5"><i class="ri-check-double-line text-xl"></i></div>
-                                <div><h4 class="text-white font-bold text-lg" th:text="'Order #' + ${order.orderId}">Order #1</h4><p class="text-sm text-gray-500" th:text="${#dates.format(order.orderDate, 'dd MMM yyyy, HH:mm')}">Date</p></div>
+                        <div th:each="order : ${historyOrders}" class="glass-panel p-6 rounded-2xl flex flex-col md:flex-row items-center gap-6 border border-white/5 opacity-80 hover:opacity-100 transition-all group relative overflow-hidden">
+                            <div class="absolute -left-2 top-0 h-full w-1 bg-green-500/50 rounded-r-full"></div>
+                            <div class="flex items-center gap-5 flex-1">
+                                <div class="w-14 h-14 rounded-xl bg-brand-dark flex items-center justify-center text-gray-400 border border-white/5 shadow-inner">
+                                    <i class="ri-checkbox-circle-fill text-2xl text-green-500"></i>
+                                </div>
+                                <div>
+                                    <h4 class="text-white font-bold text-lg flex items-center gap-2">
+                                        Invoice #<span th:text="${order.orderId}"></span>
+                                    </h4>
+                                    <p class="text-sm text-gray-500" th:text="${#dates.format(order.orderDate, 'dd MMMM yyyy, HH:mm')}">Date</p>
+                                </div>
                             </div>
-                            
-                            <div class="flex items-center gap-4 justify-end">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase border border-green-500/30 text-green-400 bg-green-500/10 whitespace-nowrap">Paid</span>
-                                <p class="text-white font-bold text-lg text-right w-36" th:text="'Rp ' + ${#numbers.formatDecimal(#aggregates.sum(order.orderDetails.![totalPrice]), 0, 'POINT', 0, 'COMMA')}">Rp 0</p>
+                            <div class="flex flex-col md:flex-row items-center gap-6 w-full md:w-auto">
+                                <div class="text-right">
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Paid</p>
+                                    <p class="text-brand-accent font-bold text-xl font-mono" th:text="'Rp ' + ${#numbers.formatDecimal(#aggregates.sum(order.orderDetails.![totalPrice]), 0, 'POINT', 0, 'COMMA')}">Rp 0</p>
+                                </div>
+                                
+                                <a th:href="@{/order/invoice/{id}(id=${order.orderId})}" class="px-5 py-2.5 rounded-xl border border-white/10 text-gray-300 hover:text-white hover:bg-white/5 hover:border-brand-accent/50 transition-all flex items-center gap-2 group/btn">
+                                    <span>Lihat Invoice</span>
+                                    <i class="ri-file-text-line group-hover/btn:text-brand-accent transition-colors"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
