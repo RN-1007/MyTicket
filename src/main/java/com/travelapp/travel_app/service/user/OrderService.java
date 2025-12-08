@@ -35,7 +35,7 @@ public class OrderService {
     @Autowired private TransportTicketRepository transportTicketRepository;
     @Autowired private AttractionTicketRepository attractionTicketRepository;
 
-    // --- CREATE ORDER (SUPPORT TANGGAL & HITUNG MALAM HOTEL) ---
+    // --- CREATE ORDER ---
     @Transactional
     public Order createNewOrder(ItemType itemType, Integer itemId, int quantity, String userEmail, Date checkIn, Date checkOut) {
         
@@ -59,7 +59,6 @@ public class OrderService {
 
         BigDecimal totalPrice;
 
-        // Logika Hotel (Hitung Malam)
         if (itemType == ItemType.Hotel) {
             if (checkIn == null || checkOut == null) {
                 throw new RuntimeException("Tanggal Check-in dan Check-out wajib diisi.");
@@ -81,13 +80,11 @@ public class OrderService {
             newDetail.setHotelRoom(room);
 
         } else {
-            // Logika Transport & Attraction (Harga Flat per Tiket)
             if (checkIn == null) {
                 throw new RuntimeException("Tanggal Keberangkatan/Kunjungan wajib dipilih.");
             }
 
             newDetail.setCheckInDate(checkIn); 
-            // checkOutDate null untuk tiket
             
             totalPrice = pricePerItem.multiply(new BigDecimal(quantity));
             
@@ -106,28 +103,24 @@ public class OrderService {
         return savedOrder;
     }
 
-    // --- GET ALL ORDERS ---
     public List<Order> findOrdersByUser(String userEmail) {
         User currentUser = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return orderRepository.findByUser(currentUser);
     }
 
-    // --- GET PENDING ORDERS (KERANJANG) ---
     public List<Order> findPendingOrders(String userEmail) {
         return findOrdersByUser(userEmail).stream()
                 .filter(o -> o.getStatus() == OrderStatus.Pending)
                 .collect(Collectors.toList());
     }
 
-    // --- GET HISTORY ORDERS (SUDAH DIBAYAR/BATAL) ---
     public List<Order> findHistoryOrders(String userEmail) {
         return findOrdersByUser(userEmail).stream()
                 .filter(o -> o.getStatus() != OrderStatus.Pending)
                 .collect(Collectors.toList());
     }
 
-    // --- PROCESS CHECKOUT (BULK PAYMENT) ---
     @Transactional
     public void payMultipleOrders(List<Integer> orderIds) {
         List<Order> orders = orderRepository.findAllById(orderIds);
@@ -139,22 +132,25 @@ public class OrderService {
         }
     }
 
-    // --- CANCEL ORDER (DELETE ITEM) ---
+    // --- FIX: CANCEL ORDER (HARD DELETE) ---
     @Transactional
     public void cancelOrder(Integer orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         
+        // Hanya boleh hapus jika statusnya masih Pending
         if (order.getStatus() == OrderStatus.Pending) {
-            order.setStatus(OrderStatus.Cancelled); 
-            // Opsional: orderRepository.delete(order); jika ingin hapus permanen
-            orderRepository.save(order);
+            // 1. Hapus Detailnya dulu (Anak)
+            if (order.getOrderDetails() != null && !order.getOrderDetails().isEmpty()) {
+                orderDetailRepository.deleteAll(order.getOrderDetails());
+            }
+            // 2. Baru hapus Ordernya (Induk)
+            orderRepository.delete(order);
         } else {
-            throw new RuntimeException("Tidak bisa membatalkan pesanan yang sudah diproses.");
+            throw new RuntimeException("Tidak bisa menghapus pesanan yang sudah diproses.");
         }
     }
 
-    // --- HELPER PRICE ---
     private BigDecimal getPrice(ItemType itemType, Integer itemId) {
         switch (itemType) {
             case Hotel:

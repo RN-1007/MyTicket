@@ -67,10 +67,10 @@ public class DataSeeder implements CommandLineRunner {
     }
 
     private void seedUsers() {
-        if (userRepository.findByEmail("admin@travel.app").isEmpty()) {
+        if (userRepository.findByEmail("admin@gmail.com").isEmpty()) {
             User admin = new User();
             admin.setName("Admin");
-            admin.setEmail("admin@travel.app");
+            admin.setEmail("admin@gmail.com");
             admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setPhone("081200001111");
             admin.setRole(Role.ROLE_ADMIN);
@@ -78,10 +78,10 @@ public class DataSeeder implements CommandLineRunner {
             userRepository.save(admin);
         }
 
-        if (userRepository.findByEmail("user@travel.app").isEmpty()) {
+        if (userRepository.findByEmail("user@gmail.com").isEmpty()) {
             User user = new User();
             user.setName("User Demo");
-            user.setEmail("user@travel.app");
+            user.setEmail("user@gmail.com");
             user.setPassword(passwordEncoder.encode("user123"));
             user.setPhone("081200002222");
             user.setRole(Role.ROLE_USER);

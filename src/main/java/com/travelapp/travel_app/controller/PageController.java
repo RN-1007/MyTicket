@@ -35,29 +35,33 @@ public class PageController {
     @Autowired private OrderService orderService;
     @Autowired private CustomUserDetailsService customUserDetailsService; 
 
+    // --- LOGIN PAGE (SEKALIGUS MEMUAT FORM REGISTER) ---
     @GetMapping("/login")
-    public String loginPage() {
+    public String loginPage(Model model) {
+        // Kirim objek user kosong agar form register di slider bisa dipakai
+        model.addAttribute("user", new User());
         return "login";
     }
 
-    @GetMapping("/register")
-    public String showRegisterForm(Model model) {
-        model.addAttribute("user", new User());
-        return "register";
-    }
+    // --- HAPUS METHOD @GetMapping("/register") KARENA SUDAH JADI SATU ---
 
+    // --- PROSES REGISTER (Redirect kembali ke Login) ---
     @PostMapping("/register")
     public String processRegister(@ModelAttribute("user") User user, RedirectAttributes redirectAttributes) {
         try {
             customUserDetailsService.registerUser(user);
             redirectAttributes.addFlashAttribute("successMessage", "Registrasi berhasil! Silakan login.");
+            // Sukses -> Kembali ke Login (Posisi default)
             return "redirect:/login"; 
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-            return "redirect:/register"; 
+            // Gagal -> Kembali ke Login TAPI kirim sinyal 'registerError' agar slider otomatis geser ke Register
+            redirectAttributes.addFlashAttribute("registerError", true); 
+            return "redirect:/login"; 
         }
     }
 
+    // ... (Sisa method userLandingPage, myOrdersPage, dll TETAP SAMA) ...
     @GetMapping("/")
     public String userLandingPage(Model model) {
         model.addAttribute("hotels", hotelService.getAllHotels());
@@ -66,20 +70,16 @@ public class PageController {
         return "user/index"; 
     }
 
-    // --- UPDATE: SPLIT ORDER LIST ---
     @GetMapping("/my-orders")
     public String myOrdersPage(Model model, Authentication authentication) {
         String email = authentication.getName();
-        // Pisahkan order yang belum dibayar (Keranjang) dan histori
         model.addAttribute("pendingOrders", orderService.findPendingOrders(email));
         model.addAttribute("historyOrders", orderService.findHistoryOrders(email));
         return "user/my-orders";
     }
 
     @GetMapping("/about-us")
-    public String aboutUsPage() {
-        return "user/about-us";
-    }
+    public String aboutUsPage() { return "user/about-us"; }
 
     @GetMapping("/hotel/detail/{id}")
     public String hotelDetailPage(@PathVariable("id") Integer id, Model model) {

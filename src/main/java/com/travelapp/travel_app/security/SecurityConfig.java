@@ -1,6 +1,6 @@
 package com.travelapp.travel_app.security; 
 
-import com.travelapp.travel_app.service.user.CustomUserDetailsService; // <-- Path ini sudah benar
+import com.travelapp.travel_app.service.user.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,20 +18,23 @@ public class SecurityConfig {
         this.customUserDetailsService = customUserDetailsService;
     }
 
-    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         
         http
             .authorizeHttpRequests(authz -> authz
-                
-                .requestMatchers("/css/**", "/js/**", "/vendor/**", "/img/**").permitAll() 
+                // --- 1. PUBLIC ACCESS (Halaman Depan & Aset) ---
+                .requestMatchers("/", "/index", "/about-us").permitAll() 
+                .requestMatchers("/hotel/detail/**", "/transport/detail/**", "/attraction/detail/**").permitAll()
+                .requestMatchers("/css/**", "/js/**", "/vendor/**", "/img/**", "/hotel-photos/**", "/transport-photos/**", "/attraction-photos/**").permitAll() 
                 .requestMatchers("/login", "/register").permitAll() 
                 
-                // --- PERBAIKAN DI SINI ---
-                .requestMatchers("/admin/**").hasRole("ADMIN") // Hapus "ROLE_"
-                .requestMatchers("/", "/my-orders", "/order/create").hasRole("USER") // Hapus "ROLE_"
-                // --- AKHIR PERBAIKAN ---
+                // --- 2. MIDTRANS WEBHOOK ---
+                .requestMatchers("/api/midtrans/**").permitAll() 
+
+                // --- 3. ROLE BASED ACCESS ---
+                .requestMatchers("/admin/**").hasRole("ADMIN") 
+                .requestMatchers("/my-orders", "/order/**").hasRole("USER") 
 
                 .anyRequest().authenticated()
             )
@@ -40,10 +43,11 @@ public class SecurityConfig {
                 .loginPage("/login") 
                 .loginProcessingUrl("/login") 
                 .successHandler((request, response, authentication) -> {
-                    // Cek di sini tetap menggunakan .getAuthority() yang berisi nama lengkap
+                    // Redirect sesuai Role
                     if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                         response.sendRedirect("/admin/dashboard");
-                    } else if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_USER"))) {
+                    } else {
+                        // User kembali ke Home setelah login
                         response.sendRedirect("/"); 
                     }
                 })
@@ -53,11 +57,15 @@ public class SecurityConfig {
             
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) 
-                .logoutSuccessUrl("/login?logout=true") 
+                .logoutSuccessUrl("/") // Logout kembali ke Home Publik
                 .permitAll() 
             )
             .userDetailsService(customUserDetailsService)
-            .csrf(csrf -> csrf.disable()); 
+            
+            // Matikan CSRF khusus untuk endpoint Midtrans
+            .csrf(csrf -> csrf
+                .ignoringRequestMatchers("/api/midtrans/**")
+            ); 
 
         return http.build();
     }

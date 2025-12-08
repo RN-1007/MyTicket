@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
-    <nav th:fragment="navbar" class="w-full transition-all duration-300 py-4">
+    <nav th:fragment="navbar" class="w-full transition-all duration-300 py-4 relative z-50">
         <div class="container mx-auto px-6 flex justify-between items-center">
             
             <a th:href="@{/}" class="group flex items-center gap-2">
-                <div class="w-8 h-8 bg-brand-accent rounded-full flex items-center justify-center text-brand-dark">
+                <div class="w-8 h-8 bg-brand-accent rounded-full flex items-center justify-center text-brand-dark shadow-lg shadow-brand-accent/20">
                     <i class="ri-rocket-2-fill text-lg"></i>
                 </div>
                 <span class="text-xl font-bold tracking-tight text-white group-hover:text-brand-accent transition-colors">MyTicket<span class="text-brand-accent">.</span></span>
@@ -16,10 +17,12 @@
                     Home
                     <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
-                <a th:href="@{/my-orders}" class="text-sm font-medium text-gray-300 hover:text-white relative group">
+                
+                <a sec:authorize="hasRole('USER')" th:href="@{/my-orders}" class="text-sm font-medium text-gray-300 hover:text-white relative group">
                     My Orders
                     <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all duration-300 group-hover:w-full"></span>
                 </a>
+                
                 <a th:href="@{/about-us}" class="text-sm font-medium text-gray-300 hover:text-white relative group">
                     About
                     <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-accent transition-all duration-300 group-hover:w-full"></span>
@@ -27,14 +30,95 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <form th:action="@{/logout}" method="post">
-                    <button type="submit" class="flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/10 hover:bg-white/10 hover:border-brand-accent/50 text-white text-sm font-medium transition-all group">
-                        <span>Logout</span>
-                        <i class="ri-logout-circle-r-line text-gray-400 group-hover:text-brand-accent transition-colors"></i>
+
+                <div sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/login}" class="flex items-center gap-2 px-6 py-2.5 rounded-full bg-brand-accent hover:bg-orange-500 text-brand-dark font-bold text-sm transition-all shadow-lg shadow-brand-accent/20 transform hover:scale-105">
+                        <span>Login</span>
+                        <i class="ri-login-circle-line text-lg"></i>
+                    </a>
+                </div>
+
+                <div sec:authorize="isAuthenticated()" class="relative z-50">
+                    
+                    <button id="profileBtn" type="button" onclick="toggleProfileMenu(event)" class="flex items-center gap-3 focus:outline-none group cursor-pointer">
+                        
+                        <div class="text-right hidden md:block">
+                            <span class="block text-sm font-bold text-white leading-none" 
+                                  th:with="names=${#strings.arraySplit(#authentication.principal.fullName, ' ')}"
+                                  th:text="${names.length > 1 ? names[0] + ' ' + names[1] : names[0]}">
+                                User Name
+                            </span>
+                            <span class="text-[10px] text-brand-accent font-bold tracking-wider uppercase mt-0.5 block">EXPLORER</span>
+                        </div>
+                        
+                        <div class="w-10 h-10 rounded-full p-[2px] bg-gradient-to-br from-brand-accent to-purple-600 shadow-lg shadow-brand-accent/20 transition-transform group-hover:scale-105 pointer-events-none">
+                            <div class="w-full h-full rounded-full bg-brand-dark flex items-center justify-center text-white overflow-hidden border border-brand-dark">
+                                <i class="ri-user-3-fill text-lg"></i>
+                            </div>
+                        </div>
                     </button>
-                </form>
+
+                    <div id="profileDropdown" class="hidden absolute right-0 top-14 w-64 bg-[#0B0F19] border border-white/10 rounded-2xl shadow-2xl transform origin-top-right transition-all duration-200 z-[9999] overflow-hidden ring-1 ring-white/5">
+                        
+                        <div class="p-4 border-b border-white/10 bg-white/5">
+                            <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Signed in as</p>
+                            <p class="text-sm font-bold text-white truncate" sec:authentication="name">user@email.com</p>
+                        </div>
+
+                        <div class="p-2">
+                            <form th:action="@{/logout}" method="post">
+                                <button type="submit" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-500 transition-colors text-left group/logout">
+                                    <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center group-hover/logout:bg-red-500 group-hover/logout:text-white transition-colors">
+                                        <i class="ri-logout-box-r-line"></i>
+                                    </div>
+                                    <span class="text-sm font-bold">Log Out</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
+
+        <script>
+            function toggleProfileMenu(event) {
+                // Mencegah klik menyebar ke document (yang akan menutup menu)
+                if (event) {
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+
+                const menu = document.getElementById('profileDropdown');
+                
+                if (menu) {
+                    if (menu.classList.contains('hidden')) {
+                        menu.classList.remove('hidden');
+                        // Animasi Masuk
+                        menu.animate([
+                            { opacity: 0, transform: 'translateY(-10px) scale(0.95)' },
+                            { opacity: 1, transform: 'translateY(0) scale(1)' }
+                        ], { duration: 200, fill: 'forwards', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+                    } else {
+                        menu.classList.add('hidden');
+                    }
+                }
+            }
+
+            // Event Listener Global: Tutup jika klik di luar
+            document.addEventListener('click', function(e) {
+                const menu = document.getElementById('profileDropdown');
+                const btn = document.getElementById('profileBtn');
+
+                // Jika menu terbuka
+                if (menu && !menu.classList.contains('hidden')) {
+                    // Jika yang diklik BUKAN menu DAN BUKAN tombol trigger
+                    if (!menu.contains(e.target) && !btn.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                }
+            });
+        </script>
     </nav>
 </body>
 </html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Detail Pesanan User</title>
+    <title>MyTicket</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
@@ -88,7 +88,7 @@
                                 <td class="px-6 py-4 text-sm text-right text-blue-300 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(item.totalPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
                                 <td class="px-6 py-4 text-center">
                                     <span th:text="${item.order.status}" 
-                                          th:classappend="${item.order.status.name() == 'PAID'} ? 'bg-green-900 text-green-200' : 'bg-yellow-900 text-yellow-200'"
+                                          th:classappend="${item.order.status.name() == 'PAID'} ? 'bg-red-900 text-green-200' : 'bg-green-900 text-yellow-200'"
                                           class="px-3 py-1 rounded-full text-xs font-bold uppercase">Status</span>
                                 </td>
                             </tr>

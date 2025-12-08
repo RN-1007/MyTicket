@@ -19,10 +19,15 @@ public class MvcConfig implements WebMvcConfigurer {
 
     private void exposeDirectory(String dirName, ResourceHandlerRegistry registry) {
         Path uploadDir = Paths.get(dirName);
-        String uploadPath = uploadDir.toFile().getAbsolutePath();
+        
+        // --- PERBAIKAN DISINI ---
+        // Menggunakan .toUri().toString() akan otomatis menghasilkan format yang benar:
+        // Windows: file:/C:/Users/...
+        // Linux:   file:///var/www/... (3 garis miring = lokal path)
+        String uploadPath = uploadDir.toUri().toString(); 
 
         if (dirName.startsWith("../")) dirName = dirName.replace("../", "");
 
-        registry.addResourceHandler("/" + dirName + "/**").addResourceLocations("file:/" + uploadPath + "/");
+        registry.addResourceHandler("/" + dirName + "/**").addResourceLocations(uploadPath);
     }
 }

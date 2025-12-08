@@ -1,143 +1,121 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <title>Admin Dashboard</title>
+    <title>MyTicket</title>
     <script src="https://cdn.tailwindcss.com"></script>
-
-    <link
-      href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css"
-      rel="stylesheet"
-    />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
-
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
     <style>
-      .sidebar {
-        font-family: "Poppins", sans-serif;
-      }
-
-      /* Sembunyikan menu dropdown (transisi) */
-      .dropdown-menu {
-        overflow: hidden;
-        max-height: 0;
-        opacity: 0;
-        visibility: hidden;
-        transition: max-height 0.4s ease-out, opacity 0.3s ease-out,
-          visibility 0s linear 0.4s;
-      }
-
-      /* Tampilkan menu saat parent-nya punya class .open */
-      .dropdown-parent.open .dropdown-menu {
-        max-height: 500px; 
-        opacity: 1;
-        visibility: visible;
-        transition: max-height 0.4s ease-in, opacity 0.3s ease-in;
-      }
-
-      /* Transisi untuk panah */
-      .arrow-icon {
-        transition: transform 0.3s ease;
-      }
-
-      /* --- CUSTOM SCROLLBAR (GELAP/DARK MODE) --- */
-      /* 1. Support Firefox */
-      .custom-scrollbar {
-        scrollbar-width: thin;
-        scrollbar-color: #374151 #000000;
-      }
-
-      /* 2. Support Chrome, Edge, Safari */
-      .custom-scrollbar::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
-      }
-      .custom-scrollbar::-webkit-scrollbar-track {
-        background: #000000;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb {
-        background-color: #374151;
-        border-radius: 10px;
-        border: 1px solid #000000;
-      }
-      .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background-color: #4b5563;
-      }
+      .sidebar { font-family: "Poppins", sans-serif; }
+      .dropdown-menu { overflow: hidden; max-height: 0; opacity: 0; visibility: hidden; transition: all 0.4s ease; }
+      .dropdown-parent.open .dropdown-menu { max-height: 500px; opacity: 1; visibility: visible; }
+      .arrow-icon { transition: transform 0.3s ease; }
+      .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: #000000; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
     </style>
   </head>
   <body class="bg-gray-900 text-gray-200">
     <div th:replace="~{fragment/admin-layout :: layout(~{::content})}">
       <div th:fragment="content">
+        
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-            <h2 class="text-sm font-medium text-gray-400 mb-2">Total Hotels</h2>
-            <p class="text-3xl font-bold text-white" th:text="${hotelCount}">
-              0
-            </p>
-            <p class="text-sm text-green-400 mt-2 flex items-center">
-              <i class="ri-arrow-up-line"></i>
-              <span>+1.5% this week</span>
-            </p>
+          
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-medium text-gray-400 mb-1">Total Hotels</h2>
+                <p class="text-3xl font-bold text-white" th:text="${hotelCount}">0</p>
+            </div>
+            <div class="p-3 bg-blue-500/10 rounded-xl text-blue-500 border border-blue-500/20">
+                <i class="ri-building-2-line text-2xl"></i>
+            </div>
           </div>
 
-          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-            <h2 class="text-sm font-medium text-gray-400 mb-2">
-              Total Transports
-            </h2>
-            <p
-              class="text-3xl font-bold text-white"
-              th:text="${transportCount}"
-            >
-              0
-            </p>
-            <p class="text-sm text-green-400 mt-2 flex items-center">
-              <i class="ri-arrow-up-line"></i>
-              <span>+3.2% this week</span>
-            </p>
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-medium text-gray-400 mb-1">Total Transports</h2>
+                <p class="text-3xl font-bold text-white" th:text="${transportCount}">0</p>
+            </div>
+            <div class="p-3 bg-purple-500/10 rounded-xl text-purple-500 border border-purple-500/20">
+                <i class="ri-bus-2-line text-2xl"></i>
+            </div>
           </div>
 
-          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-            <h2 class="text-sm font-medium text-gray-400 mb-2">
-              Total Attractions
-            </h2>
-            <p
-              class="text-3xl font-bold text-white"
-              th:text="${attractionCount}"
-            >
-              0
-            </p>
-            <p class="text-sm text-red-400 mt-2 flex items-center">
-              <i class="ri-arrow-down-line"></i>
-              <span>-0.5% this week</span>
-            </p>
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-medium text-gray-400 mb-1">Total Attractions</h2>
+                <p class="text-3xl font-bold text-white" th:text="${attractionCount}">0</p>
+            </div>
+            <div class="p-3 bg-green-500/10 rounded-xl text-green-500 border border-green-500/20">
+                <i class="ri-camera-lens-line text-2xl"></i>
+            </div>
           </div>
 
-          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-            <h2 class="text-sm font-medium text-gray-400 mb-2">Total Users</h2>
-            <p class="text-3xl font-bold text-white" th:text="${userCount}">
-              0
-            </p>
-            <p class="text-sm text-green-400 mt-2 flex items-center">
-              <i class="ri-arrow-up-line"></i>
-              <span>+1 new user</span>
-            </p>
+          <div class="bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700 flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-medium text-gray-400 mb-1">Total Users</h2>
+                <p class="text-3xl font-bold text-white" th:text="${userCount}">0</p>
+            </div>
+            <div class="p-3 bg-yellow-500/10 rounded-xl text-yellow-500 border border-yellow-500/20">
+                <i class="ri-group-line text-2xl"></i>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="mt-8 bg-gray-800 border border-gray-700 rounded-lg shadow-lg overflow-hidden">
+          <div class="p-5 border-b border-gray-700 flex justify-between items-center bg-gray-800/50">
+             <h2 class="text-xl font-semibold text-white flex items-center gap-2">
+                <i class="ri-time-line text-blue-500"></i> Transaksi Terbaru
+             </h2>
+             <a th:href="@{/admin/transactions}" class="text-sm text-blue-400 hover:text-blue-300 hover:underline">Lihat Semua</a>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-sm text-left text-gray-400">
+                  <thead class="text-xs text-gray-500 uppercase bg-gray-900/50 border-b border-gray-700">
+                      <tr>
+                          <th class="px-6 py-4 font-medium">Order ID</th>
+                          <th class="px-6 py-4 font-medium">User</th>
+                          <th class="px-6 py-4 font-medium">Tanggal</th>
+                          <th class="px-6 py-4 text-right font-medium">Total</th>
+                          <th class="px-6 py-4 text-center font-medium">Status</th>
+                      </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-700">
+                      <tr th:each="order : ${recentOrders}" class="hover:bg-gray-700/30 transition-colors">
+                          <td class="px-6 py-4 text-blue-400 font-mono font-semibold" th:text="'#' + ${order.orderId}">#1</td>
+                          <td class="px-6 py-4 text-white font-medium">
+                              <div class="flex items-center gap-3">
+                                  <div class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs text-white font-bold border border-gray-600" 
+                                       th:text="${order.user != null ? #strings.substring(order.user.name, 0, 1) : '?'}">U</div>
+                                  <div class="flex flex-col">
+                                      <span th:text="${order.user != null ? order.user.name : 'Unknown'}">Name</span>
+                                      <span class="text-xs text-gray-500" th:text="${order.user != null ? order.user.email : '-'}">Email</span>
+                                  </div>
+                              </div>
+                          </td>
+                          <td class="px-6 py-4 text-gray-400" th:text="${#dates.format(order.orderDate, 'dd MMM yyyy, HH:mm')}">Date</td>
+                          <td class="px-6 py-4 text-right text-emerald-400 font-bold" th:text="'Rp ' + ${#numbers.formatDecimal(#aggregates.sum(order.orderDetails.![totalPrice]), 0, 'POINT', 0, 'COMMA')}">Rp 0</td>
+                          <td class="px-6 py-4 text-center">
+                              <span th:text="${order.status}" 
+                                    th:classappend="${order.status.name() == 'PAID'} ? 'bg-green-900/30 text-green-400 border-green-800' : 'bg-red-900/30 text-red-400 border-red-800'"
+                                    class="px-3 py-1 rounded-full text-xs font-bold uppercase border inline-block min-w-[80px]">
+                                  Status
+                              </span>
+                          </td>
+                      </tr>
+                      <tr th:if="${#lists.isEmpty(recentOrders)}">
+                          <td colspan="5" class="px-6 py-12 text-center text-gray-500 italic">
+                              <i class="ri-inbox-line text-4xl mb-2 block opacity-50"></i>
+                              Belum ada transaksi terbaru.
+                          </td>
+                      </tr>
+                  </tbody>
+              </table>
           </div>
         </div>
 
-        <div class="mt-8 bg-gray-800 p-6 rounded-lg shadow-lg border border-gray-700">
-          <h2 class="text-xl font-semibold text-white mb-4">
-            Revenue vs Orders (Placeholder)
-          </h2>
-          <div
-            class="h-64 bg-gray-700/50 rounded-lg flex items-center justify-center border border-gray-600 border-dashed"
-          >
-            <p class="text-gray-400">Chart akan muncul di sini</p>
-          </div>
-        </div>
       </div>
     </div>
     <script>
