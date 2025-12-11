@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Explore</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                    colors: { 
+                        brand: { 
+                            dark: '#0B0F19', 
+                            surface: '#151C2C', 
+                            accent: '#FF8A5B' 
+                        } 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0B0F19; color: #E2E8F0; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Smooth shadow untuk card */
+        .card-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body class="pb-24"> <div th:replace="~{fragment/mobile-layout :: layout(title='Explore', content=~{::content})}">
+        <div th:fragment="content">
+            
+            <header class="pt-8 pb-4 px-6 sticky top-0 z-30 bg-[#0B0F19]/90 backdrop-blur-md">
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <p class="text-gray-400 text-xs uppercase tracking-widest font-bold mb-1">Welcome Back</p>
+                        <h1 class="text-3xl font-extrabold text-white leading-none">Let's Explore <span class="text-brand-accent">World</span></h1>
+                    </div>
+                    <!-- <div class="relative w-12 h-12 rounded-full bg-[#151C2C] border border-white/10 flex items-center justify-center active:scale-95 transition-transform">
+                        <i class="ri-notification-3-fill text-white text-xl"></i>
+                        <span class="absolute top-3 right-3.5 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-[#151C2C]"></span>
+                    </div> -->
+                </div>
+
+                <div class="bg-[#151C2C] p-1.5 rounded-2xl flex items-center gap-3 border border-white/10 shadow-lg">
+                    <div class="w-10 h-10 rounded-xl bg-brand-accent/10 flex items-center justify-center text-brand-accent ml-1">
+                        <i class="ri-search-2-line text-xl"></i>
+                    </div>
+                    <input type="text" placeholder="Mau kemana hari ini?" class="bg-transparent border-none text-white w-full h-10 focus:ring-0 text-sm placeholder-gray-500 font-medium">
+                </div>
+            </header>
+
+            <div class="px-6 mb-8 overflow-x-auto no-scrollbar flex gap-3">
+                <button class="px-6 py-2.5 rounded-full bg-brand-accent text-[#0B0F19] font-bold text-sm whitespace-nowrap shadow-lg shadow-brand-accent/20 active:scale-95 transition-transform">All</button>
+                <button class="px-6 py-2.5 rounded-full bg-[#151C2C] border border-white/10 text-gray-300 font-semibold text-sm whitespace-nowrap active:scale-95 transition-transform">Hotels</button>
+                <button class="px-6 py-2.5 rounded-full bg-[#151C2C] border border-white/10 text-gray-300 font-semibold text-sm whitespace-nowrap active:scale-95 transition-transform">Attractions</button>
+                <button class="px-6 py-2.5 rounded-full bg-[#151C2C] border border-white/10 text-gray-300 font-semibold text-sm whitespace-nowrap active:scale-95 transition-transform">Transports</button>
+            </div>
+
+            <div class="pl-6 mb-10">
+                <div class="flex justify-between items-end pr-6 mb-5">
+                    <h2 class="text-xl font-bold text-white">Popular Hotels</h2>
+                    <a href="#" class="text-brand-accent text-xs font-bold uppercase tracking-wider">See All</a>
+                </div>
+                
+                <div class="swiper hotelSwiper overflow-visible">
+                    <div class="swiper-wrapper">
+                        <div th:each="hotel : ${hotels}" class="swiper-slide w-[85%]"> <a th:href="@{/android/hotel/detail/{id}(id=${hotel.hotelId})}" class="block relative h-[400px] rounded-[2rem] overflow-hidden bg-gray-800 card-shadow active:scale-[0.98] transition-transform duration-300 group">
+                                <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/600x800/?luxury-hotel" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-black/40 to-transparent"></div>
+                                
+                                <div class="absolute bottom-0 left-0 right-0 p-6">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <h3 class="text-2xl font-bold text-white leading-tight mb-1" th:text="${hotel.name}">Hotel Name</h3>
+                                            <p class="text-gray-300 text-sm flex items-center gap-1">
+                                                <i class="ri-map-pin-fill text-brand-accent"></i> 
+                                                <span th:text="${hotel.location}">Bali</span>
+                                            </p>
+                                        </div>
+                                        <div class="flex flex-col items-center bg-white/10 backdrop-blur-md rounded-xl px-2 py-1 border border-white/10">
+                                            <i class="ri-star-fill text-yellow-400 text-sm"></i>
+                                            <span class="text-xs font-bold text-white" th:text="${hotel.stars}">5</span>
+                                        </div>
+                                    </div>
+                                    <div class="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
+                                        <div>
+                                            <p class="text-[10px] text-gray-400 uppercase font-bold tracking-wider">Mulai Dari</p>
+                                            <p class="text-xl font-bold text-brand-accent" th:text="'Rp ' + ${#numbers.formatDecimal(hotel.startingPrice, 0, 'POINT', 0, 'COMMA')}">Rp 0</p>
+                                        </div>
+                                        <button class="w-10 h-10 rounded-full bg-white text-[#0B0F19] flex items-center justify-center font-bold">
+                                            <i class="ri-arrow-right-up-line text-xl"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pl-6 mb-10">
+                <div class="flex justify-between items-end pr-6 mb-5">
+                    <h2 class="text-xl font-bold text-white">Top Attractions</h2>
+                    <a href="#" class="text-green-400 text-xs font-bold uppercase tracking-wider">Explore</a>
+                </div>
+
+                <div class="swiper attractionSwiper overflow-visible">
+                    <div class="swiper-wrapper">
+                        <div th:each="attraction : ${attractions}" class="swiper-slide w-[160px]">
+                            <a th:href="@{/android/attraction/detail/{id}(id=${attraction.attractionId})}" class="block relative h-[220px] rounded-3xl overflow-hidden bg-gray-800 active:scale-95 transition-transform">
+                                <img th:if="${attraction.image != null}" th:src="@{${attraction.imagePath}}" class="absolute inset-0 w-full h-full object-cover">
+                                <img th:unless="${attraction.image != null}" src="https://source.unsplash.com/random/400x600/?theme-park,nature" class="absolute inset-0 w-full h-full object-cover">
+                                <div class="absolute inset-0 bg-gradient-to-t from-[#0B0F19] to-transparent opacity-90"></div>
+                                
+                                <div class="absolute top-3 right-3">
+                                    <span class="bg-green-500/20 backdrop-blur-md text-green-400 text-[10px] font-bold px-2 py-1 rounded-lg border border-green-500/20" 
+                                          th:text="${attraction.category}">CAT</span>
+                                </div>
+
+                                <div class="absolute bottom-3 left-3 right-3">
+                                    <h4 class="text-sm font-bold text-white leading-tight mb-1" th:text="${attraction.name}">Name</h4>
+                                    <p class="text-[10px] text-gray-400 flex items-center gap-1 truncate">
+                                        <i class="ri-map-pin-2-line text-green-500"></i> 
+                                        <span th:text="${attraction.location}">Loc</span>
+                                    </p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="px-6 mb-8">
+                <h2 class="text-xl font-bold text-white mb-5">Transportasi</h2>
+                <div class="space-y-4">
+                    <div th:each="transport : ${transports}" class="relative bg-[#151C2C] p-4 rounded-[1.5rem] flex items-center gap-4 border border-white/5 active:scale-[0.98] transition-transform">
+                        <div class="w-16 h-16 rounded-2xl overflow-hidden bg-gray-700 flex-shrink-0 shadow-lg">
+                            <img th:if="${transport.image != null}" th:src="@{${transport.imagePath}}" class="w-full h-full object-cover">
+                            <img th:unless="${transport.image != null}" src="https://source.unsplash.com/random/200x200/?bus,plane" class="w-full h-full object-cover">
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex justify-between items-start">
+                                <h3 class="text-white font-bold truncate pr-2" th:text="${transport.name}">Name</h3>
+                                <span class="text-[10px] bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-0.5 rounded font-bold uppercase" th:text="${transport.provider.type}">BUS</span>
+                            </div>
+                            <p class="text-gray-500 text-xs mt-0.5" th:text="${transport.provider.name}">Provider</p>
+                            <div class="flex items-center gap-3 mt-2">
+                                <div class="flex items-center gap-1 text-gray-400 text-xs">
+                                    <i class="ri-group-line text-purple-400"></i> <span th:text="${transport.capacity}"></span>
+                                </div>
+                                <div class="flex items-center gap-1 text-gray-400 text-xs">
+                                    <i class="ri-wifi-line text-purple-400"></i> <span>WiFi</span>
+                                </div>
+                            </div>
+                        </div>
+                        <a th:href="@{/android/transport/detail/{id}(id=${transport.transportId})}" class="absolute inset-0 rounded-[1.5rem]"></a>
+                    </div>
+                </div>
+            </div>
+
+           <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    // Hotel Swiper
+                    new Swiper(".hotelSwiper", {
+                        slidesPerView: "auto",
+                        spaceBetween: 20,
+                        slidesOffsetBefore: 0, 
+                        slidesOffsetAfter: 20,
+                    });
+
+                    // Attraction Swiper
+                    new Swiper(".attractionSwiper", {
+                        slidesPerView: "auto",
+                        spaceBetween: 12,
+                        slidesOffsetBefore: 0,
+                        slidesOffsetAfter: 20,
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</body>
+</html>

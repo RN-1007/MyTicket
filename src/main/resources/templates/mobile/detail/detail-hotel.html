@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${hotel.name}"></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'] },
+                    colors: { 
+                        brand: { 
+                            dark: '#0B0F19', 
+                            surface: '#151C2C', 
+                            accent: '#FF8A5B',
+                            accentHover: '#E06C3E'
+                        } 
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0B0F19; color: #E2E8F0; -webkit-tap-highlight-color: transparent; }
+        /* Hide scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* Input date icon fix */
+        input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.6; width: 1.5rem; height: 1.5rem; }
+    </style>
+</head>
+<body class="min-h-screen relative bg-[#0B0F19] pb-32"> <div class="fixed top-0 left-0 w-full h-[45vh] z-0">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#0B0F19]"></div>
+        <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="w-full h-full object-cover">
+        <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/800x1200/?luxury-hotel" class="w-full h-full object-cover">
+        
+        <div class="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-20 pt-10"> <a th:href="@{/android}" class="w-12 h-12 flex items-center justify-center bg-black/20 backdrop-blur-md rounded-full border border-white/10 active:scale-90 transition-transform text-white shadow-lg">
+                <i class="ri-arrow-left-line text-2xl"></i>
+            </a>
+            <button class="w-12 h-12 flex items-center justify-center bg-black/20 backdrop-blur-md rounded-full border border-white/10 active:scale-90 transition-transform text-white shadow-lg">
+                <i class="ri-heart-3-line text-2xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="relative z-10 mt-[38vh] bg-[#0B0F19] rounded-t-[2.5rem] min-h-[62vh] shadow-[0_-10px_40px_rgba(0,0,0,0.6)] border-t border-white/5 flex flex-col">
+        
+        <div class="w-full flex justify-center pt-4 pb-2">
+            <div class="w-16 h-1.5 bg-white/10 rounded-full"></div>
+        </div>
+
+        <div class="px-6 pt-2 pb-6 flex-1">
+            
+            <div class="flex justify-between items-start mb-6">
+                <div class="flex-1 pr-4">
+                    <h1 class="text-3xl font-bold text-white leading-tight mb-2" th:text="${hotel.name}">Hotel Name</h1>
+                    <p class="text-gray-400 text-sm flex items-center gap-2 font-medium">
+                        <i class="ri-map-pin-2-fill text-brand-accent"></i> 
+                        <span th:text="${hotel.location}">Location</span>
+                    </p>
+                </div>
+                <div class="flex flex-col items-center justify-center bg-[#151C2C] border border-white/10 rounded-2xl p-2 min-w-[3.5rem] shadow-sm">
+                    <i class="ri-star-fill text-yellow-400 text-xl mb-0.5"></i>
+                    <span class="text-white font-bold text-sm" th:text="${hotel.stars}">5</span>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-white font-bold text-lg mb-4 pl-1">Fasilitas</h3>
+                <div class="flex gap-4 overflow-x-auto no-scrollbar pb-2">
+                    <div class="flex flex-col items-center gap-2 min-w-[4.5rem]">
+                        <div class="w-16 h-16 rounded-2xl bg-[#151C2C] border border-white/10 flex items-center justify-center text-brand-accent shadow-sm">
+                            <i class="ri-wifi-line text-2xl"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 font-medium">WiFi</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 min-w-[4.5rem]">
+                        <div class="w-16 h-16 rounded-2xl bg-[#151C2C] border border-white/10 flex items-center justify-center text-brand-accent shadow-sm">
+                            <i class="ri-restaurant-line text-2xl"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 font-medium">Resto</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 min-w-[4.5rem]">
+                        <div class="w-16 h-16 rounded-2xl bg-[#151C2C] border border-white/10 flex items-center justify-center text-brand-accent shadow-sm">
+                            <i class="ri-goblet-line text-2xl"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 font-medium">Bar</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 min-w-[4.5rem]">
+                        <div class="w-16 h-16 rounded-2xl bg-[#151C2C] border border-white/10 flex items-center justify-center text-brand-accent shadow-sm">
+                            <i class="ri-customer-service-2-line text-2xl"></i>
+                        </div>
+                        <span class="text-xs text-gray-400 font-medium">24/7</span>
+                    </div>
+                </div>
+            </div>
+
+            <form th:action="@{/android/order/create}" method="post" id="bookingForm" class="space-y-8">
+                <input type="hidden" name="itemType" value="Hotel">
+                <input type="hidden" name="itemId" id="selectedItemId">
+
+                <div>
+                    <h3 class="text-white font-bold text-lg mb-4 pl-1">Pilih Tipe Kamar</h3>
+                    <div class="space-y-4">
+                        <div th:each="room, iter : ${rooms}" class="relative group">
+                            <input type="radio" name="roomSelection" th:id="'room-'+${room.roomId}" 
+                                   th:value="${room.roomId}" th:data-price="${room.price}" 
+                                   class="peer hidden" onchange="updatePrice()" th:checked="${iter.index == 0}">
+                            
+                            <label th:for="'room-'+${room.roomId}" 
+                                   class="flex justify-between items-center p-5 rounded-3xl bg-[#151C2C] border-[1.5px] border-transparent peer-checked:border-brand-accent peer-checked:bg-brand-accent/5 transition-all cursor-pointer shadow-md active:scale-[0.98]">
+                                <div>
+                                    <h4 class="text-white font-bold text-lg" th:text="${room.roomType}">Deluxe Room</h4>
+                                    <div class="flex items-center gap-2 mt-1.5">
+                                        <i class="ri-user-line text-gray-500"></i>
+                                        <p class="text-gray-400 text-sm">Max <span th:text="${room.capacity}">2</span> Tamu</p>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-brand-accent font-bold text-lg" th:text="'Rp ' + ${#numbers.formatDecimal(room.price, 0, 'POINT', 0, 'COMMA')}"></p>
+                                    <p class="text-gray-500 text-xs">/ malam</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-5">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Check-In</label>
+                            <div class="bg-[#151C2C] border border-white/10 rounded-2xl h-14 flex items-center px-4 relative transition-colors focus-within:border-brand-accent">
+                                <input type="date" name="checkIn" id="checkIn" required onchange="updatePrice()"
+                                       class="bg-transparent text-white text-sm font-semibold w-full h-full outline-none border-none p-0 focus:ring-0 appearance-none placeholder-gray-500">
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Check-Out</label>
+                            <div class="bg-[#151C2C] border border-white/10 rounded-2xl h-14 flex items-center px-4 relative transition-colors focus-within:border-brand-accent">
+                                <input type="date" name="checkOut" id="checkOut" required onchange="updatePrice()"
+                                       class="bg-transparent text-white text-sm font-semibold w-full h-full outline-none border-none p-0 focus:ring-0 appearance-none placeholder-gray-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider pl-1">Jumlah Kamar</label>
+                        <div class="bg-[#151C2C] border border-white/10 rounded-2xl h-16 flex items-center justify-between px-4">
+                            <span class="text-gray-300 text-sm font-medium flex items-center gap-2">
+                                <i class="ri-door-open-line text-brand-accent text-lg"></i> Kamar
+                            </span>
+                            <div class="flex items-center gap-3 bg-black/20 rounded-xl p-1.5 h-12">
+                                <button type="button" onclick="adjustQty(-1)" class="w-12 h-full bg-white/5 rounded-lg flex items-center justify-center text-white text-xl active:bg-white/10 transition-colors"><i class="ri-subtract-line"></i></button>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" readonly class="w-10 bg-transparent text-center text-white font-bold text-lg border-none focus:ring-0 p-0">
+                                <button type="button" onclick="adjustQty(1)" class="w-12 h-full bg-white/5 rounded-lg flex items-center justify-center text-white text-xl active:bg-white/10 transition-colors"><i class="ri-add-line"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="fixed bottom-0 left-0 w-full bg-[#151C2C]/95 backdrop-blur-xl border-t border-white/10 px-6 pt-5 pb-14 z-50 shadow-[0_-10px_40px_rgba(0,0,0,0.5)]">
+        <div class="flex flex-col gap-4">
+            <div class="flex justify-between items-end px-1">
+                <span class="text-xs text-gray-400 font-medium">Total Estimasi</span>
+                <span id="totalPrice" class="text-2xl font-bold text-brand-accent tracking-tight">Rp 0</span>
+            </div>
+            
+            <button onclick="document.getElementById('bookingForm').submit()" 
+                    class="w-full h-16 bg-brand-accent hover:bg-brand-accentHover text-[#0B0F19] rounded-2xl font-extrabold text-xl shadow-lg shadow-brand-accent/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+                <span>Pesan Sekarang</span>
+                <i class="ri-arrow-right-line text-2xl"></i>
+            </button>
+        </div>
+    </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const tmrw = new Date(today); tmrw.setDate(tmrw.getDate() + 1);
+            document.getElementById('checkIn').valueAsDate = today;
+            document.getElementById('checkOut').valueAsDate = tmrw;
+            updatePrice();
+        });
+
+        function adjustQty(n) {
+            const el = document.getElementById('quantity');
+            let val = parseInt(el.value) + n;
+            if(val >= 1) { el.value = val; updatePrice(); }
+        }
+
+        function updatePrice() {
+            const radio = document.querySelector('input[name="roomSelection"]:checked');
+            if(!radio) return;
+            
+            document.getElementById('selectedItemId').value = radio.value;
+            const price = parseFloat(radio.getAttribute('data-price'));
+            const qty = parseInt(document.getElementById('quantity').value);
+            
+            const d1 = new Date(document.getElementById('checkIn').value);
+            const d2 = new Date(document.getElementById('checkOut').value);
+            const nights = Math.max(1, Math.ceil((d2 - d1) / (1000 * 60 * 60 * 24)) || 1);
+            
+            const total = price * qty * nights;
+            document.getElementById('totalPrice').innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total);
+        }
+    </script>
+</body>
+</html>

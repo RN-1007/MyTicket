@@ -419,6 +419,11 @@
                         target.scrollIntoView({ behavior: 'smooth' });
                     }
                 }
+
+                if (window.innerWidth < 768 && !window.location.pathname.startsWith('/android')) {
+                    console.log("Mobile device detected, redirecting to Android view...");
+                    window.location.href = "/android";
+                }
             </script>
         </div>
     </div>
