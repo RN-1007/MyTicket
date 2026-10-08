@@ -3,6 +3,7 @@ package com.travelapp.travel_app.model;
 import java.util.Set;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,7 +26,7 @@ public class Attraction {
     @Column(nullable = true, length = 255)
     private String image;
     
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = CategoryConverter.class)
     private Category category;
 
     @OneToMany(mappedBy = "attraction")
