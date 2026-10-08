@@ -18,11 +18,10 @@
                     <i class="ri-arrow-left-line text-xl font-bold"></i>
                 </a>
 
-                <img th:if="${transport.image != null}" th:src="@{${transport.imagePath}}" class="w-full h-full object-cover" data-speed="0.5">
-                <img th:unless="${transport.image != null}" src="https://source.unsplash.com/random/1600x900/?airplane,train,bus" class="w-full h-full object-cover" data-speed="0.5">
+                <img th:src="@{${transport.imagePath}}" class="w-full h-full object-cover" data-speed="0.5" th:alt="${transport.name}">
                 <div class="absolute inset-0 bg-gradient-to-b from-transparent via-brand-dark/50 to-brand-dark"></div>
                 
-                <div class="absolute bottom-0 left-0 w-full p-6 md:p-12 z-10">
+                <div class="absolute bottom-0 left-0 w-full pb-8 z-10">
                     <div class="container mx-auto">
                          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 backdrop-blur-md text-purple-400 text-xs mb-4 uppercase tracking-widest font-bold">
                              <i class="ri-steering-2-line"></i> <span th:text="${transport.provider.type}">Type</span>
@@ -35,7 +34,7 @@
                 </div>
             </div>
 
-            <div class="container mx-auto px-6 py-12 relative z-20 -mt-20">
+            <div class="container mx-auto py-12 relative z-20 -mt-20">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     
                     <div class="lg:col-span-2 space-y-10">

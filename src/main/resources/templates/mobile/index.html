@@ -70,8 +70,7 @@
                 <div class="swiper hotelSwiper overflow-visible">
                     <div class="swiper-wrapper">
                         <div th:each="hotel : ${hotels}" class="swiper-slide w-[85%]"> <a th:href="@{/android/hotel/detail/{id}(id=${hotel.hotelId})}" class="block relative h-[400px] rounded-[2rem] overflow-hidden bg-gray-800 card-shadow active:scale-[0.98] transition-transform duration-300 group">
-                                <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                                <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/600x800/?luxury-hotel" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                                <img th:src="@{${hotel.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" th:alt="${hotel.name}">
                                 
                                 <div class="absolute inset-0 bg-gradient-to-t from-[#0B0F19] via-black/40 to-transparent"></div>
                                 
@@ -115,8 +114,7 @@
                     <div class="swiper-wrapper">
                         <div th:each="attraction : ${attractions}" class="swiper-slide w-[160px]">
                             <a th:href="@{/android/attraction/detail/{id}(id=${attraction.attractionId})}" class="block relative h-[220px] rounded-3xl overflow-hidden bg-gray-800 active:scale-95 transition-transform">
-                                <img th:if="${attraction.image != null}" th:src="@{${attraction.imagePath}}" class="absolute inset-0 w-full h-full object-cover">
-                                <img th:unless="${attraction.image != null}" src="https://source.unsplash.com/random/400x600/?theme-park,nature" class="absolute inset-0 w-full h-full object-cover">
+                                <img th:src="@{${attraction.imagePath}}" class="absolute inset-0 w-full h-full object-cover" th:alt="${attraction.name}">
                                 <div class="absolute inset-0 bg-gradient-to-t from-[#0B0F19] to-transparent opacity-90"></div>
                                 
                                 <div class="absolute top-3 right-3">
@@ -142,8 +140,7 @@
                 <div class="space-y-4">
                     <div th:each="transport : ${transports}" class="relative bg-[#151C2C] p-4 rounded-[1.5rem] flex items-center gap-4 border border-white/5 active:scale-[0.98] transition-transform">
                         <div class="w-16 h-16 rounded-2xl overflow-hidden bg-gray-700 flex-shrink-0 shadow-lg">
-                            <img th:if="${transport.image != null}" th:src="@{${transport.imagePath}}" class="w-full h-full object-cover">
-                            <img th:unless="${transport.image != null}" src="https://source.unsplash.com/random/200x200/?bus,plane" class="w-full h-full object-cover">
+                            <img th:src="@{${transport.imagePath}}" class="w-full h-full object-cover" th:alt="${transport.name}">
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex justify-between items-start">

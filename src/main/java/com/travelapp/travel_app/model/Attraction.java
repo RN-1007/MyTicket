@@ -81,7 +81,41 @@ public class Attraction {
     }
     @Transient
     public String getImagePath() {
-        if (image == null || attractionId == null) return null;
-        return "/attraction-photos/" + attractionId + "/" + image;
+        if (image != null && !image.trim().isEmpty()) {
+            if (image.startsWith("http://") || image.startsWith("https://")) {
+                return image;
+            }
+            if (attractionId != null) {
+                return "/attraction-photos/" + attractionId + "/" + image;
+            }
+        }
+
+        if (name != null) {
+            String lower = name.toLowerCase();
+            if (lower.contains("borobudur") || lower.contains("temple") || lower.contains("prambanan") || lower.contains("candi")) {
+                return "https://images.unsplash.com/photo-1596402184320-417e7178b2cd?q=80&w=1200&auto=format&fit=crop";
+            }
+            if (lower.contains("ancol") || lower.contains("dufan") || lower.contains("park") || lower.contains("dreamland")) {
+                return "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?q=80&w=1200&auto=format&fit=crop";
+            }
+            if (lower.contains("beach") || lower.contains("pantai") || lower.contains("sea") || lower.contains("bali")) {
+                return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop";
+            }
+        }
+
+        if (category != null) {
+            switch (category) {
+                case Culture:
+                    return "https://images.unsplash.com/photo-1596402184320-417e7178b2cd?q=80&w=1200&auto=format&fit=crop";
+                case Park:
+                    return "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?q=80&w=1200&auto=format&fit=crop";
+                case Nature:
+                    return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200&auto=format&fit=crop";
+                case Museum:
+                    return "https://images.unsplash.com/photo-1565008447742-97f6f38c985c?q=80&w=1200&auto=format&fit=crop";
+            }
+        }
+
+        return "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?q=80&w=1200&auto=format&fit=crop";
     }
 }

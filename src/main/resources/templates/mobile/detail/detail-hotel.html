@@ -32,9 +32,7 @@
     </style>
 </head>
 <body class="min-h-screen relative bg-[#0B0F19] pb-32"> <div class="fixed top-0 left-0 w-full h-[45vh] z-0">
-        <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-[#0B0F19]"></div>
-        <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="w-full h-full object-cover">
-        <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/800x1200/?luxury-hotel" class="w-full h-full object-cover">
+        <img th:src="@{${hotel.imagePath}}" class="w-full h-full object-cover" th:alt="${hotel.name}">
         
         <div class="absolute top-0 left-0 w-full p-6 flex justify-between items-center z-20 pt-10"> <a th:href="@{/android}" class="w-12 h-12 flex items-center justify-center bg-black/20 backdrop-blur-md rounded-full border border-white/10 active:scale-90 transition-transform text-white shadow-lg">
                 <i class="ri-arrow-left-line text-2xl"></i>
