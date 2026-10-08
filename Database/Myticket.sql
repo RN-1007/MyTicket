@@ -70,13 +70,13 @@ CREATE TABLE attractions (
   attraction_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) DEFAULT NULL,
   location VARCHAR(255) DEFAULT NULL,
-  category ENUM('Nature','Museum','Theme Park','Culture') DEFAULT NULL,
+  category ENUM('Nature','Museum','Park','Culture') DEFAULT NULL,
   image VARCHAR(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO attractions (attraction_id, name, location, category, image) VALUES
 (1, 'Borobudur Temple', 'Magelang', 'Culture', 'https://images.unsplash.com/photo-1596402184320-417e7178b2cd?q=80&w=1200&auto=format&fit=crop'),
-(2, 'Ancol Dreamland', 'Jakarta', 'Theme Park', 'https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?q=80&w=1200&auto=format&fit=crop');
+(2, 'Ancol Dreamland', 'Jakarta', 'Park', 'https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?q=80&w=1200&auto=format&fit=crop');
 
 -- --------------------------------------------------------
 -- Table structure for table `attraction_tickets`
