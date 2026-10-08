@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title th:text="${title}">TravelApp Mobile</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    <script>    
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], serif: ['Playfair Display', 'serif'] },
+                    colors: { brand: { dark: '#0B0F19', surface: '#151C2C', accent: '#FF8A5B' } }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #0B0F19; color: #E2E8F0; -webkit-tap-highlight-color: transparent; }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .bottom-nav-active i { color: #FF8A5B; transform: scale(1.1); }
+        .bottom-nav-active span { color: #FF8A5B; font-weight: 600; }
+    </style>
+</head>
+<body class="pb-24"> 
+    <main>
+        <div th:replace="${content}"></div>
+    </main>
+
+    <nav class="fixed bottom-0 left-0 w-full z-50 px-4 pb-4 pointer-events-none">
+        <div class="bg-[#151C2C]/90 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl flex justify-between items-center px-6 py-3 mx-auto max-w-sm pointer-events-auto relative">
+            
+            <a th:href="@{/android}" class="flex flex-col items-center gap-1 transition-all text-gray-500 hover:text-brand-accent">
+                <i class="ri-home-5-fill text-2xl transition-transform"></i>
+                <span class="text-[10px]">Home</span>
+            </a>
+
+            <a th:href="@{/android/my-orders}" class="flex flex-col items-center gap-1 transition-all text-gray-500 hover:text-brand-accent">
+                <i class="ri-ticket-2-fill text-2xl transition-transform"></i>
+                <span class="text-[10px]">Orders</span>
+            </a>
+<a sec:authorize="!isAuthenticated()" th:href="@{/android/login}" class="flex flex-col items-center gap-1 text-gray-500 hover:text-brand-accent transition-all">
+                <i class="ri-user-3-line text-2xl"></i>
+                <span class="text-[10px]">Login</span>
+            </a>
+            
+            <a sec:authorize="isAuthenticated()" th:href="@{/android/profile}" class="flex flex-col items-center gap-1 transition-all"
+               th:classappend="${currentUri == '/android/profile'} ? 'bottom-nav-active' : 'text-gray-500 hover:text-brand-accent'">
+                <i class="ri-user-3-fill text-2xl transition-transform"></i>
+                <span class="text-[10px]">Akun</span>
+            </a>        </div>
+    </nav>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</body>
+</html>

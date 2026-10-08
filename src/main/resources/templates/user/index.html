@@ -21,7 +21,13 @@
     <div th:replace="~{fragment/user-layout :: layout(title='MyTicket - Cosmic Travel', content=~{::content})}">
         <div th:fragment="content">
             
-            <section class="relative min-h-[95vh] flex flex-col justify-center items-center px-6 overflow-hidden py-20">
+            <section class="relative min-h-screen flex flex-col justify-center items-center px-6 overflow-hidden -mt-20 pt-28 pb-20">
+                <!-- Background Image -->
+                <div class="absolute inset-0 z-0 pointer-events-none">
+                    <img th:src="@{'/img/Senja Mewah di Resor Pesisir.png'}" src="/img/Senja%20Mewah%20di%20Resor%20Pesisir.png" class="w-full h-full object-cover object-top" alt="Hero Background">
+                    <div class="absolute inset-0 bg-gradient-to-b from-black/20 via-[#0B0F19]/60 to-[#0B0F19]"></div>
+                </div>
+
                 <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-accent/20 rounded-full blur-[128px] pointer-events-none animate-pulse z-0"></div>
                 <div class="absolute bottom-1/4 right-1/4 w-64 h-64 bg-blue-600/20 rounded-full blur-[100px] pointer-events-none z-0"></div>
 
@@ -38,62 +44,6 @@
                         <div class="hero-layered-img w-48 h-80 md:w-64 md:h-[28rem] rounded-[3rem] overflow-hidden border-2 border-white/10 shadow-2xl shadow-blue-500/20 rotate-[6deg] -translate-x-12 md:-translate-x-16 z-10 opacity-0 translate-y-20">
                             <img src="https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=2674&auto=format&fit=crop" class="w-full h-full object-cover grayscale-[30%]" alt="Travel">
                              <div class="absolute inset-0 bg-gradient-to-t from-brand-dark/80 to-transparent"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="absolute left-[5%] lg:left-[8%] top-[35%] hidden lg:block z-20 hero-side-widget opacity-0 -translate-x-10">
-                    <div class="glass-panel p-4 rounded-3xl border border-brand-accent/20 bg-brand-dark/40 backdrop-blur-xl shadow-xl shadow-brand-accent/5 flex items-center gap-4 w-60 transform hover:scale-105 transition-transform duration-300">
-                        <div class="w-12 h-12 rounded-full bg-brand-accent/10 flex items-center justify-center text-brand-accent relative">
-                            <i class="ri-compass-discover-line text-2xl animate-spin-slow"></i>
-                            <div class="absolute top-0 right-0 w-2 h-2 bg-brand-accent rounded-full animate-ping"></div>
-                        </div>
-                        <div>
-                            <h4 class="text-white font-bold text-sm leading-none">Destination</h4>
-                            <p class="text-accent-gradient text-xs font-bold mt-1">Mars Dunes, Sec-7</p>
-                            <p class="text-gray-500 text-[0.6rem] tracking-wider uppercase mt-0.5">Target Locked</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="absolute left-[10%] lg:left-[14%] top-[65%] hidden lg:block z-20 hero-side-widget opacity-0 -translate-x-10">
-                    <div class="glass-panel p-3 rounded-2xl border border-purple-500/20 bg-brand-dark/40 backdrop-blur-xl shadow-xl shadow-purple-500/5 flex items-center gap-3 w-52 transform hover:scale-105 transition-transform duration-300">
-                        <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400">
-                            <i class="ri-mist-line text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-white font-bold text-xs leading-none">Atmosphere</h4>
-                            <p class="text-purple-300 text-[0.65rem] mt-1 font-mono">Visibility: 98% <br> Temp: 24°C</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="absolute right-[5%] lg:right-[8%] top-[45%] hidden lg:block z-20 hero-side-widget opacity-0 translate-x-10">
-                    <div class="glass-panel p-4 rounded-3xl border border-blue-400/20 bg-brand-dark/40 backdrop-blur-xl shadow-xl shadow-blue-500/5 flex items-center gap-4 w-60 justify-between transform hover:scale-105 transition-transform duration-300">
-                        <div>
-                            <h4 class="text-white font-bold text-sm leading-none text-right">Live Travelers</h4>
-                            <p class="text-blue-400 text-xs font-bold mt-1 text-right"><i class="ri-signal-tower-line inline-block mr-1 animate-pulse"></i> 1,240 Online</p>
-                             <div class="flex justify-end -space-x-2 mt-2">
-                                <img src="https://i.pravatar.cc/150?img=1" class="w-6 h-6 rounded-full border border-brand-dark">
-                                <img src="https://i.pravatar.cc/150?img=3" class="w-6 h-6 rounded-full border border-brand-dark">
-                                <div class="w-6 h-6 rounded-full bg-brand-surface border border-brand-dark flex items-center justify-center text-[0.5rem] text-gray-300">+1k</div>
-                            </div>
-                        </div>
-                        <div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
-                            <i class="ri-earth-line text-2xl"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="absolute right-[12%] lg:right-[16%] top-[18%] hidden lg:block z-20 hero-side-widget opacity-0 translate-x-10">
-                    <div class="glass-panel p-3 rounded-2xl border border-green-500/20 bg-brand-dark/40 backdrop-blur-xl shadow-xl shadow-green-500/5 flex items-center gap-3 w-48 flex-row-reverse transform hover:scale-105 transition-transform duration-300">
-                        <div class="w-10 h-10 rounded-full bg-green-500/10 flex items-center justify-center text-green-400 relative">
-                            <i class="ri-rocket-2-line text-lg"></i>
-                            <span class="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full animate-ping"></span>
-                        </div>
-                        <div class="text-right">
-                            <h4 class="text-white font-bold text-xs leading-none">Next Launch</h4>
-                            <p class="text-green-400 text-[0.65rem] font-mono mt-1 tracking-tighter">T-MINUS 04:20:00</p>
                         </div>
                     </div>
                 </div>
@@ -124,7 +74,7 @@
                 </div>
             </section>
 
-            <section class="py-20 px-6 relative z-20">
+            <section class="py-20 relative z-20">
                  <div class="container mx-auto">
                     <div class="flex justify-between items-end mb-12">
                         <h2 class="text-3xl md:text-4xl font-bold text-white section-title">Kategori <span class="text-brand-accent font-serif italic">Populer</span></h2>
@@ -182,7 +132,7 @@
             </section>
             
             <section id="hotels" class="py-20 border-t border-white/5 bg-brand-surface/30 relative z-20">
-                <div class="container mx-auto px-6 relative group/swiper">
+                <div class="container mx-auto relative group/swiper">
                     <div class="flex justify-between items-center mb-10">
                         <h2 class="text-3xl font-bold text-white">Curated <span class="text-brand-accent font-serif italic">Stays</span></h2>
                     </div>
@@ -191,8 +141,7 @@
                         <div class="swiper-wrapper">
                             <div th:each="hotel : ${hotels}" class="swiper-slide w-[300px] md:w-[400px]">
                                 <a th:href="@{/hotel/detail/{id}(id=${hotel.hotelId})}" class="block group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-brand-accent/50 transition-colors cursor-pointer">
-                                    <img th:if="${hotel.image != null}" th:src="@{${hotel.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                                    <img th:unless="${hotel.image != null}" src="https://source.unsplash.com/random/400x500/?luxury-hotel" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                    <img th:src="@{${hotel.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" th:alt="${hotel.name}">
                                     
                                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-90"></div>
                                     
@@ -231,7 +180,7 @@
             </section>
 
             <section id="attractions" class="py-20 relative z-20">
-                <div class="container mx-auto px-6 relative group/swiper">
+                <div class="container mx-auto relative group/swiper">
                     <div class="flex justify-between items-center mb-10">
                         <h2 class="text-3xl font-bold text-white">Uncharted <span class="text-green-400 font-serif italic">Worlds</span></h2>
                     </div>
@@ -240,8 +189,7 @@
                         <div class="swiper-wrapper">
                             <div th:each="attraction : ${attractions}" class="swiper-slide w-[300px] md:w-[400px]">
                                 <a th:href="@{/attraction/detail/{id}(id=${attraction.attractionId})}" class="block group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-green-500/50 transition-colors cursor-pointer">
-                                    <img th:if="${attraction.image != null}" th:src="@{${attraction.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                                    <img th:unless="${attraction.image != null}" src="https://source.unsplash.com/random/400x500/?nature,museum,park" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                    <img th:src="@{${attraction.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" th:alt="${attraction.name}">
                                     
                                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-90"></div>
                                     
@@ -284,7 +232,7 @@
             </section>
 
             <section id="transports" class="py-20 border-t border-white/5 bg-brand-surface/30 relative z-20">
-                <div class="container mx-auto px-6 relative group/swiper">
+                <div class="container mx-auto relative group/swiper">
                     <div class="flex justify-between items-center mb-10">
                         <h2 class="text-3xl font-bold text-white">Hyper-Speed <span class="text-purple-400 font-serif italic">Fleet</span></h2>
                     </div>
@@ -293,8 +241,7 @@
                         <div class="swiper-wrapper">
                             <div th:each="transport : ${transports}" class="swiper-slide w-[300px] md:w-[400px]">
                                 <a th:href="@{/transport/detail/{id}(id=${transport.transportId})}" class="block group relative h-[500px] rounded-[2rem] overflow-hidden border border-white/10 bg-brand-dark hover:border-purple-500/50 transition-colors cursor-pointer">
-                                    <img th:if="${transport.image != null}" th:src="@{${transport.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
-                                    <img th:unless="${transport.image != null}" src="https://source.unsplash.com/random/400x500/?airplane,train,bus" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0">
+                                    <img th:src="@{${transport.imagePath}}" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0" th:alt="${transport.name}">
                                     
                                     <div class="absolute inset-0 bg-gradient-to-t from-brand-dark via-transparent to-transparent opacity-90"></div>
                                     
@@ -336,17 +283,11 @@
 
             <script>
                 document.addEventListener("DOMContentLoaded", (event) => {
-                    // GSAP TIMELINE (HERO) - TIdak Berubah
+                    // GSAP TIMELINE (HERO)
                     const tl = gsap.timeline({ delay: 0.2 });
                     tl.to(".hero-layered-img", { y: 0, opacity: 1, duration: 1.4, stagger: 0.2, ease: "power4.out" }, "start")
                       .to(".hero-content", { y: 0, opacity: 1, duration: 1, ease: "power3.out" }, "-=0.8")
-                      .to(".hero-side-widget", { x: 0, opacity: 1, duration: 1, stagger: { amount: 0.5, from: "random" }, ease: "back.out(1.5)" }, "-=1")
                       .to(".hero-search", { y: 0, opacity: 1, duration: 1, ease: "back.out(1.7)" }, "-=0.6");
-
-                    // Continuous Floating Animation
-                    gsap.utils.toArray(".hero-side-widget").forEach((widget, i) => {
-                        gsap.to(widget, { y: -15, duration: 2 + (i * 0.5), repeat: -1, yoyo: true, ease: "sine.inOut", delay: i * 0.2 });
-                    });
 
                     // BENTO GRID ANIMATION
                     gsap.from(".bento-item", { scrollTrigger: { trigger: ".bento-item", start: "top 85%" }, y: 50, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power2.out" });
@@ -418,6 +359,11 @@
                     if (target) {
                         target.scrollIntoView({ behavior: 'smooth' });
                     }
+                }
+
+                if (window.innerWidth < 768 && !window.location.pathname.startsWith('/android')) {
+                    console.log("Mobile device detected, redirecting to Android view...");
+                    window.location.href = "/android";
                 }
             </script>
         </div>

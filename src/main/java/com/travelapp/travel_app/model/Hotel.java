@@ -83,8 +83,32 @@ public class Hotel {
 
     @Transient
     public String getImagePath() {
-        if (image == null || hotelId == null) return null;
-        return "/hotel-photos/" + hotelId + "/" + image;
+        if (image != null && !image.trim().isEmpty()) {
+            if (image.startsWith("http://") || image.startsWith("https://")) {
+                return image;
+            }
+            if (hotelId != null) {
+                return "/hotel-photos/" + hotelId + "/" + image;
+            }
+        }
+
+        if (name != null) {
+            String lower = name.toLowerCase();
+            if (lower.contains("mulia") || lower.contains("jakarta") || lower.contains("city")) {
+                return "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200&auto=format&fit=crop";
+            }
+            if (lower.contains("bali") || lower.contains("resort") || lower.contains("paradise") || lower.contains("beach")) {
+                return "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop";
+            }
+            if (lower.contains("grand") || lower.contains("suite")) {
+                return "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format&fit=crop";
+            }
+        }
+
+        int hash = (hotelId != null ? hotelId : 1) % 3;
+        if (hash == 0) return "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=1200&auto=format&fit=crop";
+        if (hash == 1) return "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1200&auto=format&fit=crop";
+        return "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=1200&auto=format&fit=crop";
     }
 
     // --- METHOD BARU UNTUK MENGHITUNG HARGA TERENDAH ---

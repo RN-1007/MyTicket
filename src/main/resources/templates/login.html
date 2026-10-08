@@ -24,6 +24,14 @@
 </head>
 <body class="bg-cover bg-center h-screen relative" style="background-image: url('/img/image_login.jpg');">
     
+    <!-- Tombol Kembali ke Beranda -->
+    <a th:href="@{/}" 
+       class="absolute top-6 left-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full bg-gray-900/80 hover:bg-gray-800 text-white text-sm font-semibold border border-white/15 backdrop-blur-md shadow-2xl transition-all hover:scale-105 active:scale-95 group"
+       title="Kembali ke Beranda">
+        <i class="ri-arrow-left-line text-lg group-hover:-translate-x-1 transition-transform"></i>
+        <span>Kembali ke Beranda</span>
+    </a>
+
     <div th:if="${param.error != null || param.logout != null || successMessage != null}"
          x-data="{ show: true }"
          x-show="show"
@@ -201,6 +209,9 @@
                 icon.classList.remove('ri-eye-line');
                 icon.classList.add('ri-eye-off-line');
             }
+        }
+        if (window.innerWidth < 768 && !window.location.pathname.includes('/android')) {
+            window.location.href = "/android/login";
         }
     </script>
 

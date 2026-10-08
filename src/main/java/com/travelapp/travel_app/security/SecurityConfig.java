@@ -20,52 +20,63 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        
         http
             .authorizeHttpRequests(authz -> authz
-                // --- 1. PUBLIC ACCESS (Halaman Depan & Aset) ---
+                // --- PUBLIC ACCESS ---
                 .requestMatchers("/", "/index", "/about-us").permitAll() 
                 .requestMatchers("/hotel/detail/**", "/transport/detail/**", "/attraction/detail/**").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/vendor/**", "/img/**", "/hotel-photos/**", "/transport-photos/**", "/attraction-photos/**").permitAll() 
                 .requestMatchers("/login", "/register").permitAll() 
                 
-                // --- 2. MIDTRANS WEBHOOK ---
+                // --- ANDROID PUBLIC ACCESS ---
+                .requestMatchers(
+                    "/android", "/android/", "/android/home", "/android/login",
+                    "/android/hotel/detail/**", 
+                    "/android/transport/detail/**", 
+                    "/android/attraction/detail/**"
+
+                ).permitAll()
+                
+                // --- MIDTRANS ---
                 .requestMatchers("/api/midtrans/**").permitAll() 
 
-                // --- 3. ROLE BASED ACCESS ---
+                // --- PROTECTED ROUTES ---
                 .requestMatchers("/admin/**").hasRole("ADMIN") 
-                .requestMatchers("/my-orders", "/order/**").hasRole("USER") 
+                .requestMatchers("/my-orders", 
+                                    "/order/**",   
+                                    "/android/my-orders", 
+                                    "/android/order/**",
+                                    "/android/profile",
+                                    "/android/order/invoice/**").hasRole("USER") 
 
                 .anyRequest().authenticated()
             )
-            
             .formLogin(form -> form
                 .loginPage("/login") 
                 .loginProcessingUrl("/login") 
                 .successHandler((request, response, authentication) -> {
-                    // Redirect sesuai Role
                     if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                         response.sendRedirect("/admin/dashboard");
                     } else {
-                        // User kembali ke Home setelah login
-                        response.sendRedirect("/"); 
+                        // Redirect cerdas berdasarkan asal device/URL
+                        String referer = request.getHeader("referer");
+                        if (referer != null && referer.contains("/android")) {
+                            response.sendRedirect("/android");
+                        } else {
+                            response.sendRedirect("/");
+                        }
                     }
                 })
                 .failureUrl("/login?error=true")
                 .permitAll() 
             )
-            
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout")) 
-                .logoutSuccessUrl("/") // Logout kembali ke Home Publik
+                .logoutSuccessUrl("/") 
                 .permitAll() 
             )
             .userDetailsService(customUserDetailsService)
-            
-            // Matikan CSRF khusus untuk endpoint Midtrans
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/api/midtrans/**")
-            ); 
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/api/midtrans/**")); 
 
         return http.build();
     }

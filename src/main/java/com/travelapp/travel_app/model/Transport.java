@@ -81,9 +81,43 @@ public class Transport {
     public void setImage(String image) { 
         this.image = image; 
     }
-     @Transient
+    @Transient
     public String getImagePath() {
-        if (image == null || transportId == null) return null;
-        return "/transport-photos/" + transportId + "/" + image;
+        if (image != null && !image.trim().isEmpty()) {
+            if (image.startsWith("http://") || image.startsWith("https://")) {
+                return image;
+            }
+            if (transportId != null) {
+                return "/transport-photos/" + transportId + "/" + image;
+            }
+        }
+
+        if (provider != null && provider.getType() != null) {
+            switch (provider.getType()) {
+                case Plane:
+                    return "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1200&auto=format&fit=crop";
+                case Bus:
+                    return "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1200&auto=format&fit=crop";
+                case Train:
+                    return "https://images.unsplash.com/photo-1474487548417-781cb71495f3?q=80&w=1200&auto=format&fit=crop";
+                case Boat:
+                    return "https://images.unsplash.com/photo-1505705694340-019e1e335916?q=80&w=1200&auto=format&fit=crop";
+            }
+        }
+
+        if (name != null) {
+            String lower = name.toLowerCase();
+            if (lower.contains("plane") || lower.contains("garuda") || lower.contains("air") || lower.contains("flight") || lower.contains("ga-")) {
+                return "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1200&auto=format&fit=crop";
+            }
+            if (lower.contains("damri") || lower.contains("bus")) {
+                return "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?q=80&w=1200&auto=format&fit=crop";
+            }
+            if (lower.contains("kereta") || lower.contains("train") || lower.contains("kai")) {
+                return "https://images.unsplash.com/photo-1474487548417-781cb71495f3?q=80&w=1200&auto=format&fit=crop";
+            }
+        }
+
+        return "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?q=80&w=1200&auto=format&fit=crop";
     }
 }
